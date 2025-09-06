@@ -266,6 +266,25 @@
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
     }
 
+    /* Special styling for different TTS states */
+    #readAloudBtn[data-audio-ready="true"] {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+    0% {
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+    50% {
+        box-shadow: 0 6px 16px rgba(40, 167, 69, 0.5);
+        transform: translateY(-1px);
+    }
+    100% {
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+    }
+
     .story-btn-secondary {
     background: white;
     color: #667eea;
@@ -388,6 +407,65 @@
     flex: 1;
     }
 
+    .provider-selection {
+    display: flex;
+    gap: 15px;
+    margin-top: 5px;
+    flex-wrap: wrap;
+    }
+
+    .provider-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 8px 12px;
+    border: 1px solid #e1e5e9;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+    }
+
+    .provider-option:hover {
+    background: #e9ecef;
+    border-color: #667eea;
+    }
+
+    .provider-option input[type="radio"] {
+    margin: 0;
+    }
+
+    .provider-option input[type="radio"]:checked + .provider-label {
+    color: #667eea;
+    font-weight: 600;
+    }
+
+    .provider-option:has(input[type="radio"]:checked) {
+    background: #f0f4ff;
+    border-color: #667eea;
+    }
+
+    .provider-label {
+    user-select: none;
+    }
+
+    #openaiApiKeyInput, #anthropicApiKeyInput {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    font-family: "Courier New", monospace;
+    }
+
+    #openaiApiKeyInput:focus, #anthropicApiKeyInput:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
     @media (max-width: 600px) {
     .container {
         padding: 30px 20px;
@@ -404,5 +482,14 @@
 
     .modal-content {
         padding: 20px;
+    }
+    
+    .provider-selection {
+        gap: 10px;
+    }
+    
+    .provider-option {
+        padding: 6px 10px;
+        font-size: 0.85rem;
     }
     }

@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="EmojiStori" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <title>EmojiStori Generator</title>
+
+    <!-- PWA Icons -->
+    <link
+      rel="apple-touch-icon"
+      href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDE4MCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIiByeD0iNDAiIGZpbGw9InVybCgjZ3JhZGllbnQwX2xpbmVhcl8xXzEpIi8+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9ImdyYWRpZW50MF9saW5lYXJfMV8xIiB4MT0iMCIgeTE9IjAiIHgyPSIxODAiIHkyPSIxODAiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KPHN0b3Agc3RvcC1jb2xvcj0iIzY2N2VlYSIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM3NjRiYTIiLz4KPC9saW5lYXJHcmFkaWVudD4KPC9kZWZzPgo8dGV4dCB4PSI5MCIgeT0iMTEwIiBmb250LXNpemU9IjcwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7inKg8L3RleHQ+Cjwvc3ZnPgo="
+    />
+    <link
+      rel="manifest"
+      href="data:application/json;base64,eyJuYW1lIjoiRW1vamkgU3RvcnkgR2VuZXJhdG9yIiwic2hvcnRfbmFtZSI6IkVtb2ppIFN0b3JpZXMiLCJzdGFydF91cmwiOiIuIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzY2N2VlYSIsInRoZW1lX2NvbG9yIjoiIzY2N2VlYSIsImljb25zIjpbeyJzcmMiOiJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUIzYVdSMGFEMGlNVGd3SWlCb1pXbG5hSFE5SWpFNE1DSWlJSFpwWlhkQ2IzZzlJakFnTUNBeE9EQWdNVGd3SWlCbWFXeHNQU0p1YjI1bElpQjRiV3h1Y3owaWFIUjBjRG92TDNkM2R5NTNNeTV2Y21jdk1qQXdNQzl6ZG1jaVBnbzhjbVZqZENCM2FXUjBhRDBpTVRnd0lpQm9aV2xuYUhROUlqRTRNQ0lpSUhKNFBTSTBNQ0lpSUdacGJHdzlJblZ5YkNnamNYSmhaR2xsYm5Rd1gyeHBibVZoY2w5eE1qRXBJaTgrQ2p4a1pXWnpQZ285YkdsdVpXRnlSM0poWkdsbGJuUWdhV1E5SW1keVlXUnBaVzUwTUY5c2FXNWxZWEpmTVY4eElpQjRNVDBpTUNJZ2VURTlJakFpSUhneFBTSTBNQ0lpSUhreFBTSTBNQ0lnWjNKaFpHbGxiblJWYm1sMGN6MGlkWE5sY2xOd1lXTmxUMjVWYzJVaVBnbzljM1J2Y0NCemRHOXdMV052Ykc5eVBTSWpOalkzWldWaElpOCtDanh6ZEc5d0lHOW1abk5sZEQwaU1TSWdjM1J2Y0MxamIyeHZjajBpSXpjMk5HSmhNaUl2UGdvOEwyeHBibVZoY2tkeVlXUnBaVzUwUGdvOEwyUmxabk0rQ2p4MFpYaDBJSGc5SWprd0lpQjVQU0l4TVRBaUlHWnZiblF0YzJsNlpUMGlOekFpSUhSbGVIUXRZVzVqYUc5eVBTSnRhV1JrYkdVaVBqaGJhWGtiTDNSbGVIUStDand2YzNablBnbz0iLCJzaXplcyI6IjE4MHgxODAiLCJ0eXBlIjoiaW1hZ2Uvc3ZnK3htbCJ9XX0="
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+        max-width: 600px;
+        width: 100%;
+      }
+
+      h1 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 30px;
+        font-size: 2.5rem;
+        font-weight: 700;
+      }
+
+      .settings-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 10;
+      }
+
+      .settings-btn:hover {
+        background: white;
+        transform: scale(1.1);
+      }
+
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 20px;
+      }
+
+      .modal.show {
+        display: flex;
+      }
+
+      .modal-content {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        max-width: 500px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .modal-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #333;
+      }
+
+      .close-btn {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #999;
+        padding: 5px;
+      }
+
+      .close-btn:hover {
+        color: #333;
+      }
+
+      .input-section {
+        margin-bottom: 30px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 10px;
+        color: #555;
+        font-weight: 600;
+        font-size: 1.1rem;
+      }
+
+      #emojiInput {
+        width: 100%;
+        padding: 15px 20px;
+        border: 2px solid #e1e5e9;
+        border-radius: 12px;
+        font-size: 2rem;
+        line-height: 1.4;
+        min-height: 80px;
+        resize: vertical;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+      }
+
+      #emojiInput:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        background: white;
+      }
+
+      #apiKeyInput {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e1e5e9;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        font-family: "Courier New", monospace;
+      }
+
+      #apiKeyInput:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+      }
+
+      .btn-secondary {
+        background: #f8f9fa;
+        color: #666;
+        border: 1px solid #e1e5e9;
+      }
+
+      .btn-secondary:hover {
+        background: #e9ecef;
+      }
+
+      #generateBtn {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.2rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      #generateBtn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+      }
+
+      #generateBtn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .loading {
+        display: none;
+        text-align: center;
+        margin: 20px 0;
+        color: #667eea;
+        font-weight: 600;
+      }
+
+      .loading.show {
+        display: block;
+      }
+
+      .story-output {
+        margin-top: 30px;
+        padding: 25px;
+        background: #f8f9fa;
+        border-radius: 12px;
+        border-left: 4px solid #667eea;
+        display: none;
+      }
+
+      .story-output.show {
+        display: block;
+        animation: fadeIn 0.5s ease;
+      }
+
+      .story-controls {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+      }
+
+      .story-btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .story-btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .story-btn-primary:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      }
+
+      .story-btn-secondary {
+        background: white;
+        color: #667eea;
+        border: 2px solid #667eea;
+      }
+
+      .story-btn-secondary:hover:not(:disabled) {
+        background: #667eea;
+        color: white;
+      }
+
+      .story-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .voice-controls {
+        display: none;
+        margin-top: 10px;
+        padding: 15px;
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #e1e5e9;
+      }
+
+      .voice-controls.show {
+        display: block;
+      }
+
+      .voice-select {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #e1e5e9;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+      }
+
+      .voice-controls label {
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+        font-weight: 500;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .story-output h3 {
+        color: #333;
+        margin-bottom: 15px;
+        font-size: 1.3rem;
+      }
+
+      .story-text {
+        color: #555;
+        line-height: 1.6;
+        font-size: 1.1rem;
+      }
+
+      .error {
+        background: #fee;
+        border-left-color: #e74c3c;
+        color: #c0392b;
+      }
+
+      .hint {
+        text-align: center;
+        color: #888;
+        font-style: italic;
+        margin-top: 10px;
+        font-size: 0.9rem;
+      }
+
+      .api-info {
+        background: #e8f4f8;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 0.9rem;
+        color: #2c5aa0;
+      }
+
+      .api-info a {
+        color: #2c5aa0;
+        text-decoration: underline;
+      }
+
+      .status-indicator {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 8px;
+      }
+
+      .status-connected {
+        background: #28a745;
+      }
+
+      .status-disconnected {
+        background: #dc3545;
+      }
+
+      .modal-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+      }
+
+      .modal-actions .btn {
+        flex: 1;
+      }
+
+      @media (max-width: 600px) {
+        .container {
+          padding: 30px 20px;
+        }
+
+        h1 {
+          font-size: 2rem;
+        }
+
+        #emojiInput {
+          font-size: 1.5rem;
+          min-height: 60px;
+        }
+
+        .modal-content {
+          padding: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <button class="settings-btn" id="settingsBtn" title="Settings">⚙️</button>
+
+      <h1>✨ EmojiStori Generator ✨</h1>
+
+      <div class="input-section">
+        <label for="emojiInput">Enter your emojis:</label>
+        <textarea
+          id="emojiInput"
+          placeholder="🐸🌟🏰👑..."
+          inputmode="text"
+        ></textarea>
+        <div class="hint">
+          Tap here and your emoji keyboard will appear on mobile! 📱
+        </div>
+      </div>
+
+      <button id="generateBtn">Generate Story</button>
+
+      <div class="loading" id="loading">
+        <div>🎭 Creating your magical story...</div>
+      </div>
+
+      <div class="story-output" id="storyOutput">
+        <h3>📚 Your Story:</h3>
+        <div class="story-text" id="storyText"></div>
+        <div class="story-controls">
+          <button class="story-btn story-btn-primary" id="readAloudBtn">
+            🔊 Read Aloud
+          </button>
+          <button
+            class="story-btn story-btn-secondary"
+            id="stopReadingBtn"
+            style="display: none"
+          >
+            ⏹️ Stop
+          </button>
+          <button class="story-btn story-btn-secondary" id="voiceSettingsBtn">
+            🎭 Voice
+          </button>
+        </div>
+        <div class="voice-controls" id="voiceControls">
+          <label for="voiceSelect">Choose Voice:</label>
+          <select id="voiceSelect" class="voice-select"></select>
+          <label for="speedRange"
+            >Speed: <span id="speedValue">1.0x</span></label
+          >
+          <input
+            type="range"
+            id="speedRange"
+            min="0.5"
+            max="2"
+            step="0.1"
+            value="1"
+            style="width: 100%"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">⚙️ Settings</h2>
+          <button class="close-btn" id="closeModal">&times;</button>
+        </div>
+
+        <div class="api-info">
+          <div style="margin-bottom: 10px">
+            <span class="status-indicator" id="apiStatus"></span>
+            <strong id="apiStatusText">API Key Required</strong>
+          </div>
+          <p>
+            You need an Anthropic API key to generate stories. Get yours at
+            <a href="https://console.anthropic.com" target="_blank"
+              >console.anthropic.com</a
+            >
+          </p>
+        </div>
+
+        <div class="input-section">
+          <label for="apiKeyInput">Anthropic API Key:</label>
+          <input
+            type="password"
+            id="apiKeyInput"
+            placeholder="sk-ant-..."
+            autocomplete="off"
+          />
+        </div>
+        <div class="input-section" id="settingsVoiceControls">
+          <label for="settingsVoiceSelect">Choose Voice:</label>
+          <select id="settingsVoiceSelect" class="voice-select"></select>
+          <label for="settingsSpeedRange"
+            >Speed: <span id="settingsSpeedValue">1.0x</span></label
+          >
+          <input
+            type="range"
+            id="settingsSpeedRange"
+            min="0.5"
+            max="2"
+            step="0.1"
+            value="1"
+            style="width: 100%"
+          />
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-secondary" id="clearApiKey">Clear Key</button>
+          <button class="btn btn-primary" id="saveApiKey">Save Key</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const emojiInput = document.getElementById("emojiInput");
+      const generateBtn = document.getElementById("generateBtn");
+      const loading = document.getElementById("loading");
+      const storyOutput = document.getElementById("storyOutput");
+      const storyText = document.getElementById("storyText");
+      const settingsBtn = document.getElementById("settingsBtn");
+      const settingsModal = document.getElementById("settingsModal");
+      const closeModal = document.getElementById("closeModal");
+      const apiKeyInput = document.getElementById("apiKeyInput");
+      const saveApiKey = document.getElementById("saveApiKey");
+      const clearApiKey = document.getElementById("clearApiKey");
+      const apiStatus = document.getElementById("apiStatus");
+      const apiStatusText = document.getElementById("apiStatusText");
+      const readAloudBtn = document.getElementById("readAloudBtn");
+      const stopReadingBtn = document.getElementById("stopReadingBtn");
+      const voiceSettingsBtn = document.getElementById("voiceSettingsBtn");
+      const voiceControls = document.getElementById("voiceControls");
+      const voiceSelect = document.getElementById("voiceSelect");
+      const speedRange = document.getElementById("speedRange");
+      const speedValue = document.getElementById("speedValue");
+      const settingsVoiceSelect = document.getElementById(
+        "settingsVoiceSelect"
+      );
+      const settingsSpeedRange = document.getElementById("settingsSpeedRange");
+      const settingsSpeedValue = document.getElementById("settingsSpeedValue");
+
+      let apiKey = "";
+      let speechSynthesis = window.speechSynthesis;
+      let currentUtterance = null;
+      let voices = [];
+
+      // Initialize app
+      function init() {
+        loadApiKey();
+        setupEmojiInput();
+        updateApiStatus();
+        initSpeech();
+
+        // Check if API key exists on startup
+        if (!apiKey) {
+          setTimeout(() => {
+            showSettings();
+          }, 500);
+        }
+      }
+
+      // Speech Synthesis Setup
+      function initSpeech() {
+        if ("speechSynthesis" in window) {
+          loadVoices();
+          speechSynthesis.onvoiceschanged = loadVoices;
+
+          // Setup speed control for story output
+          speedRange.addEventListener("input", function () {
+            speedValue.textContent = this.value + "x";
+            saveVoicePreferences();
+          });
+
+          // Setup voice selection change for story output
+          voiceSelect.addEventListener("change", function () {
+            saveVoicePreferences();
+          });
+
+          // Setup speed control for settings
+          settingsSpeedRange.addEventListener("input", function () {
+            settingsSpeedValue.textContent = this.value + "x";
+            speedRange.value = this.value;
+            speedValue.textContent = this.value + "x";
+            saveVoicePreferences();
+          });
+
+          // Setup voice selection change for settings
+          settingsVoiceSelect.addEventListener("change", function () {
+            voiceSelect.value = this.value;
+            saveVoicePreferences();
+          });
+        } else {
+          readAloudBtn.style.display = "none";
+          console.log("Speech synthesis not supported");
+        }
+      }
+
+      function loadVoices() {
+        voices = speechSynthesis.getVoices();
+        voiceSelect.innerHTML = "";
+        settingsVoiceSelect.innerHTML = "";
+
+        // Filter for English voices and prioritize quality ones
+        const englishVoices = voices.filter(
+          (voice) =>
+            voice.lang.startsWith("en") ||
+            voice.lang.includes("US") ||
+            voice.lang.includes("GB")
+        );
+
+        // Add all English voices to both selects
+        englishVoices.forEach((voice, index) => {
+          const option = document.createElement("option");
+          option.value = index;
+          option.textContent = `${voice.name} (${voice.lang})`;
+
+          const settingsOption = document.createElement("option");
+          settingsOption.value = index;
+          settingsOption.textContent = `${voice.name} (${voice.lang})`;
+
+          // Mark default voice
+          if (voice.default) {
+            option.selected = true;
+            settingsOption.selected = true;
+          }
+
+          voiceSelect.appendChild(option);
+          settingsVoiceSelect.appendChild(settingsOption);
+        });
+
+        // If no English voices, add all voices
+        if (englishVoices.length === 0) {
+          voices.forEach((voice, index) => {
+            const option = document.createElement("option");
+            option.value = index;
+            option.textContent = `${voice.name} (${voice.lang})`;
+
+            const settingsOption = document.createElement("option");
+            settingsOption.value = index;
+            settingsOption.textContent = `${voice.name} (${voice.lang})`;
+
+            voiceSelect.appendChild(option);
+            settingsVoiceSelect.appendChild(settingsOption);
+          });
+        }
+
+        // Load saved voice preferences
+        loadVoicePreferences();
+      }
+
+      function readStoryAloud() {
+        const text = storyText.textContent;
+
+        if (!text || text.includes("❌") || text.includes("Oops!")) {
+          showError("No story to read! Generate a story first. 📖");
+          return;
+        }
+
+        // Stop any current speech
+        if (currentUtterance) {
+          speechSynthesis.cancel();
+        }
+
+        // Create new utterance
+        currentUtterance = new SpeechSynthesisUtterance(text);
+
+        // Get selected voice
+        const selectedVoiceIndex = voiceSelect.value;
+        if (voices[selectedVoiceIndex]) {
+          currentUtterance.voice = voices[selectedVoiceIndex];
+        }
+
+        // Set speech rate
+        currentUtterance.rate = parseFloat(speedRange.value);
+
+        // Set pitch (slightly higher for kid-friendly tone)
+        currentUtterance.pitch = 1.1;
+
+        // Event handlers
+        currentUtterance.onstart = function () {
+          readAloudBtn.style.display = "none";
+          stopReadingBtn.style.display = "inline-flex";
+          readAloudBtn.disabled = true;
+        };
+
+        currentUtterance.onend = function () {
+          readAloudBtn.style.display = "inline-flex";
+          stopReadingBtn.style.display = "none";
+          readAloudBtn.disabled = false;
+          currentUtterance = null;
+        };
+
+        currentUtterance.onerror = function (event) {
+          console.error("Speech synthesis error:", event);
+          showError("Sorry, there was an error reading the story. 🔊");
+          readAloudBtn.style.display = "inline-flex";
+          stopReadingBtn.style.display = "none";
+          readAloudBtn.disabled = false;
+        };
+
+        // Start speaking
+        speechSynthesis.speak(currentUtterance);
+      }
+
+      function stopReading() {
+        if (currentUtterance) {
+          // Clear the error handler to prevent it from showing an error when we cancel
+          currentUtterance.onerror = null;
+          speechSynthesis.cancel();
+          readAloudBtn.style.display = "inline-flex";
+          stopReadingBtn.style.display = "none";
+          readAloudBtn.disabled = false;
+          currentUtterance = null;
+        }
+      }
+
+      function toggleVoiceSettings() {
+        voiceControls.classList.toggle("show");
+      }
+
+      // Voice preference management
+      function saveVoicePreferences() {
+        const preferences = {
+          voiceIndex: voiceSelect.value,
+          speed: speedRange.value,
+        };
+        localStorage.setItem("voice_preferences", JSON.stringify(preferences));
+      }
+
+      function loadVoicePreferences() {
+        const saved = localStorage.getItem("voice_preferences");
+        if (saved) {
+          try {
+            const preferences = JSON.parse(saved);
+            if (preferences.voiceIndex !== undefined) {
+              voiceSelect.value = preferences.voiceIndex;
+              settingsVoiceSelect.value = preferences.voiceIndex;
+            }
+            if (preferences.speed !== undefined) {
+              speedRange.value = preferences.speed;
+              settingsSpeedRange.value = preferences.speed;
+              speedValue.textContent = preferences.speed + "x";
+              settingsSpeedValue.textContent = preferences.speed + "x";
+            }
+          } catch (e) {
+            console.error("Error loading voice preferences:", e);
+          }
+        }
+      }
+
+      // API Key Management
+      function loadApiKey() {
+        apiKey = localStorage.getItem("anthropic_api_key") || "";
+        apiKeyInput.value = apiKey;
+      }
+
+      function saveApiKeyToStorage() {
+        const newKey = apiKeyInput.value.trim();
+        if (newKey) {
+          localStorage.setItem("anthropic_api_key", newKey);
+          apiKey = newKey;
+          showSuccess("API key saved successfully! 🔑");
+        } else {
+          showError("Please enter a valid API key");
+          return;
+        }
+        updateApiStatus();
+        hideSettings();
+      }
+
+      function clearApiKeyFromStorage() {
+        localStorage.removeItem("anthropic_api_key");
+        apiKey = "";
+        apiKeyInput.value = "";
+        updateApiStatus();
+        showSuccess("API key cleared");
+      }
+
+      function updateApiStatus() {
+        if (apiKey) {
+          apiStatus.className = "status-indicator status-connected";
+          apiStatusText.textContent = "API Key Connected";
+          generateBtn.disabled = false;
+        } else {
+          apiStatus.className = "status-indicator status-disconnected";
+          apiStatusText.textContent = "API Key Required";
+          generateBtn.disabled = true;
+        }
+      }
+
+      // Modal Management
+      function showSettings() {
+        settingsModal.classList.add("show");
+        apiKeyInput.focus();
+      }
+
+      function hideSettings() {
+        settingsModal.classList.remove("show");
+      }
+
+      // Function to trigger emoji keyboard on iOS
+      function setupEmojiInput() {
+        emojiInput.setAttribute("inputmode", "text");
+
+        emojiInput.addEventListener("focus", function () {
+          if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+            setTimeout(() => {
+              this.focus();
+            }, 100);
+          }
+        });
+      }
+
+      // Generate story using Claude API
+      async function generateStory() {
+        const emojis = emojiInput.value.trim();
+
+        if (!emojis) {
+          showError("Please enter some emojis first! 🎭");
+          return;
+        }
+
+        if (!apiKey) {
+          showError("Please set your API key in settings first! ⚙️");
+          showSettings();
+          return;
+        }
+
+        try {
+          setLoading(true);
+          hideStory();
+
+          const prompt = `Create a fun, imaginative, and kid-friendly story inspired by these emojis: ${emojis}
+
+Please make it:
+- Appropriate for children ages 5-12
+- Creative and engaging
+- 3-4 paragraphs long (about 4-6 sentences total)
+- Include line breaks between the title and all paragraphs
+- Use the emojis as inspiration for characters, settings, or story elements
+- Have a positive, uplifting message
+- DO NOT include any emojis in the actual story text - only use words
+- Write in a storytelling style that's perfect for reading aloud
+
+Turn these emojis into a magical adventure story!`;
+
+          fetch("https://api.anthropic.com/v1/messages", {
+            method: "POST",
+            headers: {
+              "x-api-key": apiKey,
+              "anthropic-version": "2023-06-01",
+              "content-type": "application/json",
+              "anthropic-dangerous-direct-browser-access": "true",
+            },
+            body: JSON.stringify({
+              model: "claude-3-haiku-20240307",
+              max_tokens: 1024,
+              messages: [
+                {
+                  role: "user",
+                  content: [{ type: "text", text: prompt }],
+                },
+              ],
+            }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              const story = data.content[0].text;
+              // replace `\n` with line breaks
+              showStory(story.replace(/\n/g, "<br>"));
+            });
+        } catch (error) {
+          console.error("Error generating story:", error);
+          if (error.message.includes("API key")) {
+            showError("❌ " + error.message + " Check your settings! ⚙️");
+            setTimeout(showSettings, 2000);
+          } else {
+            showError(
+              "Oops! Something went wrong creating your story. Please try again! 🔄"
+            );
+          }
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      function setLoading(isLoading) {
+        generateBtn.disabled = isLoading || !apiKey;
+        generateBtn.textContent = isLoading
+          ? "Creating Story..."
+          : "Generate Story";
+
+        if (isLoading) {
+          loading.classList.add("show");
+        } else {
+          loading.classList.remove("show");
+        }
+      }
+
+      function showStory(story) {
+        storyText.innerHTML = story;
+        storyOutput.classList.remove("error");
+        storyOutput.classList.add("show");
+      }
+
+      function showError(message) {
+        storyText.textContent = message;
+        storyOutput.classList.add("error");
+        storyOutput.classList.add("show");
+      }
+
+      function showSuccess(message) {
+        storyText.textContent = message;
+        storyOutput.classList.remove("error");
+        storyOutput.classList.add("show");
+        setTimeout(hideStory, 3000);
+      }
+
+      function hideStory() {
+        storyOutput.classList.remove("show");
+      }
+
+      // Event listeners
+      generateBtn.addEventListener("click", generateStory);
+      settingsBtn.addEventListener("click", showSettings);
+      closeModal.addEventListener("click", hideSettings);
+      saveApiKey.addEventListener("click", saveApiKeyToStorage);
+      clearApiKey.addEventListener("click", clearApiKeyFromStorage);
+      readAloudBtn.addEventListener("click", readStoryAloud);
+      stopReadingBtn.addEventListener("click", stopReading);
+      voiceSettingsBtn.addEventListener("click", toggleVoiceSettings);
+
+      // Modal click outside to close
+      settingsModal.addEventListener("click", function (e) {
+        if (e.target === settingsModal) {
+          hideSettings();
+        }
+      });
+
+      // Enter key to save API key
+      apiKeyInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          saveApiKeyToStorage();
+        }
+      });
+
+      // Allow Enter key to generate (with Shift+Enter for new lines)
+      emojiInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          generateStory();
+        }
+      });
+
+      // Initialize app
+      init();
+
+      // Auto-focus input on page load for mobile
+      window.addEventListener("load", function () {
+        if (apiKey) {
+          setTimeout(() => {
+            emojiInput.focus();
+          }, 500);
+        }
+      });
+    </script>
+  </body>
+</html>

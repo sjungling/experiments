@@ -332,6 +332,8 @@ function updateTTSButtons(state, audioElement = null) {
       readAloudBtn.disabled = true;
       readAloudBtn.style.display = "inline-flex";
       stopReadingBtn.style.display = "none";
+      readAloudBtn.classList.remove('playing');
+      stopReadingBtn.classList.remove('playing');
       break;
       
     case 'ready':
@@ -342,12 +344,16 @@ function updateTTSButtons(state, audioElement = null) {
       // Store audio element for click-to-play
       readAloudBtn.dataset.audioReady = 'true';
       readAloudBtn._audioElement = audioElement;
+      readAloudBtn.classList.remove('playing');
+      stopReadingBtn.classList.remove('playing');
       break;
       
     case 'playing':
       readAloudBtn.style.display = "none";
       stopReadingBtn.style.display = "inline-flex";
       readAloudBtn.disabled = true;
+      readAloudBtn.classList.remove('playing');
+      stopReadingBtn.classList.add('playing');
       break;
       
     case 'idle':
@@ -358,6 +364,8 @@ function updateTTSButtons(state, audioElement = null) {
       stopReadingBtn.style.display = "none";
       readAloudBtn.dataset.audioReady = 'false';
       readAloudBtn._audioElement = null;
+      readAloudBtn.classList.remove('playing');
+      stopReadingBtn.classList.remove('playing');
       break;
   }
 }
@@ -710,8 +718,10 @@ function setLoading(isLoading) {
 
   if (isLoading) {
     loading.classList.add("show");
+    generateBtn.classList.add("generating");
   } else {
     loading.classList.remove("show");
+    generateBtn.classList.remove("generating");
   }
 }
 
@@ -786,7 +796,7 @@ readAloudBtn.addEventListener("click", function() {
   }
 });
 stopReadingBtn.addEventListener("click", stopReading);
-voiceSettingsBtn.addEventListener("click", toggleVoiceSettings);
+voiceSettingsBtn.addEventListener("click", showSettings);
 
 // Modal click outside to close
 settingsModal.addEventListener("click", function (e) {

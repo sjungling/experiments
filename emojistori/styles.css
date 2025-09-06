@@ -8,34 +8,45 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
         Oxygen, Ubuntu, Cantarell, sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
+    height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 20px;
+    overflow: hidden;
     }
 
     .container {
     background: white;
     border-radius: 20px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    padding: 40px;
+    padding: 20px;
     max-width: 600px;
     width: 100%;
+    height: calc(100vh - 40px);
+    max-height: calc(100vh - 40px);
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    gap: 20px;
+    overflow: hidden;
+    }
+
+    .header-area {
+    position: relative;
     }
 
     h1 {
     text-align: center;
     color: #333;
-    margin-bottom: 30px;
+    margin-bottom: 0;
     font-size: 2.5rem;
     font-weight: 700;
     }
 
     .settings-btn {
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 0;
+    right: 0;
     background: rgba(255, 255, 255, 0.9);
     border: none;
     border-radius: 50%;
@@ -106,8 +117,21 @@
     color: #333;
     }
 
+    .input-area {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    }
+
     .input-section {
-    margin-bottom: 30px;
+    margin-bottom: 0;
+    }
+
+    .story-area {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
     }
 
     label {
@@ -205,9 +229,64 @@
     }
 
     #generateBtn:disabled {
-    opacity: 0.7;
+    opacity: 0.9;
     cursor: not-allowed;
     transform: none;
+    }
+
+    #generateBtn.generating {
+    animation: generateSparkle 2s ease-in-out infinite;
+    position: relative;
+    overflow: hidden;
+    }
+
+    #generateBtn.generating::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: sparkleMove 1.5s ease-in-out infinite;
+    }
+
+    @keyframes generateSparkle {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    25% {
+        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.5);
+        background: linear-gradient(135deg, #7c8df0 0%, #8657b8 100%);
+    }
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 18px 40px rgba(102, 126, 234, 0.6);
+        background: linear-gradient(135deg, #8a9bf6 0%, #9663ce 100%);
+    }
+    75% {
+        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.5);
+        background: linear-gradient(135deg, #7c8df0 0%, #8657b8 100%);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    }
+
+    @keyframes sparkleMove {
+    0% {
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+    }
+    50% {
+        transform: translateX(0%) translateY(0%) rotate(45deg);
+    }
+    100% {
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+    }
     }
 
     .loading {
@@ -223,24 +302,29 @@
     }
 
     .story-output {
-    margin-top: 30px;
-    padding: 25px;
+    margin-top: 0;
+    padding: 20px;
     background: #f8f9fa;
     border-radius: 12px;
     border-left: 4px solid #667eea;
     display: none;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
     }
 
     .story-output.show {
-    display: block;
+    display: flex;
+    flex-direction: column;
     animation: fadeIn 0.5s ease;
     }
 
     .story-controls {
     display: flex;
     gap: 10px;
-    margin-top: 15px;
+    margin-top: 0;
     flex-wrap: wrap;
+    flex-shrink: 0;
     }
 
     .story-btn {
@@ -269,19 +353,114 @@
     /* Special styling for different TTS states */
     #readAloudBtn[data-audio-ready="true"] {
     background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-    animation: pulse 2s infinite;
+    animation: audioSparkle 2s ease-in-out infinite;
+    position: relative;
+    overflow: hidden;
     }
 
-    @keyframes pulse {
+    #readAloudBtn[data-audio-ready="true"]::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    animation: audioSparkleMove 1.2s ease-in-out infinite;
+    }
+
+    .story-btn.playing {
+    animation: audioPlaySparkle 1.8s ease-in-out infinite;
+    position: relative;
+    overflow: hidden;
+    }
+
+    .story-btn.playing::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: audioPlaySparkleMove 1.3s ease-in-out infinite;
+    }
+
+    @keyframes audioSparkle {
     0% {
         box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    }
+    25% {
+        box-shadow: 0 6px 16px rgba(40, 167, 69, 0.5);
+        background: linear-gradient(135deg, #34ce57 0%, #2dd4a7 100%);
     }
     50% {
-        box-shadow: 0 6px 16px rgba(40, 167, 69, 0.5);
         transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(40, 167, 69, 0.6);
+        background: linear-gradient(135deg, #40d568 0%, #3ae1b7 100%);
+    }
+    75% {
+        box-shadow: 0 6px 16px rgba(40, 167, 69, 0.5);
+        background: linear-gradient(135deg, #34ce57 0%, #2dd4a7 100%);
     }
     100% {
         box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    }
+    }
+
+    @keyframes audioPlaySparkle {
+    0% {
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    25% {
+        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+        background: linear-gradient(135deg, #7c8df0 0%, #8657b8 100%);
+    }
+    50% {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.6);
+        background: linear-gradient(135deg, #8a9bf6 0%, #9663ce 100%);
+    }
+    75% {
+        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+        background: linear-gradient(135deg, #7c8df0 0%, #8657b8 100%);
+    }
+    100% {
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    }
+
+    @keyframes audioSparkleMove {
+    0% {
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        opacity: 0;
+    }
+    50% {
+        transform: translateX(0%) translateY(0%) rotate(45deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+        opacity: 0;
+    }
+    }
+
+    @keyframes audioPlaySparkleMove {
+    0% {
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        opacity: 0;
+    }
+    50% {
+        transform: translateX(0%) translateY(0%) rotate(45deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+        opacity: 0;
     }
     }
 
@@ -351,6 +530,9 @@
     color: #555;
     line-height: 1.6;
     font-size: 1.1rem;
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 15px;
     }
 
     .error {
@@ -467,17 +649,38 @@
     }
 
     @media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+
     .container {
-        padding: 30px 20px;
+        padding: 15px;
+        height: calc(100vh - 20px);
+        max-height: calc(100vh - 20px);
+        gap: 15px;
     }
 
     h1 {
-        font-size: 2rem;
+        font-size: 1.8rem;
+        margin-bottom: 0;
     }
 
     #emojiInput {
         font-size: 1.5rem;
         min-height: 60px;
+        padding: 12px 15px;
+    }
+
+    .input-area {
+        gap: 12px;
+    }
+
+    .story-output {
+        padding: 15px;
+    }
+
+    .story-text {
+        font-size: 1rem;
     }
 
     .modal-content {

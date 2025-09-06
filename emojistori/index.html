@@ -2,7 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="EmojiStori" />
@@ -16,68 +19,74 @@
     />
     <link
       rel="manifest"
-      href="data:application/json;base64,eyJuYW1lIjoiRW1vamkgU3RvcnkgR2VuZXJhdG9yIiwic2hvcnRfbmFtZSI6IkVtb2ppIFN0b3JpZXMiLCJzdGFydF91cmwiOiIuIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzY2N2VlYSIsInRoZW1lX2NvbG9yIjoiIzY2N2VlYSIsImljb25zIjpbeyJzcmMiOiJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUIzYVdSMGFEMGlNVGd3SWlCb1pXbG5hSFE5SWpFNE1DSWlJSFpwWlhkQ2IzZzlJakFnTUNBeE9EQWdNVGd3SWlCbWFXeHNQU0p1YjI1bElpQjRiV3h1Y3owaWFIUjBjRG92TDNkM2R5NTNNeTV2Y21jdk1qQXdNQzl6ZG1jaVBnbzhjbVZqZENCM2FXUjBhRDBpTVRnd0lpQm9aV2xuYUhROUlqRTRNQ0lpSUhKNFBTSTBNQ0lpSUdacGJHdzlJblZ5YkNnamNYSmhaR2xsYm5Rd1gyeHBibVZoY2w5eE1qRXBJaTgrQ2p4a1pXWnpQZ285YkdsdVpXRnlSM0poWkdsbGJuUWdhV1E5SW1keVlXUnBaVzUwTUY5c2FXNWxZWEpmTVY4eElpQjRNVDBpTUNJZ2VURTlJakFpSUhneFBTSTBNQ0lpSUhreFBTSTBNQ0lnWjNKaFpHbGxiblJWYm1sMGN6MGlkWE5sY2xOd1lXTmxUMjVWYzJVaVBnbzljM1J2Y0NCemRHOXdMV052Ykc5eVBTSWpOalkzWldWaElpOCtDanh6ZEc5d0lHOW1abk5sZEQwaU1TSWdjM1J2Y0MxamIyeHZjajBpSXpjMk5HSmhNaUl2UGdvOEwyeHBibVZoY2tkeVlXUnBaVzUwUGdvOEwyUmxabk0rQ2p4MFpYaDBJSGc5SWprd0lpQjVQU0l4TVRBaUlHWnZiblF0YzJsNlpUMGlOekFpSUhSbGVIUXRZVzVqYUc5eVBTSnRhV1JrYkdVaVBqaGJhWGtiTDNSbGVIUStDand2YzNablBnbz0iLCJzaXplcyI6IjE4MHgxODAiLCJ0eXBlIjoiaW1hZ2Uvc3ZnK3htbCJ9XX0="
+      href="data:application/json;base64,eyJuYW1lIjoiRW1vamlTdG9yaWVzIiwic2hvcnRfbmFtZSI6IkVtb2ppU3RvcmllcyIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjNjY3ZWVhIiwidGhlbWVfY29sb3IiOiIjNjY3ZWVhIiwiaWNvbnMiOlt7InNyYyI6ImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjNhV1IwYUQwaU1UZ3dJaUJvWldsbmFIUTlJakU0TUNJaUlIWnBaWGRDYjNnOUlqQWdNQ0F4T0RBZ01UZ3dJaUJtYVd4c1BTSnViMjVsSWlCNGJXeHVjejBpYUhSMGNEb3ZMM2QzZHk1M015NXZjbWN2TWpBd01DOXpkbWNpUGdvOGNtVmpkQ0IzYVdSMGFEMGlNVGd3SWlCb1pXbG5hSFE5SWpFNE1DSWlJSEo0UFNJME1DSWlJR1pwYkd3OUluVnliQ2dqY1hKaFpHbGxiblF3WDJ4cGJtVmhjbDl4TWpFcElpOCtDanhrWldaelBnbzliR2x1WldGeVIzSmhaR2xsYm5RZ2FXUTlJbWR5WVdScFpXNTBNRjlzYVc1bFlYSmZNVjh4SWlCNE1UMGlNQ0lnZVRFOUlqQWlJSGd4UFNJME1DSWlJSGt4UFNJME1DSWdaM0poWkdsbGJuUlZibWwwY3owaWRYTmxjbE53WVdObFQyNVZjMlVpUGdvOWMzUnZjQ0J6ZEc5d0xXTnZiRzl5UFNJak5qWTNaV1ZoSWk4K0NqeHpkRzl3SUc5bVpuTmxkRDBpTVNJZ2MzUnZjQzFqYjJ4dmNqMGlJemMyTkdKaE1pSXZQZ284TDJ4cGJtVmhja2R5WVdScFpXNTBQZ284TDJSbFpuTStDangwWlhoMElIZzlJamt3SWlCNVBTSXhNVEFpSUdadmJuUXRjMmw2WlQwaU56QWlJSFJsZUhRdFlXNWphRzl5UFNKdGFXUmtiR1VpUGpoYmFYa2JMM1JsZUhRK0Nqd3ZjM1puUGdvPSIsInNpemVzIjoiMTgweDE4MCIsInR5cGUiOiJpbWFnZS9zdmcreG1sIn1dfQ=="
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div class="container">
-      <button class="settings-btn" id="settingsBtn" title="Settings">⚙️</button>
+      <div class="header-area">
+        <button class="settings-btn" id="settingsBtn" title="Settings">
+          ⚙️
+        </button>
+        <h1>✨ EmojiStories ✨</h1>
+      </div>
 
-      <h1>✨ EmojiStori Generator ✨</h1>
+      <div class="input-area">
+        <div class="input-section">
+          <label for="emojiInput">Enter your emojis:</label>
+          <textarea
+            id="emojiInput"
+            placeholder="🐸🌟🏰👑..."
+            inputmode="text"
+          ></textarea>
+          <div class="hint">
+            Tap here and your emoji keyboard will appear on mobile! 📱
+          </div>
+        </div>
 
-      <div class="input-section">
-        <label for="emojiInput">Enter your emojis:</label>
-        <textarea
-          id="emojiInput"
-          placeholder="🐸🌟🏰👑..."
-          inputmode="text"
-        ></textarea>
-        <div class="hint">
-          Tap here and your emoji keyboard will appear on mobile! 📱
+        <button id="generateBtn">Generate Story</button>
+
+        <div class="loading" id="loading">
+          <div>🎭 Creating your magical story...</div>
         </div>
       </div>
 
-      <button id="generateBtn">Generate Story</button>
-
-      <div class="loading" id="loading">
-        <div>🎭 Creating your magical story...</div>
+      <div class="story-area">
+        <div class="story-output" id="storyOutput">
+          <h3>📚 Your Story:</h3>
+          <div class="story-text" id="storyText"></div>
+          <div class="story-controls">
+            <button class="story-btn story-btn-primary" id="readAloudBtn">
+              🔊 Read Aloud
+            </button>
+            <button
+              class="story-btn story-btn-secondary"
+              id="stopReadingBtn"
+              style="display: none"
+            >
+              ⏹️ Stop
+            </button>
+            <button class="story-btn story-btn-secondary" id="voiceSettingsBtn">
+              🎭 Voice
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div class="story-output" id="storyOutput">
-        <h3>📚 Your Story:</h3>
-        <div class="story-text" id="storyText"></div>
-        <div class="story-controls">
-          <button class="story-btn story-btn-primary" id="readAloudBtn">
-            🔊 Read Aloud
-          </button>
-          <button
-            class="story-btn story-btn-secondary"
-            id="stopReadingBtn"
-            style="display: none"
-          >
-            ⏹️ Stop
-          </button>
-          <button class="story-btn story-btn-secondary" id="voiceSettingsBtn">
-            🎭 Voice
-          </button>
-        </div>
-        <div class="voice-controls" id="voiceControls">
-          <label for="voiceSelect">Choose Voice:</label>
-          <select id="voiceSelect" class="voice-select"></select>
-          <label for="speedRange"
-            >Speed: <span id="speedValue">1.0x</span></label
-          >
-          <input
-            type="range"
-            id="speedRange"
-            min="0.5"
-            max="2"
-            step="0.1"
-            value="1"
-            style="width: 100%"
-          />
-        </div>
+      <div class="voice-controls" id="voiceControls">
+        <label for="voiceSelect">Choose Voice:</label>
+        <select id="voiceSelect" class="voice-select"></select>
+        <label for="speedRange">Speed: <span id="speedValue">1.0x</span></label>
+        <input
+          type="range"
+          id="speedRange"
+          min="0.5"
+          max="2"
+          step="0.1"
+          value="1"
+          style="width: 100%"
+        />
       </div>
     </div>
 
@@ -93,11 +102,22 @@
           <label>Model Provider:</label>
           <div class="provider-selection">
             <label class="provider-option">
-              <input type="radio" name="provider" value="anthropic" id="providerAnthropic" checked>
+              <input
+                type="radio"
+                name="provider"
+                value="anthropic"
+                id="providerAnthropic"
+                checked
+              />
               <span class="provider-label">Anthropic Claude</span>
             </label>
             <label class="provider-option">
-              <input type="radio" name="provider" value="openai" id="providerOpenAI">
+              <input
+                type="radio"
+                name="provider"
+                value="openai"
+                id="providerOpenAI"
+              />
               <span class="provider-label">OpenAI</span>
             </label>
           </div>
@@ -110,7 +130,10 @@
           </div>
           <p id="apiInfoText">
             You need an Anthropic API key to generate stories. Get yours at
-            <a href="https://console.anthropic.com" target="_blank" id="apiInfoLink"
+            <a
+              href="https://console.anthropic.com"
+              target="_blank"
+              id="apiInfoLink"
               >console.anthropic.com</a
             >
           </p>
@@ -125,8 +148,8 @@
             autocomplete="off"
           />
         </div>
-        
-        <div class="input-section" id="openaiKeySection" style="display: none;">
+
+        <div class="input-section" id="openaiKeySection" style="display: none">
           <label for="openaiApiKeyInput">OpenAI API Key:</label>
           <input
             type="password"
@@ -135,16 +158,27 @@
             autocomplete="off"
           />
         </div>
-        
+
         <div class="input-section" id="ttsProviderSection">
           <label>Text-to-Speech:</label>
           <div class="provider-selection">
             <label class="provider-option">
-              <input type="radio" name="ttsProvider" value="browser" id="ttsBrowser" checked>
+              <input
+                type="radio"
+                name="ttsProvider"
+                value="browser"
+                id="ttsBrowser"
+                checked
+              />
               <span class="provider-label">Browser TTS</span>
             </label>
             <label class="provider-option">
-              <input type="radio" name="ttsProvider" value="openai" id="ttsOpenAI">
+              <input
+                type="radio"
+                name="ttsProvider"
+                value="openai"
+                id="ttsOpenAI"
+              />
               <span class="provider-label">OpenAI TTS</span>
             </label>
           </div>
@@ -167,8 +201,12 @@
         </div>
 
         <div class="modal-actions">
-          <button class="btn btn-secondary" id="clearApiKeys">Clear Keys</button>
-          <button class="btn btn-primary" id="saveApiKeys">Save Settings</button>
+          <button class="btn btn-secondary" id="clearApiKeys">
+            Clear Keys
+          </button>
+          <button class="btn btn-primary" id="saveApiKeys">
+            Save Settings
+          </button>
         </div>
       </div>
     </div>

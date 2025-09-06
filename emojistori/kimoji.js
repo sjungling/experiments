@@ -9,7 +9,8 @@ const closeModal = document.getElementById("closeModal");
 const anthropicApiKeyInput = document.getElementById("anthropicApiKeyInput");
 const openaiApiKeyInput = document.getElementById("openaiApiKeyInput");
 const saveApiKeys = document.getElementById("saveApiKeys");
-const clearApiKeys = document.getElementById("clearApiKeys");
+const clearAnthropicKey = document.getElementById("clearAnthropicKey");
+const clearOpenaiKey = document.getElementById("clearOpenaiKey");
 const providerAnthropic = document.getElementById("providerAnthropic");
 const providerOpenAI = document.getElementById("providerOpenAI");
 const ttsBrowser = document.getElementById("ttsBrowser");
@@ -19,8 +20,6 @@ const openaiKeySection = document.getElementById("openaiKeySection");
 const apiInfo = document.getElementById("apiInfo");
 const apiInfoText = document.getElementById("apiInfoText");
 const apiInfoLink = document.getElementById("apiInfoLink");
-const apiStatus = document.getElementById("apiStatus");
-const apiStatusText = document.getElementById("apiStatusText");
 const readAloudBtn = document.getElementById("readAloudBtn");
 const stopReadingBtn = document.getElementById("stopReadingBtn");
 const voiceSettingsBtn = document.getElementById("voiceSettingsBtn");
@@ -31,6 +30,14 @@ const speedValue = document.getElementById("speedValue");
 const settingsVoiceSelect = document.getElementById("settingsVoiceSelect");
 const settingsSpeedRange = document.getElementById("settingsSpeedRange");
 const settingsSpeedValue = document.getElementById("settingsSpeedValue");
+const audioTab = document.getElementById("audioTab");
+const aiTab = document.getElementById("aiTab");
+const audioContent = document.getElementById("audioContent");
+const aiContent = document.getElementById("aiContent");
+const anthropicStatus = document.getElementById("anthropicStatus");
+const openaiStatus = document.getElementById("openaiStatus");
+const openaiTTSStatus = document.getElementById("openaiTTSStatus");
+const openaiTTSOption = document.getElementById("openaiTTSOption");
 
 let anthropicApiKey = "";
 let openaiApiKey = "";
@@ -41,14 +48,14 @@ let currentUtterance = null;
 let voices = [];
 let currentAudioElement = null;
 let openaiVoices = [
-  { id: 'alloy', name: 'Alloy', description: 'Neutral, balanced voice' },
-  { id: 'echo', name: 'Echo', description: 'Warm, engaging voice' },
-  { id: 'fable', name: 'Fable', description: 'Expressive storytelling voice' },
-  { id: 'onyx', name: 'Onyx', description: 'Deep, authoritative voice' },
-  { id: 'nova', name: 'Nova', description: 'Bright, energetic voice' },
-  { id: 'shimmer', name: 'Shimmer', description: 'Gentle, soothing voice' }
+  { id: "alloy", name: "Alloy", description: "Neutral, balanced voice" },
+  { id: "echo", name: "Echo", description: "Warm, engaging voice" },
+  { id: "fable", name: "Fable", description: "Expressive storytelling voice" },
+  { id: "onyx", name: "Onyx", description: "Deep, authoritative voice" },
+  { id: "nova", name: "Nova", description: "Bright, energetic voice" },
+  { id: "shimmer", name: "Shimmer", description: "Gentle, soothing voice" },
 ];
-let selectedOpenAIVoice = 'fable'; // Default to fable for storytelling
+let selectedOpenAIVoice = "fable"; // Default to fable for storytelling
 
 // Initialize app
 function init() {
@@ -58,8 +65,9 @@ function init() {
   initSpeech();
 
   // Check if API key exists on startup
-  const hasValidKey = (currentProvider === "anthropic" && anthropicApiKey) || 
-                     (currentProvider === "openai" && openaiApiKey);
+  const hasValidKey =
+    (currentProvider === "anthropic" && anthropicApiKey) ||
+    (currentProvider === "openai" && openaiApiKey);
   if (!hasValidKey) {
     setTimeout(() => {
       showSettings();
@@ -106,31 +114,31 @@ function initSpeech() {
 function loadVoices() {
   voiceSelect.innerHTML = "";
   settingsVoiceSelect.innerHTML = "";
-  
+
   if (currentTTSProvider === "openai") {
     // Load OpenAI voices
     openaiVoices.forEach((voice) => {
       const option = document.createElement("option");
       option.value = voice.id;
       option.textContent = `${voice.name} - ${voice.description}`;
-      
+
       const settingsOption = document.createElement("option");
       settingsOption.value = voice.id;
       settingsOption.textContent = `${voice.name} - ${voice.description}`;
-      
+
       // Mark default voice (fable for storytelling)
-      if (voice.id === 'fable') {
+      if (voice.id === "fable") {
         option.selected = true;
         settingsOption.selected = true;
       }
-      
+
       voiceSelect.appendChild(option);
       settingsVoiceSelect.appendChild(settingsOption);
     });
   } else {
     // Load browser voices
     voices = speechSynthesis.getVoices();
-    
+
     // Filter for English voices and prioritize quality ones
     const englishVoices = voices.filter(
       (voice) =>
@@ -138,44 +146,44 @@ function loadVoices() {
         voice.lang.includes("US") ||
         voice.lang.includes("GB")
     );
-    
+
     // Add all English voices to both selects
     englishVoices.forEach((voice, index) => {
       const option = document.createElement("option");
       option.value = index;
       option.textContent = `${voice.name} (${voice.lang})`;
-    
+
       const settingsOption = document.createElement("option");
       settingsOption.value = index;
       settingsOption.textContent = `${voice.name} (${voice.lang})`;
-    
+
       // Mark default voice
       if (voice.default) {
         option.selected = true;
         settingsOption.selected = true;
       }
-    
+
       voiceSelect.appendChild(option);
       settingsVoiceSelect.appendChild(settingsOption);
     });
-    
+
     // If no English voices, add all voices
     if (englishVoices.length === 0) {
       voices.forEach((voice, index) => {
         const option = document.createElement("option");
         option.value = index;
         option.textContent = `${voice.name} (${voice.lang})`;
-    
+
         const settingsOption = document.createElement("option");
         settingsOption.value = index;
         settingsOption.textContent = `${voice.name} (${voice.lang})`;
-    
+
         voiceSelect.appendChild(option);
         settingsVoiceSelect.appendChild(settingsOption);
       });
     }
   }
-  
+
   // Load saved voice preferences
   loadVoicePreferences();
 }
@@ -190,7 +198,7 @@ async function readStoryAloud() {
 
   // Stop any current speech or audio
   stopReading();
-  
+
   try {
     if (currentTTSProvider === "openai" && openaiApiKey) {
       await readWithOpenAITTS(text);
@@ -232,18 +240,18 @@ function readWithBrowserTTS(text) {
 
   // Event handlers
   currentUtterance.onstart = function () {
-    updateTTSButtons('playing');
+    updateTTSButtons("playing");
   };
 
   currentUtterance.onend = function () {
-    updateTTSButtons('idle');
+    updateTTSButtons("idle");
     currentUtterance = null;
   };
 
   currentUtterance.onerror = function (event) {
     console.error("Speech synthesis error:", event);
     showError("Sorry, there was an error reading the story. 🔊");
-    updateTTSButtons('idle');
+    updateTTSButtons("idle");
   };
 
   // Start speaking
@@ -251,65 +259,69 @@ function readWithBrowserTTS(text) {
 }
 
 async function readWithOpenAITTS(text) {
-  const selectedVoice = voiceSelect.value || 'fable';
+  const selectedVoice = voiceSelect.value || "fable";
   const speed = parseFloat(speedRange.value);
-  
-  updateTTSButtons('loading');
-  
+
+  updateTTSButtons("loading");
+
   try {
     const response = await fetch("https://api.openai.com/v1/audio/speech", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${openaiApiKey}`,
+        Authorization: `Bearer ${openaiApiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "tts-1",
+        model: "gpt-4o-mini-tts",
         input: text,
         voice: selectedVoice,
         response_format: "mp3",
         speed: Math.max(0.25, Math.min(4.0, speed)), // OpenAI accepts 0.25 to 4.0
       }),
     });
-    
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(`OpenAI TTS error: ${response.status} - ${errorData.error?.message || response.statusText}`);
+      throw new Error(
+        `OpenAI TTS error: ${response.status} - ${
+          errorData.error?.message || response.statusText
+        }`
+      );
     }
-    
+
     // Get the audio data as a blob
     const audioBlob = await response.blob();
     const audioUrl = URL.createObjectURL(audioBlob);
-    
+
     // Create audio element but don't play yet
     const audioElement = new Audio(audioUrl);
-    
-    audioElement.onplay = function() {
-      updateTTSButtons('playing');
+
+    audioElement.onplay = function () {
+      updateTTSButtons("playing");
     };
-    
-    audioElement.onended = function() {
-      updateTTSButtons('idle');
+
+    audioElement.onended = function () {
+      updateTTSButtons("idle");
       URL.revokeObjectURL(audioUrl);
       currentAudioElement = null;
     };
-    
-    audioElement.onerror = function() {
+
+    audioElement.onerror = function () {
       console.error("Audio playback error");
-      updateTTSButtons('idle');
+      updateTTSButtons("idle");
       URL.revokeObjectURL(audioUrl);
       currentAudioElement = null;
     };
-    
+
     // Try to play immediately, but handle autoplay restrictions
     try {
       await audioElement.play();
       currentAudioElement = audioElement;
     } catch (playError) {
-      if (playError.name === 'NotAllowedError') {
+      if (playError.name === "NotAllowedError") {
         // Autoplay blocked - show "Click to Play" button
         currentAudioElement = audioElement;
-        updateTTSButtons('ready', audioElement);
+        updateTTSButtons("ready", audioElement);
         return; // Don't throw error, just wait for user interaction
       } else {
         // Other playback error
@@ -317,9 +329,8 @@ async function readWithOpenAITTS(text) {
         throw playError;
       }
     }
-    
   } catch (error) {
-    updateTTSButtons('idle');
+    updateTTSButtons("idle");
     throw error;
   }
 }
@@ -327,45 +338,45 @@ async function readWithOpenAITTS(text) {
 function updateTTSButtons(state, audioElement = null) {
   // States: 'idle', 'loading', 'ready', 'playing'
   switch (state) {
-    case 'loading':
+    case "loading":
       readAloudBtn.textContent = "🎵 Generating Audio...";
       readAloudBtn.disabled = true;
       readAloudBtn.style.display = "inline-flex";
       stopReadingBtn.style.display = "none";
-      readAloudBtn.classList.remove('playing');
-      stopReadingBtn.classList.remove('playing');
+      readAloudBtn.classList.remove("playing");
+      stopReadingBtn.classList.remove("playing");
       break;
-      
-    case 'ready':
+
+    case "ready":
       readAloudBtn.textContent = "▶️ Click to Play";
       readAloudBtn.disabled = false;
       readAloudBtn.style.display = "inline-flex";
       stopReadingBtn.style.display = "none";
       // Store audio element for click-to-play
-      readAloudBtn.dataset.audioReady = 'true';
+      readAloudBtn.dataset.audioReady = "true";
       readAloudBtn._audioElement = audioElement;
-      readAloudBtn.classList.remove('playing');
-      stopReadingBtn.classList.remove('playing');
+      readAloudBtn.classList.remove("playing");
+      stopReadingBtn.classList.remove("playing");
       break;
-      
-    case 'playing':
+
+    case "playing":
       readAloudBtn.style.display = "none";
       stopReadingBtn.style.display = "inline-flex";
       readAloudBtn.disabled = true;
-      readAloudBtn.classList.remove('playing');
-      stopReadingBtn.classList.add('playing');
+      readAloudBtn.classList.remove("playing");
+      stopReadingBtn.classList.add("playing");
       break;
-      
-    case 'idle':
+
+    case "idle":
     default:
       readAloudBtn.textContent = "🔊 Read Aloud";
       readAloudBtn.disabled = false;
       readAloudBtn.style.display = "inline-flex";
       stopReadingBtn.style.display = "none";
-      readAloudBtn.dataset.audioReady = 'false';
+      readAloudBtn.dataset.audioReady = "false";
       readAloudBtn._audioElement = null;
-      readAloudBtn.classList.remove('playing');
-      stopReadingBtn.classList.remove('playing');
+      readAloudBtn.classList.remove("playing");
+      stopReadingBtn.classList.remove("playing");
       break;
   }
 }
@@ -373,10 +384,10 @@ function updateTTSButtons(state, audioElement = null) {
 function playPreloadedAudio(audioElement) {
   try {
     audioElement.play();
-    updateTTSButtons('playing');
+    updateTTSButtons("playing");
   } catch (error) {
     console.error("Error playing preloaded audio:", error);
-    updateTTSButtons('idle');
+    updateTTSButtons("idle");
     showError("Sorry, there was an error playing the audio. 🔊");
   }
 }
@@ -389,16 +400,16 @@ function stopReading() {
     speechSynthesis.cancel();
     currentUtterance = null;
   }
-  
+
   // Stop OpenAI audio
   if (currentAudioElement) {
     currentAudioElement.pause();
     currentAudioElement.currentTime = 0;
     currentAudioElement = null;
   }
-  
+
   // Reset buttons
-  updateTTSButtons('idle');
+  updateTTSButtons("idle");
 }
 
 function toggleVoiceSettings() {
@@ -410,7 +421,7 @@ function saveVoicePreferences() {
   const preferences = {
     voiceIndex: voiceSelect.value,
     speed: speedRange.value,
-    ttsProvider: currentTTSProvider
+    ttsProvider: currentTTSProvider,
   };
   localStorage.setItem("voice_preferences", JSON.stringify(preferences));
 }
@@ -444,11 +455,12 @@ function loadApiKeys() {
   anthropicApiKey = localStorage.getItem("anthropic_api_key") || "";
   openaiApiKey = localStorage.getItem("openai_api_key") || "";
   currentProvider = localStorage.getItem("current_provider") || "anthropic";
-  currentTTSProvider = localStorage.getItem("current_tts_provider") || "browser";
-  
+  currentTTSProvider =
+    localStorage.getItem("current_tts_provider") || "browser";
+
   anthropicApiKeyInput.value = anthropicApiKey;
   openaiApiKeyInput.value = openaiApiKey;
-  
+
   // Set provider radio buttons
   if (currentProvider === "openai") {
     providerOpenAI.checked = true;
@@ -457,7 +469,7 @@ function loadApiKeys() {
     providerAnthropic.checked = true;
     providerOpenAI.checked = false;
   }
-  
+
   // Set TTS provider radio buttons
   if (currentTTSProvider === "openai") {
     ttsOpenAI.checked = true;
@@ -466,84 +478,149 @@ function loadApiKeys() {
     ttsBrowser.checked = true;
     ttsOpenAI.checked = false;
   }
-  
+
   updateProviderUI();
+  updateProviderStatuses();
+  updateTTSAvailability();
 }
 
 function saveApiKeysToStorage() {
   const newAnthropicKey = anthropicApiKeyInput.value.trim();
   const newOpenAIKey = openaiApiKeyInput.value.trim();
-  
+
   // Update provider selection
   currentProvider = providerAnthropic.checked ? "anthropic" : "openai";
   currentTTSProvider = ttsBrowser.checked ? "browser" : "openai";
-  
+
   // Validate that at least one key is provided for the selected provider
   if (currentProvider === "anthropic" && !newAnthropicKey) {
     showError("Please enter an Anthropic API key or switch to OpenAI");
     return;
   }
-  
+
   if (currentProvider === "openai" && !newOpenAIKey) {
     showError("Please enter an OpenAI API key or switch to Anthropic");
     return;
   }
-  
+
   // Save keys
   if (newAnthropicKey) {
     localStorage.setItem("anthropic_api_key", newAnthropicKey);
     anthropicApiKey = newAnthropicKey;
   }
-  
+
   if (newOpenAIKey) {
     localStorage.setItem("openai_api_key", newOpenAIKey);
     openaiApiKey = newOpenAIKey;
   }
-  
+
   // Save provider preferences
   localStorage.setItem("current_provider", currentProvider);
   localStorage.setItem("current_tts_provider", currentTTSProvider);
-  
+
   updateApiStatus();
+  updateProviderStatuses();
+  updateTTSAvailability();
   showSuccess("Settings saved successfully! 🔑");
   hideSettings();
 }
 
-function clearApiKeysFromStorage() {
+function clearAnthropicApiKey() {
+  if (!confirm("Are you sure you want to clear your Anthropic API key?")) {
+    return;
+  }
+  
   localStorage.removeItem("anthropic_api_key");
-  localStorage.removeItem("openai_api_key");
-  localStorage.removeItem("current_provider");
-  localStorage.removeItem("current_tts_provider");
-  
   anthropicApiKey = "";
-  openaiApiKey = "";
-  currentProvider = "anthropic";
-  currentTTSProvider = "browser";
-  
   anthropicApiKeyInput.value = "";
-  openaiApiKeyInput.value = "";
-  providerAnthropic.checked = true;
-  providerOpenAI.checked = false;
-  ttsBrowser.checked = true;
-  ttsOpenAI.checked = false;
   
-  updateProviderUI();
+  // If Anthropic was selected, switch to OpenAI if available
+  if (currentProvider === "anthropic" && openaiApiKey) {
+    currentProvider = "openai";
+    providerOpenAI.checked = true;
+    providerAnthropic.checked = false;
+    localStorage.setItem("current_provider", currentProvider);
+    updateProviderUI();
+  }
+  
   updateApiStatus();
-  showSuccess("All settings cleared");
+  updateProviderStatuses();
+  updateTTSAvailability();
+}
+
+function clearOpenaiApiKey() {
+  if (!confirm("Are you sure you want to clear your OpenAI API key?")) {
+    return;
+  }
+  
+  localStorage.removeItem("openai_api_key");
+  openaiApiKey = "";
+  openaiApiKeyInput.value = "";
+  
+  // If OpenAI was selected, switch to Anthropic if available
+  if (currentProvider === "openai" && anthropicApiKey) {
+    currentProvider = "anthropic";
+    providerAnthropic.checked = true;
+    providerOpenAI.checked = false;
+    localStorage.setItem("current_provider", currentProvider);
+    updateProviderUI();
+  }
+  
+  updateApiStatus();
+  updateProviderStatuses();
+  updateTTSAvailability();
 }
 
 function updateApiStatus() {
-  const hasValidKey = (currentProvider === "anthropic" && anthropicApiKey) || 
-                     (currentProvider === "openai" && openaiApiKey);
-  
-  if (hasValidKey) {
-    apiStatus.className = "status-indicator status-connected";
-    apiStatusText.textContent = `${currentProvider === "anthropic" ? "Anthropic" : "OpenAI"} Connected`;
-    generateBtn.disabled = false;
+  const hasValidKey =
+    (currentProvider === "anthropic" && anthropicApiKey) ||
+    (currentProvider === "openai" && openaiApiKey);
+
+  generateBtn.disabled = !hasValidKey;
+}
+
+function updateProviderStatuses() {
+  // Update Anthropic status
+  if (anthropicApiKey) {
+    anthropicStatus.textContent = "Connected";
+    anthropicStatus.className = "provider-status connected";
   } else {
-    apiStatus.className = "status-indicator status-disconnected";
-    apiStatusText.textContent = "API Key Required";
-    generateBtn.disabled = true;
+    anthropicStatus.textContent = "Not Connected";
+    anthropicStatus.className = "provider-status disconnected";
+  }
+
+  // Update OpenAI status
+  if (openaiApiKey) {
+    openaiStatus.textContent = "Connected";
+    openaiStatus.className = "provider-status connected";
+  } else {
+    openaiStatus.textContent = "Not Connected";
+    openaiStatus.className = "provider-status disconnected";
+  }
+}
+
+function updateTTSAvailability() {
+  // Enable/disable OpenAI TTS based on API key availability
+  if (openaiApiKey) {
+    ttsOpenAI.disabled = false;
+    openaiTTSOption.style.opacity = "1";
+    openaiTTSOption.style.pointerEvents = "auto";
+    openaiTTSStatus.textContent = "Available";
+    openaiTTSStatus.className = "provider-status connected";
+  } else {
+    // If OpenAI TTS is currently selected but no key, switch to browser
+    if (currentTTSProvider === "openai") {
+      currentTTSProvider = "browser";
+      ttsBrowser.checked = true;
+      ttsOpenAI.checked = false;
+      localStorage.setItem("current_tts_provider", "browser");
+    }
+
+    ttsOpenAI.disabled = true;
+    openaiTTSOption.style.opacity = "0.5";
+    openaiTTSOption.style.pointerEvents = "none";
+    openaiTTSStatus.textContent = "Requires OpenAI Key";
+    openaiTTSStatus.className = "provider-status disabled";
   }
 }
 
@@ -552,26 +629,46 @@ function updateProviderUI() {
   if (currentProvider === "openai") {
     openaiKeySection.style.display = "block";
     anthropicKeySection.style.display = "none";
-    apiInfoText.textContent = "You need an OpenAI API key to generate stories. Get yours at ";
+    apiInfoText.textContent =
+      "You need an OpenAI API key to generate stories. Get yours at ";
     apiInfoLink.href = "https://platform.openai.com/api-keys";
     apiInfoLink.textContent = "platform.openai.com";
   } else {
     anthropicKeySection.style.display = "block";
     openaiKeySection.style.display = "none";
-    apiInfoText.textContent = "You need an Anthropic API key to generate stories. Get yours at ";
+    apiInfoText.textContent =
+      "You need an Anthropic API key to generate stories. Get yours at ";
     apiInfoLink.href = "https://console.anthropic.com";
     apiInfoLink.textContent = "console.anthropic.com";
+  }
+}
+
+// Tab Management
+function switchToTab(tabName) {
+  // Remove active class from all tabs and content
+  audioTab.classList.remove("active");
+  aiTab.classList.remove("active");
+  audioContent.classList.remove("active");
+  aiContent.classList.remove("active");
+
+  // Add active class to selected tab and content
+  if (tabName === "audio") {
+    audioTab.classList.add("active");
+    audioContent.classList.add("active");
+  } else if (tabName === "ai") {
+    aiTab.classList.add("active");
+    aiContent.classList.add("active");
   }
 }
 
 // Modal Management
 function showSettings() {
   settingsModal.classList.add("show");
-  if (currentProvider === "anthropic") {
-    anthropicApiKeyInput.focus();
-  } else {
-    openaiApiKeyInput.focus();
-  }
+  updateProviderStatuses();
+  updateTTSAvailability();
+
+  // Default to Audio tab
+  switchToTab("audio");
 }
 
 function hideSettings() {
@@ -593,6 +690,9 @@ function setupEmojiInput() {
 
 // Generate story using selected API provider
 async function generateStory() {
+  // Stop any currently playing audio
+  stopReading();
+  
   const emojis = emojiInput.value.trim();
 
   if (!emojis) {
@@ -600,7 +700,8 @@ async function generateStory() {
     return;
   }
 
-  const currentApiKey = currentProvider === "anthropic" ? anthropicApiKey : openaiApiKey;
+  const currentApiKey =
+    currentProvider === "anthropic" ? anthropicApiKey : openaiApiKey;
   if (!currentApiKey) {
     showError("Please set your API key in settings first! ⚙️");
     showSettings();
@@ -631,12 +732,16 @@ Turn these emojis into a magical adventure story!`;
     } else {
       story = await generateAnthropicStory(prompt, currentApiKey);
     }
-    
+
     // replace `\n` with line breaks
     showStory(story.replace(/\n/g, "<br>"));
   } catch (error) {
     console.error("Error generating story:", error);
-    if (error.message.includes("API key") || error.message.includes("401") || error.message.includes("authentication")) {
+    if (
+      error.message.includes("API key") ||
+      error.message.includes("401") ||
+      error.message.includes("authentication")
+    ) {
       showError("❌ " + error.message + " Check your settings! ⚙️");
       setTimeout(showSettings, 2000);
     } else {
@@ -670,12 +775,16 @@ async function generateAnthropicStory(prompt, apiKey) {
       ],
     }),
   });
-  
+
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(`Anthropic API error: ${response.status} - ${errorData.error?.message || response.statusText}`);
+    throw new Error(
+      `Anthropic API error: ${response.status} - ${
+        errorData.error?.message || response.statusText
+      }`
+    );
   }
-  
+
   const data = await response.json();
   return data.content[0].text;
 }
@@ -685,7 +794,7 @@ async function generateOpenAIStory(prompt, apiKey) {
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${apiKey}`,
+      Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -700,19 +809,24 @@ async function generateOpenAIStory(prompt, apiKey) {
       temperature: 0.8,
     }),
   });
-  
+
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(`OpenAI API error: ${response.status} - ${errorData.error?.message || response.statusText}`);
+    throw new Error(
+      `OpenAI API error: ${response.status} - ${
+        errorData.error?.message || response.statusText
+      }`
+    );
   }
-  
+
   const data = await response.json();
   return data.choices[0].message.content;
 }
 
 function setLoading(isLoading) {
-  const hasValidKey = (currentProvider === "anthropic" && anthropicApiKey) || 
-                     (currentProvider === "openai" && openaiApiKey);
+  const hasValidKey =
+    (currentProvider === "anthropic" && anthropicApiKey) ||
+    (currentProvider === "openai" && openaiApiKey);
   generateBtn.disabled = isLoading || !hasValidKey;
   generateBtn.textContent = isLoading ? "Creating Story..." : "Generate Story";
 
@@ -753,24 +867,34 @@ generateBtn.addEventListener("click", generateStory);
 settingsBtn.addEventListener("click", showSettings);
 closeModal.addEventListener("click", hideSettings);
 saveApiKeys.addEventListener("click", saveApiKeysToStorage);
-clearApiKeys.addEventListener("click", clearApiKeysFromStorage);
+clearAnthropicKey.addEventListener("click", clearAnthropicApiKey);
+clearOpenaiKey.addEventListener("click", clearOpenaiApiKey);
+
+// Tab switching event listeners
+audioTab.addEventListener("click", function () {
+  switchToTab("audio");
+});
+
+aiTab.addEventListener("click", function () {
+  switchToTab("ai");
+});
 
 // Provider selection event listeners
-providerAnthropic.addEventListener("change", function() {
+providerAnthropic.addEventListener("change", function () {
   if (this.checked) {
     currentProvider = "anthropic";
     updateProviderUI();
   }
 });
 
-providerOpenAI.addEventListener("change", function() {
+providerOpenAI.addEventListener("change", function () {
   if (this.checked) {
     currentProvider = "openai";
     updateProviderUI();
   }
 });
 
-ttsBrowser.addEventListener("change", function() {
+ttsBrowser.addEventListener("change", function () {
   if (this.checked) {
     currentTTSProvider = "browser";
     loadVoices(); // Reload voices for browser TTS
@@ -778,16 +902,19 @@ ttsBrowser.addEventListener("change", function() {
   }
 });
 
-ttsOpenAI.addEventListener("change", function() {
+ttsOpenAI.addEventListener("change", function () {
   if (this.checked) {
     currentTTSProvider = "openai";
     loadVoices(); // Reload voices for OpenAI TTS
     saveVoicePreferences();
   }
 });
-readAloudBtn.addEventListener("click", function() {
+readAloudBtn.addEventListener("click", function () {
   // Check if audio is ready to play
-  if (readAloudBtn.dataset.audioReady === 'true' && readAloudBtn._audioElement) {
+  if (
+    readAloudBtn.dataset.audioReady === "true" &&
+    readAloudBtn._audioElement
+  ) {
     // Play pre-loaded audio
     playPreloadedAudio(readAloudBtn._audioElement);
   } else {
@@ -831,8 +958,9 @@ init();
 
 // Auto-focus input on page load for mobile
 window.addEventListener("load", function () {
-  const hasValidKey = (currentProvider === "anthropic" && anthropicApiKey) || 
-                     (currentProvider === "openai" && openaiApiKey);
+  const hasValidKey =
+    (currentProvider === "anthropic" && anthropicApiKey) ||
+    (currentProvider === "openai" && openaiApiKey);
   if (hasValidKey) {
     setTimeout(() => {
       emojiInput.focus();

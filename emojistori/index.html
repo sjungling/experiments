@@ -98,112 +98,132 @@
           <button class="close-btn" id="closeModal">&times;</button>
         </div>
 
-        <div class="input-section">
-          <label>Model Provider:</label>
-          <div class="provider-selection">
-            <label class="provider-option">
-              <input
-                type="radio"
-                name="provider"
-                value="anthropic"
-                id="providerAnthropic"
-                checked
-              />
-              <span class="provider-label">Anthropic Claude</span>
-            </label>
-            <label class="provider-option">
-              <input
-                type="radio"
-                name="provider"
-                value="openai"
-                id="providerOpenAI"
-              />
-              <span class="provider-label">OpenAI</span>
-            </label>
-          </div>
+        <div class="tabs">
+          <button class="tab-button active" id="audioTab">🔊 Audio</button>
+          <button class="tab-button" id="aiTab">🤖 AI</button>
         </div>
 
-        <div class="api-info" id="apiInfo">
-          <div style="margin-bottom: 10px">
-            <span class="status-indicator" id="apiStatus"></span>
-            <strong id="apiStatusText">API Key Required</strong>
+        <div class="tab-content active" id="audioContent">
+          <div class="input-section" id="ttsProviderSection">
+            <label>Text-to-Speech:</label>
+            <div class="provider-selection">
+              <label class="provider-option">
+                <input
+                  type="radio"
+                  name="ttsProvider"
+                  value="browser"
+                  id="ttsBrowser"
+                  checked
+                />
+                <span class="provider-label">Browser TTS</span>
+              </label>
+              <label class="provider-option" id="openaiTTSOption">
+                <input
+                  type="radio"
+                  name="ttsProvider"
+                  value="openai"
+                  id="ttsOpenAI"
+                />
+                <span class="provider-label">OpenAI TTS</span>
+                <span class="provider-status" id="openaiTTSStatus"></span>
+              </label>
+            </div>
           </div>
-          <p id="apiInfoText">
-            You need an Anthropic API key to generate stories. Get yours at
-            <a
-              href="https://console.anthropic.com"
-              target="_blank"
-              id="apiInfoLink"
-              >console.anthropic.com</a
+
+          <div class="input-section" id="settingsVoiceControls">
+            <label for="settingsVoiceSelect">Choose Voice:</label>
+            <select id="settingsVoiceSelect" class="voice-select"></select>
+            <label for="settingsSpeedRange"
+              >Speed: <span id="settingsSpeedValue">1.0x</span></label
             >
-          </p>
-        </div>
-
-        <div class="input-section" id="anthropicKeySection">
-          <label for="anthropicApiKeyInput">Anthropic API Key:</label>
-          <input
-            type="password"
-            id="anthropicApiKeyInput"
-            placeholder="sk-ant-..."
-            autocomplete="off"
-          />
-        </div>
-
-        <div class="input-section" id="openaiKeySection" style="display: none">
-          <label for="openaiApiKeyInput">OpenAI API Key:</label>
-          <input
-            type="password"
-            id="openaiApiKeyInput"
-            placeholder="sk-..."
-            autocomplete="off"
-          />
-        </div>
-
-        <div class="input-section" id="ttsProviderSection">
-          <label>Text-to-Speech:</label>
-          <div class="provider-selection">
-            <label class="provider-option">
-              <input
-                type="radio"
-                name="ttsProvider"
-                value="browser"
-                id="ttsBrowser"
-                checked
-              />
-              <span class="provider-label">Browser TTS</span>
-            </label>
-            <label class="provider-option">
-              <input
-                type="radio"
-                name="ttsProvider"
-                value="openai"
-                id="ttsOpenAI"
-              />
-              <span class="provider-label">OpenAI TTS</span>
-            </label>
+            <input
+              type="range"
+              id="settingsSpeedRange"
+              min="0.5"
+              max="2"
+              step="0.1"
+              value="1"
+              style="width: 100%"
+            />
           </div>
         </div>
-        <div class="input-section" id="settingsVoiceControls">
-          <label for="settingsVoiceSelect">Choose Voice:</label>
-          <select id="settingsVoiceSelect" class="voice-select"></select>
-          <label for="settingsSpeedRange"
-            >Speed: <span id="settingsSpeedValue">1.0x</span></label
+
+        <div class="tab-content" id="aiContent">
+          <div class="input-section">
+            <label>Model Provider:</label>
+            <div class="provider-selection">
+              <label class="provider-option">
+                <input
+                  type="radio"
+                  name="provider"
+                  value="anthropic"
+                  id="providerAnthropic"
+                  checked
+                />
+                <span class="provider-label">Anthropic Claude</span>
+                <span class="provider-status" id="anthropicStatus"></span>
+              </label>
+              <label class="provider-option">
+                <input
+                  type="radio"
+                  name="provider"
+                  value="openai"
+                  id="providerOpenAI"
+                />
+                <span class="provider-label">OpenAI</span>
+                <span class="provider-status" id="openaiStatus"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="input-section" id="anthropicKeySection">
+            <label for="anthropicApiKeyInput">Anthropic API Key:</label>
+            <div class="api-key-input-group">
+              <input
+                type="password"
+                id="anthropicApiKeyInput"
+                placeholder="sk-ant-..."
+                autocomplete="off"
+              />
+              <button class="clear-key-btn" id="clearAnthropicKey" title="Clear Anthropic Key">
+                ×
+              </button>
+            </div>
+          </div>
+
+          <div
+            class="input-section"
+            id="openaiKeySection"
+            style="display: none"
           >
-          <input
-            type="range"
-            id="settingsSpeedRange"
-            min="0.5"
-            max="2"
-            step="0.1"
-            value="1"
-            style="width: 100%"
-          />
+            <label for="openaiApiKeyInput">OpenAI API Key:</label>
+            <div class="api-key-input-group">
+              <input
+                type="password"
+                id="openaiApiKeyInput"
+                placeholder="sk-..."
+                autocomplete="off"
+              />
+              <button class="clear-key-btn" id="clearOpenaiKey" title="Clear OpenAI Key">
+                ×
+              </button>
+            </div>
+          </div>
+
+          <div class="api-info" id="apiInfo">
+            <p id="apiInfoText">
+              You need an Anthropic API key to generate stories. Get yours at
+              <a
+                href="https://console.anthropic.com"
+                target="_blank"
+                id="apiInfoLink"
+                >console.anthropic.com</a
+              >
+            </p>
+          </div>
         </div>
 
         <div class="modal-actions">
-          <button class="btn btn-secondary" id="clearApiKeys">
-            Clear Keys
-          </button>
           <button class="btn btn-primary" id="saveApiKeys">
             Save Settings
           </button>

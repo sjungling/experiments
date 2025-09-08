@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emoji Tic-Tac-Toe</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Emoji Tic-Tac-Toe">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#667eea">
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iNDAiIGZpbGw9InVybCgjZ3JhZGllbnQwXzFfMikiLz4KPHN0eWxlPi5zdDB7Zm9udC1mYW1pbHk6QXJpYWw7Zm9udC1zaXplOjQ4cHg7ZmlsbDojZmZmO308L3N0eWxlPgo8dGV4dCB4PSI5NiIgeT0iODAiIGNsYXNzPSJzdDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPvCfkLE8L3RleHQ+Cjx0ZXh0IHg9Ijk2IiB5PSIxMzAiIGNsYXNzPSJzdDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPvCfkKY8L3RleHQ+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9ImdyYWRpZW50MF8xXzIiIHgxPSIwIiB5MT0iMCIgeDI9IjE5MiIgeTI9IjE5MiIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgo8c3RvcCBzdG9wLWNvbG9yPSIjNjY3ZWVhIi8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzc2NGJhMiIvPgo8L2xpbmVhckdyYWRpZW50Pgo8L2RlZnM+Cjwvc3ZnPgo=">
+    <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDE4MCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIiByeD0iNDAiIGZpbGw9InVybCgjZ3JhZGllbnQwXzFfMikiLz4KPHN0eWxlPi5zdDB7Zm9udC1mYW1pbHk6QXJpYWw7Zm9udC1zaXplOjQ0cHg7ZmlsbDojZmZmO308L3N0eWxlPgo8dGV4dCB4PSI5MCIgeT0iNzUiIGNsYXNzPSJzdDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPvCfkLE8L3RleHQ+Cjx0ZXh0IHg9IjkwIiB5PSIxMjAiIGNsYXNzPSJzdDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPvCfkKY8L3RleHQ+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9ImdyYWRpZW50MF8xXzIiIHgxPSIwIiB5MT0iMCIgeDI9IjE4MCIgeTI9IjE4MCIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgo8c3RvcCBzdG9wLWNvbG9yPSIjNjY3ZWVhIi8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzc2NGJhMiIvPgo8L2xpbmVhckdyYWRpZW50Pgo8L2RlZnM+Cjwvc3ZnPgo=">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHN0eWxlPi5zdDB7Zm9udC1mYW1pbHk6QXJpYWw7Zm9udC1zaXplOjEycHg7ZmlsbDojNjY3ZWVhO308L3N0eWxlPgo8dGV4dCB4PSIxNiIgeT0iMTIiIGNsYXNzPSJzdDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPvCfkLE8L3RleHQ+Cjx0ZXh0IHg9IjE2IiB5PSIyNCIgY2xhc3M9InN0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+QpjwvdGV4dD4KPC9zdmc+Cg==">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            backdrop-filter: blur(10px);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.2em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            font-weight: 700;
+        }
+
+        .current-player {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-gap: 8px;
+            max-width: 280px;
+            margin: 0 auto 30px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 15px;
+            box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .cell {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 2.5em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .cell:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            background: #f8f8f8;
+        }
+
+        .cell:active {
+            transform: translateY(0);
+            background: #e8e8e8;
+        }
+
+        .cell.winning {
+            background: linear-gradient(45deg, #ffeb3b, #ffc107);
+            animation: pulse 0.6s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .game-status {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .winner-message {
+            color: #4caf50;
+            animation: bounce 0.8s ease-in-out;
+        }
+
+        .draw-message {
+            color: #ff9800;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .reset-btn {
+            background: linear-gradient(45deg, #4caf50, #45a049);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.1em;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #45a049, #4caf50);
+        }
+
+        .reset-btn:active {
+            transform: translateY(0);
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .score-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .score-label {
+            font-size: 1em;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .score-value {
+            font-size: 1.6em;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .install-prompt {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: none;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
+
+        .install-prompt.show {
+            display: block;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .install-text {
+            margin-bottom: 10px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .install-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .install-btn, .dismiss-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .install-btn {
+            background: #4caf50;
+            color: white;
+        }
+
+        .dismiss-btn {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        @media (max-width: 480px) {
+            .game-container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .cell {
+                width: 70px;
+                height: 70px;
+                font-size: 2.2em;
+            }
+            
+            .game-board {
+                max-width: 230px;
+                grid-gap: 6px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .score-label {
+                font-size: 0.9em;
+            }
+
+            .score-value {
+                font-size: 1.4em;
+            }
+        }
+
+        /* iOS specific adjustments */
+        @supports (-webkit-touch-callout: none) {
+            body {
+                padding-top: max(20px, env(safe-area-inset-top));
+                padding-bottom: max(20px, env(safe-area-inset-bottom));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🎮 Emoji Tic-Tac-Toe 🎮</h1>
+        
+        <div class="score-board">
+            <div class="score-item">
+                <div class="score-label">🐱 Wins</div>
+                <div class="score-value" id="catScore">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">Draws</div>
+                <div class="score-value" id="drawScore">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">🐶 Wins</div>
+                <div class="score-value" id="dogScore">0</div>
+            </div>
+        </div>
+
+        <div class="current-player" id="currentPlayer">Current Player: 🐱</div>
+        
+        <div class="game-board" id="gameBoard">
+            <button class="cell" data-index="0"></button>
+            <button class="cell" data-index="1"></button>
+            <button class="cell" data-index="2"></button>
+            <button class="cell" data-index="3"></button>
+            <button class="cell" data-index="4"></button>
+            <button class="cell" data-index="5"></button>
+            <button class="cell" data-index="6"></button>
+            <button class="cell" data-index="7"></button>
+            <button class="cell" data-index="8"></button>
+        </div>
+
+        <div class="game-status" id="gameStatus">Make your move!</div>
+        
+        <button class="reset-btn" id="resetBtn">🔄 New Game</button>
+    </div>
+
+    <div class="install-prompt" id="installPrompt">
+        <div class="install-text">
+            📱 Install this game on your home screen for quick access!
+        </div>
+        <div class="install-buttons">
+            <button class="install-btn" id="installBtn">Install App</button>
+            <button class="dismiss-btn" id="dismissBtn">Maybe Later</button>
+        </div>
+    </div>
+
+    <script>
+        // Web App Manifest
+        const manifestData = {
+            name: "Emoji Tic-Tac-Toe",
+            short_name: "TicTacToe",
+            description: "A fun emoji-based tic-tac-toe game",
+            start_url: "./",
+            display: "standalone",
+            background_color: "#667eea",
+            theme_color: "#667eea",
+            orientation: "portrait",
+            icons: [
+                {
+                    src: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iNDAiIGZpbGw9InVybCgjZ3JhZGllbnQwXzFfMikiLz4KPHN0eWxlPi5zdDB7Zm9udC1mYW1pbHk6QXJpYWw7Zm9udC1zaXplOjQ4cHg7ZmlsbDojZmZmO308L3N0eWxlPgo8dGV4dCB4PSI5NiIgeT0iODAiIGNsYXNzPSJzdDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPvCfkLE8L3RleHQ+Cjx0ZXh0IHg9Ijk2IiB5PSIxMzAiIGNsYXNzPSJzdDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPvCfkKY8L3RleHQ+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9ImdyYWRpZW50MF8xXzIiIHgxPSIwIiB5MT0iMCIgeDI9IjE5MiIgeTI9IjE5MiIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgo8c3RvcCBzdG9wLWNvbG9yPSIjNjY3ZWVhIi8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzc2NGJhMiIvPgo8L2xpbmVhckdyYWRpZW50Pgo8L2RlZnM+Cjwvc3ZnPgo=",
+                    sizes: "192x192",
+                    type: "image/svg+xml",
+                    purpose: "any maskable"
+                },
+                {
+                    src: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iMTAwIiBmaWxsPSJ1cmwoI2dyYWRpZW50MF8xXzIpIi8+CjxzdHlsZT4uc3Qwe2ZvbnQtZmFtaWx5OkFyaWFsO2ZvbnQtc2l6ZToxMjhweDtmaWxsOiNmZmY7fTwvc3R5bGU+Cjx0ZXh0IHg9IjI1NiIgeT0iMjAwIiBjbGFzcz0ic3QwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7wn5CxPC90ZXh0Pgo8dGV4dCB4PSIyNTYiIHk9IjM0MCIgY2xhc3M9InN0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+QpjwvdGV4dD4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0iZ3JhZGllbnQwXzFfMiIgeDE9IjAiIHkxPSIwIiB4Mj0iNTEyIiB5Mj0iNTEyIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiM2NjdlZWEiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNzY0YmEyIi8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+Cg==",
+                    sizes: "512x512",
+                    type: "image/svg+xml",
+                    purpose: "any maskable"
+                }
+            ]
+        };
+
+        // Create and inject manifest
+        const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
+        const manifestURL = URL.createObjectURL(manifestBlob);
+        const manifestLink = document.createElement('link');
+        manifestLink.rel = 'manifest';
+        manifestLink.href = manifestURL;
+        document.head.appendChild(manifestLink);
+
+        class TicTacToe {
+            constructor() {
+                this.board = Array(9).fill('');
+                this.currentPlayer = '🐱';
+                this.gameActive = true;
+                this.scores = this.loadScores();
+                
+                this.winningConditions = [
+                    [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+                    [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
+                    [0, 4, 8], [2, 4, 6] // diagonals
+                ];
+                
+                this.initializeGame();
+                this.handleInstallPrompt();
+            }
+
+            loadScores() {
+                try {
+                    const saved = localStorage.getItem('emojiTicTacToeScores');
+                    return saved ? JSON.parse(saved) : { cat: 0, dog: 0, draws: 0 };
+                } catch (e) {
+                    return { cat: 0, dog: 0, draws: 0 };
+                }
+            }
+
+            saveScores() {
+                try {
+                    localStorage.setItem('emojiTicTacToeScores', JSON.stringify(this.scores));
+                } catch (e) {
+                    console.log('Could not save scores');
+                }
+            }
+
+            initializeGame() {
+                this.cells = document.querySelectorAll('.cell');
+                this.gameStatus = document.getElementById('gameStatus');
+                this.currentPlayerDisplay = document.getElementById('currentPlayer');
+                this.resetBtn = document.getElementById('resetBtn');
+                this.catScore = document.getElementById('catScore');
+                this.dogScore = document.getElementById('dogScore');
+                this.drawScore = document.getElementById('drawScore');
+
+                this.cells.forEach(cell => {
+                    cell.addEventListener('click', this.handleCellClick.bind(this));
+                });
+
+                this.resetBtn.addEventListener('click', this.resetGame.bind(this));
+                this.updateDisplay();
+                this.updateScoreDisplay();
+            }
+
+            handleInstallPrompt() {
+                let deferredPrompt;
+                const installPrompt = document.getElementById('installPrompt');
+                const installBtn = document.getElementById('installBtn');
+                const dismissBtn = document.getElementById('dismissBtn');
+
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    deferredPrompt = e;
+                    
+                    // Show install prompt after a short delay
+                    setTimeout(() => {
+                        if (!window.matchMedia('(display-mode: standalone)').matches) {
+                            installPrompt.classList.add('show');
+                        }
+                    }, 3000);
+                });
+
+                installBtn.addEventListener('click', async () => {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        const { outcome } = await deferredPrompt.userChoice;
+                        deferredPrompt = null;
+                    } else {
+                        // Fallback for iOS
+                        this.showIOSInstallInstructions();
+                    }
+                    installPrompt.classList.remove('show');
+                });
+
+                dismissBtn.addEventListener('click', () => {
+                    installPrompt.classList.remove('show');
+                });
+
+                // Hide prompt if already installed
+                window.addEventListener('appinstalled', () => {
+                    installPrompt.classList.remove('show');
+                });
+            }
+
+            showIOSInstallInstructions() {
+                if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+                    alert('To install:\n1. Tap the Share button ⬆️\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" to install the app');
+                }
+            }
+
+            handleCellClick(event) {
+                const cell = event.target;
+                const index = parseInt(cell.getAttribute('data-index'));
+
+                if (this.board[index] !== '' || !this.gameActive) {
+                    return;
+                }
+
+                this.makeMove(index, cell);
+            }
+
+            makeMove(index, cell) {
+                this.board[index] = this.currentPlayer;
+                cell.textContent = this.currentPlayer;
+                cell.style.pointerEvents = 'none';
+
+                if (this.checkWinner()) {
+                    this.handleGameEnd('win');
+                } else if (this.checkDraw()) {
+                    this.handleGameEnd('draw');
+                } else {
+                    this.switchPlayer();
+                    this.updateDisplay();
+                }
+            }
+
+            checkWinner() {
+                return this.winningConditions.some(condition => {
+                    const [a, b, c] = condition;
+                    if (this.board[a] && this.board[a] === this.board[b] && this.board[a] === this.board[c]) {
+                        this.highlightWinningCells([a, b, c]);
+                        return true;
+                    }
+                    return false;
+                });
+            }
+
+            checkDraw() {
+                return this.board.every(cell => cell !== '');
+            }
+
+            highlightWinningCells(indices) {
+                indices.forEach(index => {
+                    this.cells[index].classList.add('winning');
+                });
+            }
+
+            handleGameEnd(result) {
+                this.gameActive = false;
+                
+                if (result === 'win') {
+                    const winner = this.currentPlayer === '🐱' ? 'Cat' : 'Dog';
+                    this.gameStatus.innerHTML = `<div class="winner-message">🎉 ${this.currentPlayer} ${winner} Wins! 🎉</div>`;
+                    
+                    if (this.currentPlayer === '🐱') {
+                        this.scores.cat++;
+                    } else {
+                        this.scores.dog++;
+                    }
+                } else {
+                    this.gameStatus.innerHTML = `<div class="draw-message">🤝 It's a Draw! 🤝</div>`;
+                    this.scores.draws++;
+                }
+
+                this.saveScores();
+                this.updateScoreDisplay();
+                this.currentPlayerDisplay.textContent = 'Game Over!';
+                
+                // Disable all cells
+                this.cells.forEach(cell => {
+                    cell.style.pointerEvents = 'none';
+                });
+            }
+
+            switchPlayer() {
+                this.currentPlayer = this.currentPlayer === '🐱' ? '🐶' : '🐱';
+            }
+
+            updateDisplay() {
+                this.currentPlayerDisplay.textContent = `Current Player: ${this.currentPlayer}`;
+                this.gameStatus.textContent = 'Make your move!';
+            }
+
+            updateScoreDisplay() {
+                this.catScore.textContent = this.scores.cat;
+                this.dogScore.textContent = this.scores.dog;
+                this.drawScore.textContent = this.scores.draws;
+            }
+
+            resetGame() {
+                this.board = Array(9).fill('');
+                this.currentPlayer = '🐱';
+                this.gameActive = true;
+
+                this.cells.forEach(cell => {
+                    cell.textContent = '';
+                    cell.style.pointerEvents = 'auto';
+                    cell.classList.remove('winning');
+                });
+
+                this.updateDisplay();
+            }
+        }
+
+        // Initialize the game when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new TicTacToe();
+        });
+
+        // Prevent zoom on double tap for better mobile experience
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    </script>
+</body>
+</html>

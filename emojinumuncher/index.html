@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EmojiNumunchers - Emoji Edition</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <button class="settings-btn" id="settings-btn" aria-label="Settings">⚙️</button>
+        <h1>🍽️ EmojiNumunchers 🔢</h1>
+        
+        <div class="game-info">
+            <div class="info-box">
+                <div class="challenge">Challenge:</div>
+                <div id="challenge-text">Munch Even Numbers!</div>
+            </div>
+            <div class="info-box">
+                <div>Score: <span id="score">0</span></div>
+                <div>Level: <span id="level">1</span></div>
+            </div>
+            <div class="info-box">
+                <div>Lives: <span id="lives">❤️❤️❤️</span></div>
+                <div>Time: <span id="timer">60</span>s</div>
+            </div>
+        </div>
+
+        <div class="game-grid" id="game-grid"></div>
+
+        <div class="controls">
+            <p>🎮 Use ARROW KEYS to move</p>
+            <p>🍽️ SPACE or ENTER to munch numbers</p>
+            <button class="btn" onclick="startNewGame()">🎮 New Game</button>
+            <button class="btn" onclick="pauseGame()">⏸️ Pause</button>
+        </div>
+
+        <!-- Mobile Controls -->
+        <div class="mobile-controls" id="mobile-controls">
+            <div class="touch-controls">
+                <button class="touch-btn up" data-action="up">↑</button>
+                <button class="touch-btn left" data-action="left">←</button>
+                <button class="touch-btn space" data-action="space">🍽️</button>
+                <button class="touch-btn right" data-action="right">→</button>
+                <button class="touch-btn down" data-action="down">↓</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="game-message"></div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" id="close-settings">&times;</button>
+            <h2>⚙️ Settings</h2>
+            <div class="settings-section">
+                <label class="setting-option">
+                    <span>Show D-Pad Controls</span>
+                    <input type="checkbox" id="dpad-toggle" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+                <p class="setting-description">When disabled, the game board will be larger on mobile devices.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

@@ -50,6 +50,117 @@
             width: 100%;
         }
 
+        .emoji-selector {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .emoji-selector h2 {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .player-emoji-setup {
+            display: flex;
+            justify-content: space-around;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .player-setup {
+            flex: 1;
+            text-align: center;
+        }
+
+        .player-setup label {
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .emoji-input {
+            font-size: 2.5em;
+            width: 80px;
+            height: 80px;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .emoji-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .emoji-grid.show {
+            display: grid;
+        }
+
+        .emoji-option {
+            width: 40px;
+            height: 40px;
+            font-size: 1.5em;
+            border: 1px solid #eee;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .emoji-option:hover {
+            transform: scale(1.2);
+            background: #f0f0f0;
+        }
+
+        .start-game-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.1em;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+            width: 100%;
+        }
+
+        .start-game-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-content {
+            display: none;
+        }
+
+        .game-content.active {
+            display: block;
+        }
+
         h1 {
             color: #333;
             margin-bottom: 10px;
@@ -292,6 +403,23 @@
     <div class="game-container">
         <h1>🎮 Emoji Tic-Tac-Toe 🎮</h1>
         
+        <div class="emoji-selector" id="emojiSelector">
+            <h2>Choose Your Emojis!</h2>
+            <div class="player-emoji-setup">
+                <div class="player-setup">
+                    <label for="player1Emoji">Player 1</label>
+                    <input type="text" class="emoji-input" id="player1Emoji" value="🐱" readonly>
+                </div>
+                <div class="player-setup">
+                    <label for="player2Emoji">Player 2</label>
+                    <input type="text" class="emoji-input" id="player2Emoji" value="🐶" readonly>
+                </div>
+            </div>
+            <div class="emoji-grid" id="emojiGrid"></div>
+            <button class="start-game-btn" id="startGameBtn">Start Game!</button>
+        </div>
+        
+        <div class="game-content" id="gameContent">
         <div class="score-board">
             <div class="score-item">
                 <div class="score-label">🐱 Wins</div>
@@ -324,6 +452,7 @@
         <div class="game-status" id="gameStatus">Make your move!</div>
         
         <button class="reset-btn" id="resetBtn">🔄 New Game</button>
+        </div>
     </div>
 
     <div class="install-prompt" id="installPrompt">
@@ -374,9 +503,13 @@
         class TicTacToe {
             constructor() {
                 this.board = Array(9).fill('');
-                this.currentPlayer = '🐱';
-                this.gameActive = true;
+                this.player1Emoji = '🐱';
+                this.player2Emoji = '🐶';
+                this.currentPlayer = this.player1Emoji;
+                this.gameActive = false;
                 this.scores = this.loadScores();
+                this.gamesPlayed = 0;
+                this.startingPlayer = 1;
                 
                 this.winningConditions = [
                     [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
@@ -384,16 +517,93 @@
                     [0, 4, 8], [2, 4, 6] // diagonals
                 ];
                 
+                this.availableEmojis = [
+                    '😀', '😎', '🤖', '👻', '👽', '🤠', '🦄', '🐵',
+                    '🐶', '🐱', '🦊', '🐸', '🐧', '🐼', '🐨', '🐯',
+                    '🦁', '🐮', '🐷', '🐭', '🐹', '🐰', '🐻', '🐲',
+                    '🌟', '⭐', '🌙', '☀️', '🔥', '💧', '🌈', '⚡',
+                    '🍎', '🍕', '🍔', '🌮', '🍩', '🍪', '🎂', '🍦',
+                    '⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🎱', '🏓',
+                    '🎮', '🎯', '🎨', '🎭', '🎪', '🎬', '🎤', '🎧',
+                    '🚀', '✈️', '🚗', '🚂', '⛵', '🚁', '🛸', '🏎️'
+                ];
+                
+                this.initializeEmojiSelector();
                 this.initializeGame();
                 this.handleInstallPrompt();
+            }
+
+            initializeEmojiSelector() {
+                const emojiSelector = document.getElementById('emojiSelector');
+                const gameContent = document.getElementById('gameContent');
+                const startGameBtn = document.getElementById('startGameBtn');
+                const player1Input = document.getElementById('player1Emoji');
+                const player2Input = document.getElementById('player2Emoji');
+                const emojiGrid = document.getElementById('emojiGrid');
+                
+                let currentInput = null;
+                
+                // Populate emoji grid
+                this.availableEmojis.forEach(emoji => {
+                    const button = document.createElement('button');
+                    button.className = 'emoji-option';
+                    button.textContent = emoji;
+                    button.addEventListener('click', () => {
+                        if (currentInput) {
+                            currentInput.value = emoji;
+                            emojiGrid.classList.remove('show');
+                            currentInput = null;
+                        }
+                    });
+                    emojiGrid.appendChild(button);
+                });
+                
+                // Handle emoji input clicks
+                player1Input.addEventListener('click', () => {
+                    currentInput = player1Input;
+                    emojiGrid.classList.add('show');
+                });
+                
+                player2Input.addEventListener('click', () => {
+                    currentInput = player2Input;
+                    emojiGrid.classList.add('show');
+                });
+                
+                // Handle start game button
+                startGameBtn.addEventListener('click', () => {
+                    this.player1Emoji = player1Input.value || '🐱';
+                    this.player2Emoji = player2Input.value || '🐶';
+                    
+                    if (this.player1Emoji === this.player2Emoji) {
+                        alert('Please choose different emojis for each player!');
+                        return;
+                    }
+                    
+                    emojiSelector.style.display = 'none';
+                    gameContent.classList.add('active');
+                    this.gameActive = true;
+                    this.currentPlayer = this.startingPlayer === 1 ? this.player1Emoji : this.player2Emoji;
+                    this.updateDisplay();
+                    this.updateScoreDisplay();
+                });
+                
+                // Click outside to close emoji grid
+                document.addEventListener('click', (e) => {
+                    if (!emojiGrid.contains(e.target) && 
+                        !player1Input.contains(e.target) && 
+                        !player2Input.contains(e.target)) {
+                        emojiGrid.classList.remove('show');
+                        currentInput = null;
+                    }
+                });
             }
 
             loadScores() {
                 try {
                     const saved = localStorage.getItem('emojiTicTacToeScores');
-                    return saved ? JSON.parse(saved) : { cat: 0, dog: 0, draws: 0 };
+                    return saved ? JSON.parse(saved) : { player1: 0, player2: 0, draws: 0 };
                 } catch (e) {
-                    return { cat: 0, dog: 0, draws: 0 };
+                    return { player1: 0, player2: 0, draws: 0 };
                 }
             }
 
@@ -410,17 +620,17 @@
                 this.gameStatus = document.getElementById('gameStatus');
                 this.currentPlayerDisplay = document.getElementById('currentPlayer');
                 this.resetBtn = document.getElementById('resetBtn');
-                this.catScore = document.getElementById('catScore');
-                this.dogScore = document.getElementById('dogScore');
+                this.player1Score = document.getElementById('catScore');
+                this.player2Score = document.getElementById('dogScore');
                 this.drawScore = document.getElementById('drawScore');
+                this.player1Label = document.querySelector('.score-board .score-item:first-child .score-label');
+                this.player2Label = document.querySelector('.score-board .score-item:last-child .score-label');
 
                 this.cells.forEach(cell => {
                     cell.addEventListener('click', this.handleCellClick.bind(this));
                 });
 
                 this.resetBtn.addEventListener('click', this.resetGame.bind(this));
-                this.updateDisplay();
-                this.updateScoreDisplay();
             }
 
             handleInstallPrompt() {
@@ -518,15 +728,16 @@
 
             handleGameEnd(result) {
                 this.gameActive = false;
+                this.gamesPlayed++;
                 
                 if (result === 'win') {
-                    const winner = this.currentPlayer === '🐱' ? 'Cat' : 'Dog';
-                    this.gameStatus.innerHTML = `<div class="winner-message">🎉 ${this.currentPlayer} ${winner} Wins! 🎉</div>`;
+                    const winnerName = this.currentPlayer === this.player1Emoji ? 'Player 1' : 'Player 2';
+                    this.gameStatus.innerHTML = `<div class="winner-message">🎉 ${this.currentPlayer} ${winnerName} Wins! 🎉</div>`;
                     
-                    if (this.currentPlayer === '🐱') {
-                        this.scores.cat++;
+                    if (this.currentPlayer === this.player1Emoji) {
+                        this.scores.player1++;
                     } else {
-                        this.scores.dog++;
+                        this.scores.player2++;
                     }
                 } else {
                     this.gameStatus.innerHTML = `<div class="draw-message">🤝 It's a Draw! 🤝</div>`;
@@ -541,26 +752,33 @@
                 this.cells.forEach(cell => {
                     cell.style.pointerEvents = 'none';
                 });
+                
+                // Alternate starting player for next game
+                this.startingPlayer = this.startingPlayer === 1 ? 2 : 1;
             }
 
             switchPlayer() {
-                this.currentPlayer = this.currentPlayer === '🐱' ? '🐶' : '🐱';
+                this.currentPlayer = this.currentPlayer === this.player1Emoji ? this.player2Emoji : this.player1Emoji;
             }
 
             updateDisplay() {
-                this.currentPlayerDisplay.textContent = `Current Player: ${this.currentPlayer}`;
-                this.gameStatus.textContent = 'Make your move!';
+                if (this.gameActive) {
+                    this.currentPlayerDisplay.textContent = `Current Player: ${this.currentPlayer}`;
+                    this.gameStatus.textContent = 'Make your move!';
+                }
             }
 
             updateScoreDisplay() {
-                this.catScore.textContent = this.scores.cat;
-                this.dogScore.textContent = this.scores.dog;
+                this.player1Score.textContent = this.scores.player1;
+                this.player2Score.textContent = this.scores.player2;
                 this.drawScore.textContent = this.scores.draws;
+                this.player1Label.textContent = `${this.player1Emoji} Wins`;
+                this.player2Label.textContent = `${this.player2Emoji} Wins`;
             }
 
             resetGame() {
                 this.board = Array(9).fill('');
-                this.currentPlayer = '🐱';
+                this.currentPlayer = this.startingPlayer === 1 ? this.player1Emoji : this.player2Emoji;
                 this.gameActive = true;
 
                 this.cells.forEach(cell => {
@@ -570,6 +788,10 @@
                 });
 
                 this.updateDisplay();
+                
+                // Show who starts this game
+                const starter = this.startingPlayer === 1 ? 'Player 1' : 'Player 2';
+                this.gameStatus.textContent = `${this.currentPlayer} ${starter} starts!`;
             }
         }
 

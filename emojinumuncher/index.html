@@ -4,6 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>EmojiNumunchers - Emoji Edition</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#33ff33">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="EmojiNumunchers">
+    <meta name="mobile-web-app-capable" content="yes">
+    
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -26,24 +37,26 @@
             </div>
         </div>
 
-        <div class="game-grid" id="game-grid"></div>
+        <div class="game-content">
+            <div class="game-grid" id="game-grid"></div>
+
+            <!-- Mobile Controls -->
+            <div class="mobile-controls" id="mobile-controls">
+                <div class="touch-controls">
+                    <button class="touch-btn up" data-action="up">↑</button>
+                    <button class="touch-btn left" data-action="left">←</button>
+                    <button class="touch-btn space" data-action="space">🍽️</button>
+                    <button class="touch-btn right" data-action="right">→</button>
+                    <button class="touch-btn down" data-action="down">↓</button>
+                </div>
+            </div>
+        </div>
 
         <div class="controls">
             <p>🎮 Use ARROW KEYS to move</p>
             <p>🍽️ SPACE or ENTER to munch numbers</p>
             <button class="btn" onclick="startNewGame()">🎮 New Game</button>
             <button class="btn" onclick="pauseGame()">⏸️ Pause</button>
-        </div>
-
-        <!-- Mobile Controls -->
-        <div class="mobile-controls" id="mobile-controls">
-            <div class="touch-controls">
-                <button class="touch-btn up" data-action="up">↑</button>
-                <button class="touch-btn left" data-action="left">←</button>
-                <button class="touch-btn space" data-action="space">🍽️</button>
-                <button class="touch-btn right" data-action="right">→</button>
-                <button class="touch-btn down" data-action="down">↓</button>
-            </div>
         </div>
 
     </div>

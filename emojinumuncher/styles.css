@@ -687,17 +687,40 @@ h1 {
 @media (orientation: landscape) and (pointer: coarse) {
     .game-container {
         max-width: 95vw;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .game-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        flex: 1;
+    }
+    
+    .game-grid {
+        height: calc(100vh - 140px);
+        width: calc((100vh - 140px) * 8 / 6);
+        max-width: calc(70vw - 10px);
+        margin: 0;
+        flex-shrink: 0;
     }
     
     .game-grid.expanded {
         height: calc(100vh - 140px);
         width: calc((100vh - 140px) * 8 / 6);
-        max-width: calc(100vw - 20px);
-        margin: 5px auto;
+        max-width: calc(75vw - 10px);
     }
     
-    .game-grid.expanded .grid-cell {
+    .game-grid .grid-cell {
         font-size: clamp(1.5em, 4vh, 2.5em);
+    }
+    
+    .mobile-controls {
+        margin: 0;
+        flex-shrink: 0;
+        display: block !important;
     }
     
     .game-info {
@@ -718,14 +741,51 @@ h1 {
     
     /* iPad landscape */
     @media (orientation: landscape) {
-        .game-grid.expanded {
-            height: calc(100vh - 120px);
-            width: calc((100vh - 120px) * 8 / 6);
-            max-width: 90vw;
-        }
-        
+        /* Create horizontal layout for game grid and d-pad */
         .game-container {
             padding: 15px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            max-height: 100vh;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        
+        .game-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex: 1;
+        }
+        
+        .game-grid {
+            height: calc(100vh - 260px);
+            width: calc((100vh - 260px) * 8 / 6);
+            max-width: 60vw;
+            margin: 0;
+            flex-shrink: 0;
+        }
+        
+        .game-grid.expanded {
+            height: calc(100vh - 240px);
+            width: calc((100vh - 240px) * 8 / 6);
+            max-width: 70vw;
+        }
+        
+        .mobile-controls {
+            margin: 0;
+            flex-shrink: 0;
+            display: block !important;
+        }
+        
+        .controls {
+            margin-top: auto;
+            flex-shrink: 0;
+            padding: 10px 0;
+            background: rgba(0, 0, 0, 0.9);
+            border-top: 1px solid #33ff33;
         }
     }
     

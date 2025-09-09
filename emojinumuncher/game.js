@@ -13,12 +13,29 @@ class NumberMunchers {
         this.gameTimer = null;
         this.monsterTimer = null;
         this.challenges = [
-            { name: "Even Numbers", check: n => n % 2 === 0 },
-            { name: "Odd Numbers", check: n => n % 2 === 1 },
+            // Kindergarten - Number Recognition
+            { name: "Numbers = 1", check: n => n === 1 },
+            { name: "Numbers = 2", check: n => n === 2 },
+            { name: "Numbers = 3", check: n => n === 3 },
+            { name: "Numbers = 4", check: n => n === 4 },
+            { name: "Numbers = 5", check: n => n === 5 },
+            
+            // K-1 - Size Comparison
+            { name: "Small Numbers (1,2,3)", check: n => n <= 3 },
+            { name: "Big Numbers (7,8,9)", check: n => n >= 7 },
             { name: "Numbers > 5", check: n => n > 5 },
             { name: "Numbers < 5", check: n => n < 5 },
-            { name: "Multiples of 3", check: n => n % 3 === 0 },
-            { name: "Prime Numbers", check: n => this.isPrime(n) }
+            { name: "Middle Numbers (4,5,6)", check: n => n >= 4 && n <= 6 },
+            
+            // 1st Grade - Patterns & Counting
+            { name: "Even Numbers (2,4,6,8)", check: n => n % 2 === 0 },
+            { name: "Odd Numbers (1,3,5,7,9)", check: n => n % 2 === 1 },
+            { name: "Count by 2s (2,4,6,8)", check: n => n % 2 === 0 },
+            { name: "Count by 3s (3,6,9)", check: n => n % 3 === 0 },
+            
+            
+            // Future use - more advanced concepts
+            // { name: "Prime Numbers", check: n => this.isPrime(n) }
         ];
         this.currentChallenge = this.challenges[0];
         

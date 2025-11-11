@@ -168,6 +168,14 @@
           border-color: var(--primary-green);
       }
 
+      .deposit-input:invalid {
+          border-color: #ff4444;
+      }
+
+      .deposit-input:valid {
+          border-color: var(--primary-green);
+      }
+
       .deposit-btn {
           background: var(--primary-green);
           border: none;
@@ -318,12 +326,17 @@ class PiggyBankData {
         try {
             const stored = localStorage.getItem(this.storageKey);
             if (stored) {
-                return JSON.parse(stored);
+                const data = JSON.parse(stored);
+                // Validate structure
+                if (data.children && Array.isArray(data.children)) {
+                    return data;
+                }
             }
         } catch (e) {
             console.error('Error loading data:', e);
         }
-        return this.defaultData;
+        // Always return valid data
+        return JSON.parse(JSON.stringify(this.defaultData));
     }
 
     save(data) {

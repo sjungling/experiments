@@ -563,6 +563,43 @@ class RateEditor {
         alert(`Interest rate updated to ${rateValue}%/week`);
     }
 }
+
+class PiggyBankApp {
+    constructor() {
+        this.dataStore = new PiggyBankData();
+        this.calculator = new InterestCalculator();
+        this.formatter = new CurrencyFormatter();
+        this.renderer = new UIRenderer(this.formatter);
+        this.depositHandler = new DepositHandler(this.dataStore, this.renderer);
+        this.rateEditor = new RateEditor(this.dataStore, this.renderer);
+    }
+
+    initialize() {
+        // Load data and process interest
+        let data = this.dataStore.load();
+
+        // Process interest for each child
+        data.children = data.children.map(child => {
+            return this.calculator.processInterest(child, data.interestRate);
+        });
+
+        // Save updated data
+        this.dataStore.save(data);
+
+        // Render UI
+        this.renderer.renderAll(data);
+
+        // Attach event listeners
+        this.depositHandler.attachListeners();
+        this.rateEditor.attachListener();
+    }
+}
+
+// Initialize app when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    const app = new PiggyBankApp();
+    app.initialize();
+});
     </script>
 </body>
 </html>

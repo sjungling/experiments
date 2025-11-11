@@ -472,6 +472,60 @@ class UIRenderer {
         document.getElementById('interest-display').textContent = `Interest Rate: ${ratePercent}%/week`;
     }
 }
+
+class DepositHandler {
+    constructor(dataStore, renderer) {
+        this.dataStore = dataStore;
+        this.renderer = renderer;
+    }
+
+    handleDeposit(childIndex, amount) {
+        const data = this.dataStore.load();
+        const child = data.children[childIndex];
+
+        // Validate amount
+        const depositAmount = parseFloat(amount);
+        if (isNaN(depositAmount) || depositAmount <= 0) {
+            alert('Please enter a valid amount greater than 0');
+            return;
+        }
+
+        // Add to balance
+        child.balance += depositAmount;
+        child.balance = Math.round(child.balance * 100) / 100;
+
+        // Add transaction
+        child.transactions.push({
+            type: 'deposit',
+            amount: depositAmount,
+            date: new Date().toISOString().split('T')[0]
+        });
+
+        // Save and re-render
+        this.dataStore.save(data);
+        this.renderer.renderAll(data);
+
+        // Re-attach event listeners
+        this.attachListeners();
+    }
+
+    attachListeners() {
+        const forms = document.querySelectorAll('.deposit-form');
+        forms.forEach(form => {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const childIndex = parseInt(form.dataset.childIndex);
+                const input = form.querySelector('.deposit-input');
+                const amount = input.value;
+
+                this.handleDeposit(childIndex, amount);
+
+                // Clear input
+                input.value = '';
+            });
+        });
+    }
+}
     </script>
 </body>
 </html>

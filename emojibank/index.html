@@ -301,6 +301,52 @@ class PiggyBankData {
         }
     }
 }
+
+class InterestCalculator {
+    calculateWeeksElapsed(lastInterestDate) {
+        const last = new Date(lastInterestDate);
+        const now = new Date();
+        const diffTime = Math.abs(now - last);
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        return Math.floor(diffDays / 7);
+    }
+
+    applyCompoundInterest(balance, rate, weeks) {
+        if (weeks === 0) return { newBalance: balance, interestEarned: 0 };
+
+        const newBalance = balance * Math.pow(1 + rate, weeks);
+        const interestEarned = newBalance - balance;
+
+        return {
+            newBalance: Math.round(newBalance * 100) / 100,
+            interestEarned: Math.round(interestEarned * 100) / 100
+        };
+    }
+
+    processInterest(childData, interestRate) {
+        const weeks = this.calculateWeeksElapsed(childData.lastInterestDate);
+
+        if (weeks === 0) return childData;
+
+        const result = this.applyCompoundInterest(childData.balance, interestRate, weeks);
+
+        // Update child data
+        childData.balance = result.newBalance;
+        childData.totalInterestEarned += result.interestEarned;
+        childData.lastInterestDate = new Date().toISOString().split('T')[0];
+
+        // Add interest transaction
+        if (result.interestEarned > 0) {
+            childData.transactions.push({
+                type: 'interest',
+                amount: result.interestEarned,
+                date: new Date().toISOString().split('T')[0]
+            });
+        }
+
+        return childData;
+    }
+}
     </script>
 </body>
 </html>

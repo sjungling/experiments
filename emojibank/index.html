@@ -7,6 +7,278 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>🏦 Emoji Piggy Bank</title>
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75'>🏦</text></svg>">
+    <link rel="manifest" href="manifest.json">
+    <style>
+      :root {
+          --primary-pink: #ff69b4;
+          --primary-green: #90ee90;
+          --primary-yellow: #ffd700;
+          --bg-light: #fff5f7;
+          --card-bg: #ffffff;
+          --text-dark: #333333;
+          --text-light: #666666;
+          --border: #e0e0e0;
+          --shadow: rgba(0, 0, 0, 0.1);
+      }
+
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+      }
+
+      body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          background: var(--bg-light);
+          color: var(--text-dark);
+          line-height: 1.6;
+          padding: 1rem;
+      }
+
+      header {
+          text-align: center;
+          margin-bottom: 2rem;
+          padding: 1rem;
+          background: var(--card-bg);
+          border-radius: 12px;
+          box-shadow: 0 2px 8px var(--shadow);
+      }
+
+      header h1 {
+          font-size: 2rem;
+          margin-bottom: 1rem;
+      }
+
+      .interest-control {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+      }
+
+      #interest-display {
+          font-size: 1.1rem;
+          color: var(--text-light);
+      }
+
+      #edit-rate-btn {
+          background: var(--primary-yellow);
+          border: none;
+          border-radius: 8px;
+          padding: 0.5rem 0.75rem;
+          font-size: 1rem;
+          cursor: pointer;
+          min-width: 44px;
+          min-height: 44px;
+      }
+
+      #edit-rate-btn:hover {
+          opacity: 0.8;
+      }
+
+      main {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 2rem;
+          max-width: 1200px;
+          margin: 0 auto;
+      }
+
+      @media (min-width: 768px) {
+          main {
+              grid-template-columns: 1fr 1fr;
+          }
+      }
+
+      .piggy-card {
+          background: var(--card-bg);
+          border-radius: 12px;
+          padding: 1.5rem;
+          box-shadow: 0 2px 8px var(--shadow);
+      }
+
+      .card-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 1.5rem;
+          padding-bottom: 1rem;
+          border-bottom: 2px solid var(--border);
+      }
+
+      .card-header h2 {
+          font-size: 1.5rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+      }
+
+      .piggy-emoji {
+          font-size: 2rem;
+      }
+
+      .balance-section {
+          text-align: center;
+          margin-bottom: 1.5rem;
+      }
+
+      .balance-label {
+          font-size: 0.9rem;
+          color: var(--text-light);
+          text-transform: uppercase;
+          letter-spacing: 1px;
+      }
+
+      .balance-amount {
+          font-size: 3rem;
+          font-weight: bold;
+          color: var(--primary-green);
+          margin: 0.5rem 0;
+      }
+
+      .interest-earned {
+          font-size: 1rem;
+          color: var(--text-light);
+      }
+
+      .interest-earned .amount {
+          color: var(--primary-pink);
+          font-weight: bold;
+      }
+
+      .deposit-section {
+          margin-top: 1.5rem;
+      }
+
+      .deposit-form {
+          display: flex;
+          gap: 0.5rem;
+      }
+
+      .deposit-input {
+          flex: 1;
+          padding: 0.75rem;
+          font-size: 1rem;
+          border: 2px solid var(--border);
+          border-radius: 8px;
+      }
+
+      .deposit-input:focus {
+          outline: none;
+          border-color: var(--primary-green);
+      }
+
+      .deposit-input:invalid {
+          border-color: #ff4444;
+      }
+
+      .deposit-input:valid {
+          border-color: var(--primary-green);
+      }
+
+      .deposit-btn {
+          background: var(--primary-green);
+          border: none;
+          border-radius: 8px;
+          padding: 0.75rem 1.5rem;
+          font-size: 1rem;
+          font-weight: bold;
+          cursor: pointer;
+          min-width: 44px;
+          min-height: 44px;
+          white-space: nowrap;
+      }
+
+      .deposit-btn:hover {
+          opacity: 0.8;
+      }
+
+      .chart-section {
+          margin: 1.5rem 0;
+      }
+
+      .chart-title {
+          font-size: 1rem;
+          color: var(--text-light);
+          text-align: center;
+          margin-bottom: 1rem;
+      }
+
+      .chart-container {
+          display: flex;
+          align-items: flex-end;
+          justify-content: space-around;
+          height: 150px;
+          background: linear-gradient(to top, var(--border) 1px, transparent 1px);
+          background-size: 100% 25%;
+          padding: 0.5rem;
+          border-radius: 8px;
+          position: relative;
+      }
+
+      .chart-bar {
+          flex: 1;
+          max-width: 40px;
+          background: var(--primary-pink);
+          border-radius: 4px 4px 0 0;
+          position: relative;
+          transition: all 0.3s ease;
+          margin: 0 2px;
+      }
+
+      .chart-bar:hover {
+          opacity: 0.7;
+      }
+
+      .chart-bar-label {
+          position: absolute;
+          bottom: -20px;
+          left: 50%;
+          transform: translateX(-50%);
+          font-size: 0.7rem;
+          color: var(--text-light);
+          white-space: nowrap;
+      }
+
+      .empty-chart {
+          text-align: center;
+          color: var(--text-light);
+          font-style: italic;
+          padding: 2rem;
+      }
+
+      @media (max-width: 767px) {
+          header h1 {
+              font-size: 1.5rem;
+          }
+
+          .balance-amount {
+              font-size: 2.5rem;
+          }
+
+          .deposit-form {
+              flex-direction: column;
+          }
+
+          .deposit-btn {
+              width: 100%;
+          }
+
+          .chart-container {
+              height: 120px;
+          }
+      }
+
+      @media (min-width: 1024px) {
+          header h1 {
+              font-size: 2.5rem;
+          }
+
+          .balance-amount {
+              font-size: 3.5rem;
+          }
+      }
+    </style>
 </head>
 <body>
     <div id="app">
@@ -22,5 +294,358 @@
             <!-- Piggy bank cards will be inserted here -->
         </main>
     </div>
+
+    <script>
+class PiggyBankData {
+    constructor() {
+        this.storageKey = 'piggybank-data';
+        this.defaultData = {
+            interestRate: 0.01,
+            children: [
+                {
+                    name: "Child 1",
+                    emoji: "🐷",
+                    balance: 0,
+                    totalInterestEarned: 0,
+                    transactions: [],
+                    lastInterestDate: new Date().toISOString().split('T')[0]
+                },
+                {
+                    name: "Child 2",
+                    emoji: "💰",
+                    balance: 0,
+                    totalInterestEarned: 0,
+                    transactions: [],
+                    lastInterestDate: new Date().toISOString().split('T')[0]
+                }
+            ]
+        };
+    }
+
+    load() {
+        try {
+            const stored = localStorage.getItem(this.storageKey);
+            if (stored) {
+                const data = JSON.parse(stored);
+                // Validate structure
+                if (data.children && Array.isArray(data.children)) {
+                    return data;
+                }
+            }
+        } catch (e) {
+            console.error('Error loading data:', e);
+        }
+        // Always return valid data
+        return JSON.parse(JSON.stringify(this.defaultData));
+    }
+
+    save(data) {
+        try {
+            localStorage.setItem(this.storageKey, JSON.stringify(data));
+        } catch (e) {
+            console.error('Error saving data:', e);
+        }
+    }
+}
+
+class InterestCalculator {
+    calculateWeeksElapsed(lastInterestDate) {
+        const last = new Date(lastInterestDate);
+        const now = new Date();
+        const diffTime = Math.abs(now - last);
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        return Math.floor(diffDays / 7);
+    }
+
+    applyCompoundInterest(balance, rate, weeks) {
+        if (weeks === 0) return { newBalance: balance, interestEarned: 0 };
+
+        const newBalance = balance * Math.pow(1 + rate, weeks);
+        const interestEarned = newBalance - balance;
+
+        return {
+            newBalance: Math.round(newBalance * 100) / 100,
+            interestEarned: Math.round(interestEarned * 100) / 100
+        };
+    }
+
+    processInterest(childData, interestRate) {
+        const weeks = this.calculateWeeksElapsed(childData.lastInterestDate);
+
+        if (weeks === 0) return childData;
+
+        const result = this.applyCompoundInterest(childData.balance, interestRate, weeks);
+
+        // Update child data
+        childData.balance = result.newBalance;
+        childData.totalInterestEarned += result.interestEarned;
+        childData.lastInterestDate = new Date().toISOString().split('T')[0];
+
+        // Add interest transaction
+        if (result.interestEarned > 0) {
+            childData.transactions.push({
+                type: 'interest',
+                amount: result.interestEarned,
+                date: new Date().toISOString().split('T')[0]
+            });
+        }
+
+        return childData;
+    }
+}
+
+class CurrencyFormatter {
+    constructor() {
+        this.formatter = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD'
+        });
+    }
+
+    format(amount) {
+        return this.formatter.format(amount);
+    }
+}
+
+class UIRenderer {
+    constructor(formatter) {
+        this.formatter = formatter;
+    }
+
+    renderPiggyCard(child, index) {
+        const card = document.createElement('div');
+        card.className = 'piggy-card';
+        card.dataset.childIndex = index;
+
+        card.innerHTML = `
+            <div class="card-header">
+                <h2>
+                    <span class="piggy-emoji">${child.emoji}</span>
+                    <span>${child.name}</span>
+                </h2>
+            </div>
+
+            <div class="balance-section">
+                <div class="balance-label">Current Balance</div>
+                <div class="balance-amount">${this.formatter.format(child.balance)}</div>
+                <div class="interest-earned">
+                    Total Interest Earned: <span class="amount">${this.formatter.format(child.totalInterestEarned)}</span>
+                </div>
+            </div>
+
+            <div class="chart-section">
+                <div class="chart-title">📈 Balance Growth</div>
+                ${this.renderChart(child)}
+            </div>
+
+            <div class="deposit-section">
+                <form class="deposit-form" data-child-index="${index}">
+                    <input
+                        type="number"
+                        class="deposit-input"
+                        placeholder="Enter amount"
+                        step="0.01"
+                        min="0.01"
+                        required
+                    >
+                    <button type="submit" class="deposit-btn">Deposit 💵</button>
+                </form>
+            </div>
+        `;
+
+        return card;
+    }
+
+    renderChart(child) {
+        const transactions = child.transactions;
+
+        if (transactions.length === 0) {
+            return '<div class="empty-chart">Make your first deposit! 🎯</div>';
+        }
+
+        // Get weekly snapshots (last 10 weeks max)
+        const snapshots = this.getWeeklySnapshots(transactions, child.balance);
+
+        if (snapshots.length === 0) {
+            return '<div class="empty-chart">Make your first deposit! 🎯</div>';
+        }
+
+        const maxBalance = Math.max(...snapshots.map(s => s.balance));
+
+        const bars = snapshots.map((snapshot, i) => {
+            const heightPercent = maxBalance > 0 ? (snapshot.balance / maxBalance) * 100 : 0;
+            return `
+                <div class="chart-bar" style="height: ${heightPercent}%">
+                    <div class="chart-bar-label">W${i + 1}</div>
+                </div>
+            `;
+        }).join('');
+
+        return `<div class="chart-container">${bars}</div>`;
+    }
+
+    getWeeklySnapshots(transactions, currentBalance) {
+        if (transactions.length === 0) return [];
+
+        // Take last 10 transactions as snapshots
+        const recentTransactions = transactions.slice(-10);
+
+        let runningBalance = 0;
+        const snapshots = [];
+
+        recentTransactions.forEach(tx => {
+            runningBalance += tx.amount;
+            snapshots.push({
+                date: tx.date,
+                balance: Math.round(runningBalance * 100) / 100
+            });
+        });
+
+        return snapshots;
+    }
+
+    renderAll(data) {
+        const container = document.getElementById('piggy-banks');
+        container.innerHTML = '';
+
+        data.children.forEach((child, index) => {
+            const card = this.renderPiggyCard(child, index);
+            container.appendChild(card);
+        });
+
+        // Update interest rate display
+        const ratePercent = (data.interestRate * 100).toFixed(1);
+        document.getElementById('interest-display').textContent = `Interest Rate: ${ratePercent}%/week`;
+    }
+}
+
+class DepositHandler {
+    constructor(dataStore, renderer) {
+        this.dataStore = dataStore;
+        this.renderer = renderer;
+    }
+
+    handleDeposit(childIndex, amount) {
+        const data = this.dataStore.load();
+        const child = data.children[childIndex];
+
+        // Validate amount
+        const depositAmount = parseFloat(amount);
+        if (isNaN(depositAmount) || depositAmount <= 0) {
+            alert('Please enter a valid amount greater than 0');
+            return;
+        }
+
+        // Add to balance
+        child.balance += depositAmount;
+        child.balance = Math.round(child.balance * 100) / 100;
+
+        // Add transaction
+        child.transactions.push({
+            type: 'deposit',
+            amount: depositAmount,
+            date: new Date().toISOString().split('T')[0]
+        });
+
+        // Save and re-render
+        this.dataStore.save(data);
+        this.renderer.renderAll(data);
+
+        // Re-attach event listeners
+        this.attachListeners();
+    }
+
+    attachListeners() {
+        const forms = document.querySelectorAll('.deposit-form');
+        forms.forEach(form => {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const childIndex = parseInt(form.dataset.childIndex);
+                const input = form.querySelector('.deposit-input');
+                const amount = input.value;
+
+                this.handleDeposit(childIndex, amount);
+
+                // Clear input
+                input.value = '';
+            });
+        });
+    }
+}
+
+class RateEditor {
+    constructor(dataStore, renderer) {
+        this.dataStore = dataStore;
+        this.renderer = renderer;
+    }
+
+    attachListener() {
+        const editBtn = document.getElementById('edit-rate-btn');
+        editBtn.addEventListener('click', () => {
+            this.showEditDialog();
+        });
+    }
+
+    showEditDialog() {
+        const data = this.dataStore.load();
+        const currentRate = (data.interestRate * 100).toFixed(2);
+
+        const newRate = prompt(`Enter new weekly interest rate (%):\nCurrent: ${currentRate}%`, currentRate);
+
+        if (newRate === null) return; // User cancelled
+
+        const rateValue = parseFloat(newRate);
+
+        if (isNaN(rateValue) || rateValue < 0 || rateValue > 100) {
+            alert('Please enter a valid rate between 0 and 100');
+            return;
+        }
+
+        // Update rate
+        data.interestRate = rateValue / 100;
+        this.dataStore.save(data);
+        this.renderer.renderAll(data);
+
+        alert(`Interest rate updated to ${rateValue}%/week`);
+    }
+}
+
+class PiggyBankApp {
+    constructor() {
+        this.dataStore = new PiggyBankData();
+        this.calculator = new InterestCalculator();
+        this.formatter = new CurrencyFormatter();
+        this.renderer = new UIRenderer(this.formatter);
+        this.depositHandler = new DepositHandler(this.dataStore, this.renderer);
+        this.rateEditor = new RateEditor(this.dataStore, this.renderer);
+    }
+
+    initialize() {
+        // Load data and process interest
+        let data = this.dataStore.load();
+
+        // Process interest for each child
+        data.children = data.children.map(child => {
+            return this.calculator.processInterest(child, data.interestRate);
+        });
+
+        // Save updated data
+        this.dataStore.save(data);
+
+        // Render UI
+        this.renderer.renderAll(data);
+
+        // Attach event listeners
+        this.depositHandler.attachListeners();
+        this.rateEditor.attachListener();
+    }
+}
+
+// Initialize app when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    const app = new PiggyBankApp();
+    app.initialize();
+});
+    </script>
 </body>
 </html>

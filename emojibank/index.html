@@ -88,6 +88,101 @@
               grid-template-columns: 1fr 1fr;
           }
       }
+
+      .piggy-card {
+          background: var(--card-bg);
+          border-radius: 12px;
+          padding: 1.5rem;
+          box-shadow: 0 2px 8px var(--shadow);
+      }
+
+      .card-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 1.5rem;
+          padding-bottom: 1rem;
+          border-bottom: 2px solid var(--border);
+      }
+
+      .card-header h2 {
+          font-size: 1.5rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+      }
+
+      .piggy-emoji {
+          font-size: 2rem;
+      }
+
+      .balance-section {
+          text-align: center;
+          margin-bottom: 1.5rem;
+      }
+
+      .balance-label {
+          font-size: 0.9rem;
+          color: var(--text-light);
+          text-transform: uppercase;
+          letter-spacing: 1px;
+      }
+
+      .balance-amount {
+          font-size: 3rem;
+          font-weight: bold;
+          color: var(--primary-green);
+          margin: 0.5rem 0;
+      }
+
+      .interest-earned {
+          font-size: 1rem;
+          color: var(--text-light);
+      }
+
+      .interest-earned .amount {
+          color: var(--primary-pink);
+          font-weight: bold;
+      }
+
+      .deposit-section {
+          margin-top: 1.5rem;
+      }
+
+      .deposit-form {
+          display: flex;
+          gap: 0.5rem;
+      }
+
+      .deposit-input {
+          flex: 1;
+          padding: 0.75rem;
+          font-size: 1rem;
+          border: 2px solid var(--border);
+          border-radius: 8px;
+      }
+
+      .deposit-input:focus {
+          outline: none;
+          border-color: var(--primary-green);
+      }
+
+      .deposit-btn {
+          background: var(--primary-green);
+          border: none;
+          border-radius: 8px;
+          padding: 0.75rem 1.5rem;
+          font-size: 1rem;
+          font-weight: bold;
+          cursor: pointer;
+          min-width: 44px;
+          min-height: 44px;
+          white-space: nowrap;
+      }
+
+      .deposit-btn:hover {
+          opacity: 0.8;
+      }
     </style>
 </head>
 <body>

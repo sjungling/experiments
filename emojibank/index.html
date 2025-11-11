@@ -526,6 +526,43 @@ class DepositHandler {
         });
     }
 }
+
+class RateEditor {
+    constructor(dataStore, renderer) {
+        this.dataStore = dataStore;
+        this.renderer = renderer;
+    }
+
+    attachListener() {
+        const editBtn = document.getElementById('edit-rate-btn');
+        editBtn.addEventListener('click', () => {
+            this.showEditDialog();
+        });
+    }
+
+    showEditDialog() {
+        const data = this.dataStore.load();
+        const currentRate = (data.interestRate * 100).toFixed(2);
+
+        const newRate = prompt(`Enter new weekly interest rate (%):\nCurrent: ${currentRate}%`, currentRate);
+
+        if (newRate === null) return; // User cancelled
+
+        const rateValue = parseFloat(newRate);
+
+        if (isNaN(rateValue) || rateValue < 0 || rateValue > 100) {
+            alert('Please enter a valid rate between 0 and 100');
+            return;
+        }
+
+        // Update rate
+        data.interestRate = rateValue / 100;
+        this.dataStore.save(data);
+        this.renderer.renderAll(data);
+
+        alert(`Interest rate updated to ${rateValue}%/week`);
+    }
+}
     </script>
 </body>
 </html>

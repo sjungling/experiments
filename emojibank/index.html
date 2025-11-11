@@ -347,6 +347,19 @@ class InterestCalculator {
         return childData;
     }
 }
+
+class CurrencyFormatter {
+    constructor() {
+        this.formatter = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD'
+        });
+    }
+
+    format(amount) {
+        return this.formatter.format(amount);
+    }
+}
     </script>
 </body>
 </html>

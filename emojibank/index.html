@@ -7,6 +7,88 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>🏦 Emoji Piggy Bank</title>
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75'>🏦</text></svg>">
+    <style>
+      :root {
+          --primary-pink: #ff69b4;
+          --primary-green: #90ee90;
+          --primary-yellow: #ffd700;
+          --bg-light: #fff5f7;
+          --card-bg: #ffffff;
+          --text-dark: #333333;
+          --text-light: #666666;
+          --border: #e0e0e0;
+          --shadow: rgba(0, 0, 0, 0.1);
+      }
+
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+      }
+
+      body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          background: var(--bg-light);
+          color: var(--text-dark);
+          line-height: 1.6;
+          padding: 1rem;
+      }
+
+      header {
+          text-align: center;
+          margin-bottom: 2rem;
+          padding: 1rem;
+          background: var(--card-bg);
+          border-radius: 12px;
+          box-shadow: 0 2px 8px var(--shadow);
+      }
+
+      header h1 {
+          font-size: 2rem;
+          margin-bottom: 1rem;
+      }
+
+      .interest-control {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+      }
+
+      #interest-display {
+          font-size: 1.1rem;
+          color: var(--text-light);
+      }
+
+      #edit-rate-btn {
+          background: var(--primary-yellow);
+          border: none;
+          border-radius: 8px;
+          padding: 0.5rem 0.75rem;
+          font-size: 1rem;
+          cursor: pointer;
+          min-width: 44px;
+          min-height: 44px;
+      }
+
+      #edit-rate-btn:hover {
+          opacity: 0.8;
+      }
+
+      main {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 2rem;
+          max-width: 1200px;
+          margin: 0 auto;
+      }
+
+      @media (min-width: 768px) {
+          main {
+              grid-template-columns: 1fr 1fr;
+          }
+      }
+    </style>
 </head>
 <body>
     <div id="app">

@@ -183,6 +183,60 @@
       .deposit-btn:hover {
           opacity: 0.8;
       }
+
+      .chart-section {
+          margin: 1.5rem 0;
+      }
+
+      .chart-title {
+          font-size: 1rem;
+          color: var(--text-light);
+          text-align: center;
+          margin-bottom: 1rem;
+      }
+
+      .chart-container {
+          display: flex;
+          align-items: flex-end;
+          justify-content: space-around;
+          height: 150px;
+          background: linear-gradient(to top, var(--border) 1px, transparent 1px);
+          background-size: 100% 25%;
+          padding: 0.5rem;
+          border-radius: 8px;
+          position: relative;
+      }
+
+      .chart-bar {
+          flex: 1;
+          max-width: 40px;
+          background: var(--primary-pink);
+          border-radius: 4px 4px 0 0;
+          position: relative;
+          transition: all 0.3s ease;
+          margin: 0 2px;
+      }
+
+      .chart-bar:hover {
+          opacity: 0.7;
+      }
+
+      .chart-bar-label {
+          position: absolute;
+          bottom: -20px;
+          left: 50%;
+          transform: translateX(-50%);
+          font-size: 0.7rem;
+          color: var(--text-light);
+          white-space: nowrap;
+      }
+
+      .empty-chart {
+          text-align: center;
+          color: var(--text-light);
+          font-style: italic;
+          padding: 2rem;
+      }
     </style>
 </head>
 <body>

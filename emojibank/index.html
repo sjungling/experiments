@@ -360,6 +360,118 @@ class CurrencyFormatter {
         return this.formatter.format(amount);
     }
 }
+
+class UIRenderer {
+    constructor(formatter) {
+        this.formatter = formatter;
+    }
+
+    renderPiggyCard(child, index) {
+        const card = document.createElement('div');
+        card.className = 'piggy-card';
+        card.dataset.childIndex = index;
+
+        card.innerHTML = `
+            <div class="card-header">
+                <h2>
+                    <span class="piggy-emoji">${child.emoji}</span>
+                    <span>${child.name}</span>
+                </h2>
+            </div>
+
+            <div class="balance-section">
+                <div class="balance-label">Current Balance</div>
+                <div class="balance-amount">${this.formatter.format(child.balance)}</div>
+                <div class="interest-earned">
+                    Total Interest Earned: <span class="amount">${this.formatter.format(child.totalInterestEarned)}</span>
+                </div>
+            </div>
+
+            <div class="chart-section">
+                <div class="chart-title">📈 Balance Growth</div>
+                ${this.renderChart(child)}
+            </div>
+
+            <div class="deposit-section">
+                <form class="deposit-form" data-child-index="${index}">
+                    <input
+                        type="number"
+                        class="deposit-input"
+                        placeholder="Enter amount"
+                        step="0.01"
+                        min="0.01"
+                        required
+                    >
+                    <button type="submit" class="deposit-btn">Deposit 💵</button>
+                </form>
+            </div>
+        `;
+
+        return card;
+    }
+
+    renderChart(child) {
+        const transactions = child.transactions;
+
+        if (transactions.length === 0) {
+            return '<div class="empty-chart">Make your first deposit! 🎯</div>';
+        }
+
+        // Get weekly snapshots (last 10 weeks max)
+        const snapshots = this.getWeeklySnapshots(transactions, child.balance);
+
+        if (snapshots.length === 0) {
+            return '<div class="empty-chart">Make your first deposit! 🎯</div>';
+        }
+
+        const maxBalance = Math.max(...snapshots.map(s => s.balance));
+
+        const bars = snapshots.map((snapshot, i) => {
+            const heightPercent = maxBalance > 0 ? (snapshot.balance / maxBalance) * 100 : 0;
+            return `
+                <div class="chart-bar" style="height: ${heightPercent}%">
+                    <div class="chart-bar-label">W${i + 1}</div>
+                </div>
+            `;
+        }).join('');
+
+        return `<div class="chart-container">${bars}</div>`;
+    }
+
+    getWeeklySnapshots(transactions, currentBalance) {
+        if (transactions.length === 0) return [];
+
+        // Take last 10 transactions as snapshots
+        const recentTransactions = transactions.slice(-10);
+
+        let runningBalance = 0;
+        const snapshots = [];
+
+        recentTransactions.forEach(tx => {
+            runningBalance += tx.amount;
+            snapshots.push({
+                date: tx.date,
+                balance: Math.round(runningBalance * 100) / 100
+            });
+        });
+
+        return snapshots;
+    }
+
+    renderAll(data) {
+        const container = document.getElementById('piggy-banks');
+        container.innerHTML = '';
+
+        data.children.forEach((child, index) => {
+            const card = this.renderPiggyCard(child, index);
+            container.appendChild(card);
+        });
+
+        // Update interest rate display
+        const ratePercent = (data.interestRate * 100).toFixed(1);
+        document.getElementById('interest-display').textContent = `Interest Rate: ${ratePercent}%/week`;
+    }
+}
     </script>
 </body>
 </html>

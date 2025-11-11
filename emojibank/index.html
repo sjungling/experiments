@@ -253,5 +253,54 @@
             <!-- Piggy bank cards will be inserted here -->
         </main>
     </div>
+
+    <script>
+class PiggyBankData {
+    constructor() {
+        this.storageKey = 'piggybank-data';
+        this.defaultData = {
+            interestRate: 0.01,
+            children: [
+                {
+                    name: "Child 1",
+                    emoji: "🐷",
+                    balance: 0,
+                    totalInterestEarned: 0,
+                    transactions: [],
+                    lastInterestDate: new Date().toISOString().split('T')[0]
+                },
+                {
+                    name: "Child 2",
+                    emoji: "💰",
+                    balance: 0,
+                    totalInterestEarned: 0,
+                    transactions: [],
+                    lastInterestDate: new Date().toISOString().split('T')[0]
+                }
+            ]
+        };
+    }
+
+    load() {
+        try {
+            const stored = localStorage.getItem(this.storageKey);
+            if (stored) {
+                return JSON.parse(stored);
+            }
+        } catch (e) {
+            console.error('Error loading data:', e);
+        }
+        return this.defaultData;
+    }
+
+    save(data) {
+        try {
+            localStorage.setItem(this.storageKey, JSON.stringify(data));
+        } catch (e) {
+            console.error('Error saving data:', e);
+        }
+    }
+}
+    </script>
 </body>
 </html>

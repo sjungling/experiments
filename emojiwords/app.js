@@ -503,10 +503,63 @@ class WordPracticeApp {
   }
 
   async speakSyllable(syllable, bubbleElement) {
-    // To be implemented
-    console.log('Speaking:', syllable);
+    // Visual feedback
     bubbleElement.classList.add('playing');
     setTimeout(() => bubbleElement.classList.remove('playing'), 600);
+
+    // Check for API key
+    if (!this.apiKey) {
+      console.log('No API key - visual feedback only');
+      return;
+    }
+
+    // Check cache
+    if (this.audioCache.has(syllable)) {
+      console.log('Playing from cache:', syllable);
+      const cachedAudio = this.audioCache.get(syllable);
+      cachedAudio.currentTime = 0;
+      cachedAudio.play().catch(e => console.error('Playback error:', e));
+      return;
+    }
+
+    // Call OpenAI TTS
+    try {
+      const response = await fetch('https://api.openai.com/v1/audio/speech', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'tts-1',
+          voice: 'nova',
+          input: syllable,
+          speed: 0.9
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`TTS API error: ${response.status}`);
+      }
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+
+      // Cache the audio element
+      this.audioCache.set(syllable, audio);
+
+      // Cleanup URL after playing
+      audio.onended = () => {
+        URL.revokeObjectURL(audioUrl);
+      };
+
+      await audio.play();
+
+    } catch (error) {
+      console.error('TTS error:', error);
+      // Graceful degradation - continue without audio
+    }
   }
 
   revealExamples() {

@@ -259,6 +259,21 @@ class WordPracticeApp {
     // Shuffle words for variety
     this.shuffleWords();
 
+    // Handle browser back/forward navigation
+    window.addEventListener('popstate', (event) => {
+      if (event.state && event.state.word) {
+        const wordIndex = this.findWordIndex(event.state.word);
+        if (wordIndex !== -1) {
+          this.currentIndex = wordIndex;
+          this.renderPractice();
+        } else {
+          this.returnHome();
+        }
+      } else {
+        this.returnHome();
+      }
+    });
+
     // Check for URL parameter and start practice if word is specified
     const urlWord = this.getWordFromURL();
     if (urlWord) {
@@ -299,7 +314,7 @@ class WordPracticeApp {
   updateURL(word) {
     // Update URL with current word using hash parameters
     const newURL = `${window.location.pathname}#word=${encodeURIComponent(word)}`;
-    window.history.replaceState(null, '', newURL);
+    window.history.pushState({ word }, '', newURL);
   }
 
   loadProgress() {
@@ -494,7 +509,20 @@ class WordPracticeApp {
     setTimeout(() => bubbleElement.classList.remove('playing'), 600);
   }
 
+  revealExamples() {
+    // To be implemented
+    console.log('Revealing examples...');
+  }
+
   nextWord() {
+    // Mark current word as practiced
+    this.progress.practicedWords.add(this.currentIndex);
+    this.progress.todayCount++;
+    this.saveProgress();
+
+    // Check for new badges
+    this.checkBadges();
+
     // Move to next word and update URL
     this.currentIndex = (this.currentIndex + 1) % this.wordList.length;
     this.revealState = 'word';
@@ -502,9 +530,15 @@ class WordPracticeApp {
     this.renderPractice();
   }
 
-  revealExamples() {
-    // To be implemented
-    console.log('Revealing examples...');
+  checkBadges() {
+    const totalPracticed = this.progress.practicedWords.size;
+    BADGES.forEach(badge => {
+      if (totalPracticed >= badge.threshold && !this.progress.badges.has(badge.id)) {
+        this.progress.badges.add(badge.id);
+        this.saveProgress();
+        // Could add a badge unlock animation here in the future
+      }
+    });
   }
 
   showSettings() {

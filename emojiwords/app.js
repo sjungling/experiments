@@ -737,6 +737,10 @@ class WordPracticeApp {
     const example = word.examples[this.currentExampleIndex];
     const hasMoreExamples = this.currentExampleIndex < word.examples.length - 1;
 
+    // Bold the target word in the example sentence (case-insensitive, preserve original)
+    const wordRegex = new RegExp(`\\b(${word.word})\\b`, 'gi');
+    const boldExample = example.replace(wordRegex, '<strong>$1</strong>');
+
     const syllablesHTML = word.syllables.map((syllable, index) =>
       `<div class="syllable-bubble" data-syllable="${syllable}">${syllable}</div>`
     ).join('');
@@ -754,7 +758,7 @@ class WordPracticeApp {
         </div>
 
         <div class="examples-section">
-          <div class="example-sentence">${example}</div>
+          <div class="example-sentence">${boldExample}</div>
         </div>
 
         <div class="practice-buttons">

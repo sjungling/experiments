@@ -360,8 +360,61 @@ class WordPracticeApp {
   }
 
   showSettings() {
-    // To be implemented
-    console.log('Opening settings...');
+    const modalHTML = `
+    <div class="modal active" id="settingsModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">⚙️ Settings</h2>
+          <button class="close-btn" id="closeModal">&times;</button>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="apiKeyInput">OpenAI API Key</label>
+          <input
+            type="password"
+            id="apiKeyInput"
+            class="form-input"
+            placeholder="sk-..."
+            value="${this.apiKey}"
+          />
+          <div class="form-hint">Needed for syllable pronunciation. Get your key at platform.openai.com</div>
+        </div>
+
+        <button class="btn-save" id="saveBtn">Save</button>
+      </div>
+    </div>
+  `;
+
+    // Add modal to body
+    const existingModal = document.getElementById('settingsModal');
+    if (existingModal) existingModal.remove();
+
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // Event listeners
+    document.getElementById('closeModal').addEventListener('click', () => this.closeModal());
+    document.getElementById('settingsModal').addEventListener('click', (e) => {
+      if (e.target.id === 'settingsModal') this.closeModal();
+    });
+    document.getElementById('saveBtn').addEventListener('click', () => this.saveSettings());
+  }
+
+  closeModal() {
+    const modal = document.getElementById('settingsModal');
+    if (modal) modal.remove();
+  }
+
+  saveSettings() {
+    const apiKeyInput = document.getElementById('apiKeyInput');
+    this.apiKey = apiKeyInput.value.trim();
+
+    if (this.apiKey) {
+      localStorage.setItem('openai_api_key', this.apiKey);
+    } else {
+      localStorage.removeItem('openai_api_key');
+    }
+
+    this.closeModal();
   }
 }
 

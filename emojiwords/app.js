@@ -259,8 +259,47 @@ class WordPracticeApp {
     // Shuffle words for variety
     this.shuffleWords();
 
-    // Render home screen
+    // Check for URL parameter and start practice if word is specified
+    const urlWord = this.getWordFromURL();
+    if (urlWord) {
+      const wordIndex = this.findWordIndex(urlWord);
+      if (wordIndex !== -1) {
+        this.currentIndex = wordIndex;
+        this.renderPractice();
+        return;
+      }
+    }
+
+    // Render home screen if no valid word in URL
     this.renderHome();
+  }
+
+  getWordFromURL() {
+    // Support both query parameters (?word=family) and hash parameters (#word=family)
+    const urlParams = new URLSearchParams(window.location.search);
+    const queryWord = urlParams.get('word');
+
+    if (queryWord) {
+      return queryWord.toLowerCase();
+    }
+
+    // Check hash parameters
+    const hash = window.location.hash.substring(1); // Remove the #
+    const hashParams = new URLSearchParams(hash);
+    const hashWord = hashParams.get('word');
+
+    return hashWord ? hashWord.toLowerCase() : null;
+  }
+
+  findWordIndex(targetWord) {
+    // Find the index of the word in the current (shuffled) word list
+    return this.wordList.findIndex(item => item.word.toLowerCase() === targetWord);
+  }
+
+  updateURL(word) {
+    // Update URL with current word using hash parameters
+    const newURL = `${window.location.pathname}#word=${encodeURIComponent(word)}`;
+    window.history.replaceState(null, '', newURL);
   }
 
   loadProgress() {
@@ -361,13 +400,25 @@ class WordPracticeApp {
     this.renderPractice();
   }
 
+  returnHome() {
+    // Clear URL parameter
+    window.history.replaceState(null, '', window.location.pathname);
+    this.renderHome();
+  }
+
   renderPractice() {
     const word = this.wordList[this.currentIndex];
     const progressText = `Word ${this.currentIndex + 1} of ${this.wordList.length}`;
 
+    // Update URL with current word
+    this.updateURL(word.word);
+
     this.appElement.innerHTML = `
     <div class="practice-screen">
-      <div class="practice-top">${progressText}</div>
+      <div class="practice-top">
+        <button class="back-btn" id="backBtn">← Back</button>
+        <span>${progressText}</span>
+      </div>
       <div class="practice-content" id="practiceContent">
         <div class="word-emoji">${word.emoji}</div>
         <div class="word-display">${word.word}</div>
@@ -376,7 +427,8 @@ class WordPracticeApp {
     </div>
   `;
 
-    // Event listener for tap to progress
+    // Event listeners
+    document.getElementById('backBtn').addEventListener('click', () => this.returnHome());
     document.getElementById('practiceContent').addEventListener('click', () => this.handleTap());
   }
 
@@ -400,7 +452,10 @@ class WordPracticeApp {
 
     this.appElement.innerHTML = `
     <div class="practice-screen">
-      <div class="practice-top">${progressText}</div>
+      <div class="practice-top">
+        <button class="back-btn" id="backBtn">← Back</button>
+        <span>${progressText}</span>
+      </div>
       <div class="practice-content" id="practiceContent">
         <div class="word-emoji small">${word.emoji}</div>
         <div class="word-display small">${word.word}</div>
@@ -411,6 +466,9 @@ class WordPracticeApp {
       </div>
     </div>
   `;
+
+    // Event listeners
+    document.getElementById('backBtn').addEventListener('click', () => this.returnHome());
 
     // Add syllable click handlers
     document.querySelectorAll('.syllable-bubble').forEach(bubble => {
@@ -434,6 +492,14 @@ class WordPracticeApp {
     console.log('Speaking:', syllable);
     bubbleElement.classList.add('playing');
     setTimeout(() => bubbleElement.classList.remove('playing'), 600);
+  }
+
+  nextWord() {
+    // Move to next word and update URL
+    this.currentIndex = (this.currentIndex + 1) % this.wordList.length;
+    this.revealState = 'word';
+    this.currentExampleIndex = 0;
+    this.renderPractice();
   }
 
   revealExamples() {

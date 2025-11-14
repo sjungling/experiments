@@ -252,6 +252,7 @@ class WordPracticeApp {
     this.currentExampleIndex = 0;
     this.apiKey = localStorage.getItem('openai_api_key') || '';
     this.audioCache = new Map(); // Cache syllable audio
+    this.celebrationInterval = null; // Track celebration interval for cleanup
 
     // Load progress
     this.progress = this.loadProgress();
@@ -369,6 +370,12 @@ class WordPracticeApp {
   }
 
   renderHome() {
+    // Clear celebration interval if it exists
+    if (this.celebrationInterval) {
+      clearInterval(this.celebrationInterval);
+      this.celebrationInterval = null;
+    }
+
     const totalPracticed = this.progress.practicedWords.size;
     const totalWords = this.wordList.length;
     const progressPercent = (totalPracticed / totalWords) * 100;
@@ -410,6 +417,12 @@ class WordPracticeApp {
   }
 
   startPractice() {
+    // Clear celebration interval if it exists
+    if (this.celebrationInterval) {
+      clearInterval(this.celebrationInterval);
+      this.celebrationInterval = null;
+    }
+
     this.currentIndex = 0;
     this.revealState = 'word';
     this.currentExampleIndex = 0;
@@ -681,7 +694,7 @@ class WordPracticeApp {
   `;
 
     // Animate celebration emojis
-    setInterval(() => {
+    this.celebrationInterval = setInterval(() => {
       currentCelebration = (currentCelebration + 1) % celebrations.length;
       const emojiEl = document.getElementById('celebrationEmojis');
       if (emojiEl) {

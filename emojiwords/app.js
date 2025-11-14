@@ -567,9 +567,9 @@ class WordPracticeApp {
         },
         body: JSON.stringify({
           model: 'tts-1',
-          voice: 'nova',
+          voice: 'fable',
           input: syllable,
-          speed: 0.9
+          speed: 0.75
         })
       });
 
@@ -631,9 +631,9 @@ class WordPracticeApp {
         },
         body: JSON.stringify({
           model: 'tts-1',
-          voice: 'nova',
+          voice: 'fable',
           input: word,
-          speed: 0.9
+          speed: 0.75
         })
       });
 
@@ -695,9 +695,9 @@ class WordPracticeApp {
         },
         body: JSON.stringify({
           model: 'tts-1',
-          voice: 'nova',
+          voice: 'fable',
           input: sentence,
-          speed: 0.9
+          speed: 0.75
         })
       });
 

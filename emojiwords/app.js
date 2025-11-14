@@ -563,8 +563,69 @@ class WordPracticeApp {
   }
 
   revealExamples() {
-    // To be implemented
-    console.log('Revealing examples...');
+    this.revealState = 'examples';
+    this.currentExampleIndex = 0;
+    this.renderExamples();
+  }
+
+  renderExamples() {
+    const word = this.wordList[this.currentIndex];
+    const progressText = `Word ${this.currentIndex + 1} of ${this.wordList.length}`;
+    const example = word.examples[this.currentExampleIndex];
+    const hasMoreExamples = this.currentExampleIndex < word.examples.length - 1;
+
+    const syllablesHTML = word.syllables.map((syllable, index) =>
+      `<div class="syllable-bubble" data-syllable="${syllable}">${syllable}</div>`
+    ).join('');
+
+    this.appElement.innerHTML = `
+    <div class="practice-screen">
+      <div class="practice-top">
+        <button class="back-btn" id="backBtn">← Back</button>
+        <span>${progressText}</span>
+      </div>
+      <div class="practice-content">
+        <div class="word-emoji small">${word.emoji}</div>
+        <div class="syllables-container" id="syllablesContainer">
+          ${syllablesHTML}
+        </div>
+
+        <div class="examples-section">
+          <div class="example-sentence">${example}</div>
+        </div>
+
+        <div class="practice-buttons">
+          ${hasMoreExamples ? '<button class="btn-secondary" id="nextExampleBtn">Next Example ➡️</button>' : ''}
+          <button class="btn-next" id="nextWordBtn">Next Word ➡️</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+    // Event listeners
+    document.getElementById('backBtn').addEventListener('click', () => this.returnHome());
+
+    // Re-attach syllable handlers
+    document.querySelectorAll('.syllable-bubble').forEach(bubble => {
+      bubble.addEventListener('click', async () => {
+        try {
+          await this.speakSyllable(bubble.dataset.syllable, bubble);
+        } catch (error) {
+          console.error('Error speaking syllable:', error);
+        }
+      });
+    });
+
+    // Example navigation
+    if (hasMoreExamples) {
+      document.getElementById('nextExampleBtn').addEventListener('click', () => this.nextExample());
+    }
+    document.getElementById('nextWordBtn').addEventListener('click', () => this.nextWord());
+  }
+
+  nextExample() {
+    this.currentExampleIndex++;
+    this.renderExamples();
   }
 
   nextWord() {
@@ -576,11 +637,21 @@ class WordPracticeApp {
     // Check for new badges
     this.checkBadges();
 
-    // Move to next word and update URL
-    this.currentIndex = (this.currentIndex + 1) % this.wordList.length;
-    this.revealState = 'word';
-    this.currentExampleIndex = 0;
-    this.renderPractice();
+    // Move to next word
+    this.currentIndex++;
+
+    if (this.currentIndex >= this.wordList.length) {
+      this.showCompletion();
+    } else {
+      this.revealState = 'word';
+      this.currentExampleIndex = 0;
+      this.renderPractice();
+    }
+  }
+
+  showCompletion() {
+    // To be implemented
+    this.appElement.innerHTML = '<h1>Complete!</h1>';
   }
 
   checkBadges() {

@@ -355,8 +355,48 @@ class WordPracticeApp {
   }
 
   startPractice() {
+    this.currentIndex = 0;
+    this.revealState = 'word';
+    this.currentExampleIndex = 0;
+    this.renderPractice();
+  }
+
+  renderPractice() {
+    const word = this.wordList[this.currentIndex];
+    const progressText = `Word ${this.currentIndex + 1} of ${this.wordList.length}`;
+
+    this.appElement.innerHTML = `
+    <div class="practice-screen">
+      <div class="practice-top">${progressText}</div>
+      <div class="practice-content" id="practiceContent">
+        <div class="word-emoji">${word.emoji}</div>
+        <div class="word-display">${word.word}</div>
+        <div class="tap-hint">Tap to continue</div>
+      </div>
+    </div>
+  `;
+
+    // Event listener for tap to progress
+    document.getElementById('practiceContent').addEventListener('click', () => this.handleTap());
+  }
+
+  handleTap() {
+    if (this.revealState === 'word') {
+      this.revealSyllables();
+    } else if (this.revealState === 'syllables') {
+      this.revealExamples();
+    }
+    // 'examples' state handled by buttons, not tap
+  }
+
+  revealSyllables() {
     // To be implemented
-    console.log('Starting practice...');
+    console.log('Revealing syllables...');
+  }
+
+  revealExamples() {
+    // To be implemented
+    console.log('Revealing examples...');
   }
 
   showSettings() {

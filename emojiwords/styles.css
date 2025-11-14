@@ -273,3 +273,70 @@ body {
 .btn-save:hover {
   transform: translateY(-2px);
 }
+
+/* Practice Screen */
+.practice-screen {
+  text-align: center;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+}
+
+.practice-top {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 0.9rem;
+  color: #999;
+}
+
+.practice-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  cursor: pointer;
+  padding: 2rem 0;
+}
+
+.word-emoji {
+  font-size: 6rem;
+  animation: fadeInScale 0.5s ease;
+}
+
+.word-display {
+  font-size: var(--font-word);
+  font-weight: 700;
+  color: #333;
+  animation: fadeInScale 0.5s ease 0.1s backwards;
+}
+
+.tap-hint {
+  font-size: 0.9rem;
+  color: #999;
+  animation: fadeIn 0.5s ease 0.3s backwards;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

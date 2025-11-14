@@ -423,7 +423,16 @@ class WordPracticeApp {
       this.celebrationInterval = null;
     }
 
-    this.currentIndex = 0;
+    // Find first uncompleted word
+    this.currentIndex = this.wordList.findIndex(word =>
+      !this.progress.practicedWords.has(word.word)
+    );
+
+    // If all completed, start from beginning
+    if (this.currentIndex === -1) {
+      this.currentIndex = 0;
+    }
+
     this.revealState = 'word';
     this.currentExampleIndex = 0;
     this.renderPractice();

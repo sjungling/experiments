@@ -236,11 +236,11 @@ console.log(`Loaded ${WORD_LIST.length} words`);
 
 // Badge system
 const BADGES = [
-  { id: 'starter', threshold: 1, emoji: '⭐', name: 'Word Starter', unlocked: false },
-  { id: 'explorer', threshold: 25, emoji: '🚀', name: 'Word Explorer', unlocked: false },
-  { id: 'reader', threshold: 50, emoji: '📖', name: 'Growing Reader', unlocked: false },
-  { id: 'champion', threshold: 100, emoji: '🏆', name: 'Reading Champion', unlocked: false },
-  { id: 'master', threshold: 200, emoji: '👑', name: 'Word Master', unlocked: false }
+  { id: 'starter', threshold: 1, emoji: '⭐', name: 'Word Starter' },
+  { id: 'explorer', threshold: 25, emoji: '🚀', name: 'Word Explorer' },
+  { id: 'reader', threshold: 50, emoji: '📖', name: 'Growing Reader' },
+  { id: 'champion', threshold: 100, emoji: '🏆', name: 'Reading Champion' },
+  { id: 'master', threshold: 200, emoji: '👑', name: 'Word Master' }
 ];
 
 class WordPracticeApp {
@@ -265,6 +265,7 @@ class WordPracticeApp {
 
   loadProgress() {
     try {
+      // practicedWords contains integer indices (positions in the shuffled word array)
       const practicedWords = JSON.parse(localStorage.getItem('practicedWords') || '[]');
       const lastPracticeDate = localStorage.getItem('lastPracticeDate') || '';
       const badges = JSON.parse(localStorage.getItem('badges') || '[]');
@@ -272,7 +273,7 @@ class WordPracticeApp {
       // Reset daily count if new day
       const today = new Date().toISOString().split('T')[0];
       const todayCount = lastPracticeDate === today
-        ? parseInt(localStorage.getItem('todayCount') || '0')
+        ? parseInt(localStorage.getItem('todayCount') || '0', 10)
         : 0;
 
       return {

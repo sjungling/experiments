@@ -266,7 +266,8 @@ class WordPracticeApp {
         const wordIndex = this.findWordIndex(event.state.word);
         if (wordIndex !== -1) {
           this.currentIndex = wordIndex;
-          this.renderPractice();
+          this.revealState = event.state.state || 'word';
+          this.renderCurrentState();
         } else {
           this.returnHome();
         }
@@ -281,7 +282,9 @@ class WordPracticeApp {
       const wordIndex = this.findWordIndex(urlWord);
       if (wordIndex !== -1) {
         this.currentIndex = wordIndex;
-        this.renderPractice();
+        this.revealState = this.getStateFromURL();
+        this.currentExampleIndex = 0;
+        this.renderCurrentState();
         return;
       }
     }
@@ -307,15 +310,34 @@ class WordPracticeApp {
     return hashWord ? hashWord.toLowerCase() : null;
   }
 
+  getStateFromURL() {
+    // Check hash parameters for state
+    const hash = window.location.hash.substring(1); // Remove the #
+    const hashParams = new URLSearchParams(hash);
+    const state = hashParams.get('state');
+
+    // Validate state is one of the allowed values
+    if (state === 'syllables' || state === 'examples') {
+      return state;
+    }
+
+    return 'word'; // Default to word view
+  }
+
   findWordIndex(targetWord) {
     // Find the index of the word in the current (shuffled) word list
     return this.wordList.findIndex(item => item.word.toLowerCase() === targetWord);
   }
 
-  updateURL(word) {
-    // Update URL with current word using hash parameters
-    const newURL = `${window.location.pathname}#word=${encodeURIComponent(word)}`;
-    window.history.pushState({ word }, '', newURL);
+  updateURL(word, state = 'word') {
+    // Update URL with current word and state using hash parameters
+    const params = new URLSearchParams();
+    params.set('word', word);
+    if (state !== 'word') {
+      params.set('state', state);
+    }
+    const newURL = `${window.location.pathname}#${params.toString()}`;
+    window.history.pushState({ word, state }, '', newURL);
   }
 
   loadProgress() {
@@ -444,12 +466,23 @@ class WordPracticeApp {
     this.renderHome();
   }
 
+  renderCurrentState() {
+    // Render based on current reveal state
+    if (this.revealState === 'syllables') {
+      this.revealSyllables();
+    } else if (this.revealState === 'examples') {
+      this.renderExamples();
+    } else {
+      this.renderPractice();
+    }
+  }
+
   renderPractice() {
     const word = this.wordList[this.currentIndex];
     const progressText = `Word ${this.currentIndex + 1} of ${this.wordList.length}`;
 
-    // Update URL with current word
-    this.updateURL(word.word);
+    // Update URL with current word and state
+    this.updateURL(word.word, 'word');
 
     this.appElement.innerHTML = `
     <div class="practice-screen">
@@ -489,6 +522,9 @@ class WordPracticeApp {
     this.revealState = 'syllables';
     const word = this.wordList[this.currentIndex];
     const progressText = `Word ${this.currentIndex + 1} of ${this.wordList.length}`;
+
+    // Update URL with current state
+    this.updateURL(word.word, 'syllables');
 
     const syllablesHTML = word.syllables.map((syllable, index) =>
       `<div class="syllable-bubble" data-syllable="${syllable}">${syllable}</div>`
@@ -566,10 +602,10 @@ class WordPracticeApp {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'tts-1',
+          model: 'tts-1-hd',
           voice: 'fable',
           input: syllable,
-          speed: 0.75
+          speed: 1.0
         })
       });
 
@@ -630,10 +666,10 @@ class WordPracticeApp {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'tts-1',
+          model: 'tts-1-hd',
           voice: 'fable',
           input: word,
-          speed: 0.75
+          speed: 1.0
         })
       });
 
@@ -694,7 +730,7 @@ class WordPracticeApp {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'tts-1',
+          model: 'tts-1-hd',
           voice: 'fable',
           input: sentence,
           speed: 0.75
@@ -736,6 +772,9 @@ class WordPracticeApp {
     const progressText = `Word ${this.currentIndex + 1} of ${this.wordList.length}`;
     const example = word.examples[this.currentExampleIndex];
     const hasMoreExamples = this.currentExampleIndex < word.examples.length - 1;
+
+    // Update URL with current state
+    this.updateURL(word.word, 'examples');
 
     // Bold the target word in the example sentence (case-insensitive, preserve original)
     const wordRegex = new RegExp(`\\b(${word.word})\\b`, 'gi');
@@ -920,6 +959,12 @@ class WordPracticeApp {
         </div>
 
         <button class="btn-save" id="saveBtn">Save</button>
+
+        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e0e0e0;">
+          <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">⚠️ Danger Zone</h3>
+          <button class="btn-secondary" id="resetProgressBtn" style="width: 100%; background: #dc3545; color: white;">Reset All Progress</button>
+          <div class="form-hint" style="margin-top: 0.5rem;">This will clear all practiced words and badges. This cannot be undone.</div>
+        </div>
       </div>
     </div>
   `;
@@ -958,6 +1003,7 @@ class WordPracticeApp {
       }
     });
     document.getElementById('saveBtn').addEventListener('click', () => this.saveSettings());
+    document.getElementById('resetProgressBtn').addEventListener('click', () => this.resetProgress());
   }
 
   closeModal() {
@@ -991,6 +1037,33 @@ class WordPracticeApp {
     }
 
     this.closeModal();
+  }
+
+  resetProgress() {
+    if (!confirm('Are you sure you want to reset all progress? This will clear all practiced words and badges. This cannot be undone.')) {
+      return;
+    }
+
+    // Clear all progress data from localStorage
+    localStorage.removeItem('practicedWords');
+    localStorage.removeItem('todayCount');
+    localStorage.removeItem('lastPracticeDate');
+    localStorage.removeItem('badges');
+
+    // Reset in-memory progress
+    this.progress = {
+      practicedWords: new Set(),
+      todayCount: 0,
+      lastPracticeDate: '',
+      badges: new Set()
+    };
+
+    // Clear audio cache
+    this.audioCache.clear();
+
+    // Close modal and return to home
+    this.closeModal();
+    this.returnHome();
   }
 }
 

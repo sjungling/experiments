@@ -250,6 +250,13 @@ body {
   margin-top: 0.5rem;
 }
 
+.error-message {
+  font-size: 0.85rem;
+  color: #d32f2f;
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
 .btn-save {
   background: var(--primary-gradient);
   color: white;

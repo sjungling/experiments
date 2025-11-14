@@ -361,11 +361,11 @@ class WordPracticeApp {
 
   showSettings() {
     const modalHTML = `
-    <div class="modal active" id="settingsModal">
+    <div class="modal active" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <div class="modal-content">
         <div class="modal-header">
-          <h2 class="modal-title">⚙️ Settings</h2>
-          <button class="close-btn" id="closeModal">&times;</button>
+          <h2 class="modal-title" id="modalTitle">⚙️ Settings</h2>
+          <button class="close-btn" id="closeModal" aria-label="Close settings">&times;</button>
         </div>
 
         <div class="form-group">
@@ -376,8 +376,10 @@ class WordPracticeApp {
             class="form-input"
             placeholder="sk-..."
             value="${this.apiKey}"
+            autocomplete="off"
           />
           <div class="form-hint">Needed for syllable pronunciation. Get your key at platform.openai.com</div>
+          <div class="error-message" id="apiKeyError" style="display: none;"></div>
         </div>
 
         <button class="btn-save" id="saveBtn">Save</button>
@@ -391,10 +393,32 @@ class WordPracticeApp {
 
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 
+    // Focus the API key input
+    const apiKeyInput = document.getElementById('apiKeyInput');
+    setTimeout(() => apiKeyInput.focus(), 0);
+
+    // Keyboard escape handler
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        this.closeModal();
+        document.removeEventListener('keydown', handleEscape);
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
+
+    // Store handler reference for cleanup
+    document.getElementById('settingsModal').dataset.escapeHandler = 'attached';
+
     // Event listeners
-    document.getElementById('closeModal').addEventListener('click', () => this.closeModal());
+    document.getElementById('closeModal').addEventListener('click', () => {
+      document.removeEventListener('keydown', handleEscape);
+      this.closeModal();
+    });
     document.getElementById('settingsModal').addEventListener('click', (e) => {
-      if (e.target.id === 'settingsModal') this.closeModal();
+      if (e.target.id === 'settingsModal') {
+        document.removeEventListener('keydown', handleEscape);
+        this.closeModal();
+      }
     });
     document.getElementById('saveBtn').addEventListener('click', () => this.saveSettings());
   }
@@ -406,7 +430,22 @@ class WordPracticeApp {
 
   saveSettings() {
     const apiKeyInput = document.getElementById('apiKeyInput');
-    this.apiKey = apiKeyInput.value.trim();
+    const apiKeyError = document.getElementById('apiKeyError');
+    const apiKeyValue = apiKeyInput.value.trim();
+
+    // Clear previous error
+    apiKeyError.style.display = 'none';
+    apiKeyError.textContent = '';
+
+    // Validate API key format if provided
+    if (apiKeyValue && !apiKeyValue.startsWith('sk-')) {
+      apiKeyError.textContent = 'API key must start with "sk-"';
+      apiKeyError.style.display = 'block';
+      apiKeyInput.focus();
+      return;
+    }
+
+    this.apiKey = apiKeyValue;
 
     if (this.apiKey) {
       localStorage.setItem('openai_api_key', this.apiKey);

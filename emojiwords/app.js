@@ -657,12 +657,31 @@ class WordPracticeApp {
 
   checkBadges() {
     const totalPracticed = this.progress.practicedWords.size;
-    BADGES.forEach(badge => {
-      if (totalPracticed >= badge.threshold && !this.progress.badges.has(badge.id)) {
+
+    for (const badge of BADGES) {
+      if (!this.progress.badges.has(badge.id) && totalPracticed >= badge.threshold) {
         this.progress.badges.add(badge.id);
         this.saveProgress();
-        // Could add a badge unlock animation here in the future
+        this.showBadgeNotification(badge);
+        break; // Only show one badge at a time
       }
+    }
+  }
+
+  showBadgeNotification(badge) {
+    const notificationHTML = `
+    <div class="badge-notification" id="badgeNotification">
+      <div class="badge-notification-emoji">${badge.emoji}</div>
+      <div class="badge-notification-title">Badge Unlocked!</div>
+      <div class="badge-notification-text">${badge.name}</div>
+      <button class="btn-continue" id="continueBtn">Continue</button>
+    </div>
+  `;
+
+    document.body.insertAdjacentHTML('beforeend', notificationHTML);
+
+    document.getElementById('continueBtn').addEventListener('click', () => {
+      document.getElementById('badgeNotification').remove();
     });
   }
 

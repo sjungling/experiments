@@ -233,3 +233,96 @@ const WORD_LIST = [
 ];
 
 console.log(`Loaded ${WORD_LIST.length} words`);
+
+// Badge system
+const BADGES = [
+  { id: 'starter', threshold: 1, emoji: '⭐', name: 'Word Starter', unlocked: false },
+  { id: 'explorer', threshold: 25, emoji: '🚀', name: 'Word Explorer', unlocked: false },
+  { id: 'reader', threshold: 50, emoji: '📖', name: 'Growing Reader', unlocked: false },
+  { id: 'champion', threshold: 100, emoji: '🏆', name: 'Reading Champion', unlocked: false },
+  { id: 'master', threshold: 200, emoji: '👑', name: 'Word Master', unlocked: false }
+];
+
+class WordPracticeApp {
+  constructor() {
+    this.appElement = document.getElementById('app');
+    this.wordList = WORD_LIST;
+    this.currentIndex = 0;
+    this.revealState = 'word'; // 'word' | 'syllables' | 'examples'
+    this.currentExampleIndex = 0;
+    this.apiKey = localStorage.getItem('openai_api_key') || '';
+    this.audioCache = new Map(); // Cache syllable audio
+
+    // Load progress
+    this.progress = this.loadProgress();
+
+    // Shuffle words for variety
+    this.shuffleWords();
+
+    // Render home screen
+    this.renderHome();
+  }
+
+  loadProgress() {
+    try {
+      const practicedWords = JSON.parse(localStorage.getItem('practicedWords') || '[]');
+      const lastPracticeDate = localStorage.getItem('lastPracticeDate') || '';
+      const badges = JSON.parse(localStorage.getItem('badges') || '[]');
+
+      // Reset daily count if new day
+      const today = new Date().toISOString().split('T')[0];
+      const todayCount = lastPracticeDate === today
+        ? parseInt(localStorage.getItem('todayCount') || '0')
+        : 0;
+
+      return {
+        practicedWords: new Set(practicedWords),
+        todayCount,
+        lastPracticeDate,
+        badges: new Set(badges)
+      };
+    } catch (e) {
+      console.error('Error loading progress:', e);
+      return {
+        practicedWords: new Set(),
+        todayCount: 0,
+        lastPracticeDate: '',
+        badges: new Set()
+      };
+    }
+  }
+
+  saveProgress() {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      localStorage.setItem('practicedWords', JSON.stringify([...this.progress.practicedWords]));
+      localStorage.setItem('todayCount', this.progress.todayCount.toString());
+      localStorage.setItem('lastPracticeDate', today);
+      localStorage.setItem('badges', JSON.stringify([...this.progress.badges]));
+    } catch (e) {
+      console.error('Error saving progress:', e);
+    }
+  }
+
+  shuffleWords() {
+    // Fisher-Yates shuffle
+    for (let i = this.wordList.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [this.wordList[i], this.wordList[j]] = [this.wordList[j], this.wordList[i]];
+    }
+  }
+
+  renderHome() {
+    // To be implemented
+    this.appElement.innerHTML = '<h1>Home Screen</h1>';
+  }
+}
+
+// Initialize app when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    new WordPracticeApp();
+  });
+} else {
+  new WordPracticeApp();
+}

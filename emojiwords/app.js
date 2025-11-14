@@ -319,7 +319,8 @@ class WordPracticeApp {
 
   loadProgress() {
     try {
-      // practicedWords contains integer indices (positions in the shuffled word array)
+      // practicedWords contains word strings (e.g., "family", "school")
+      // This ensures progress persists across sessions even when word list is shuffled
       const practicedWords = JSON.parse(localStorage.getItem('practicedWords') || '[]');
       const lastPracticeDate = localStorage.getItem('lastPracticeDate') || '';
       const badges = JSON.parse(localStorage.getItem('badges') || '[]');
@@ -629,8 +630,8 @@ class WordPracticeApp {
   }
 
   nextWord() {
-    // Mark current word as practiced
-    this.progress.practicedWords.add(this.currentIndex);
+    // Mark current word as practiced (store word string, not index)
+    this.progress.practicedWords.add(this.wordList[this.currentIndex].word);
     this.progress.todayCount++;
     this.saveProgress();
 

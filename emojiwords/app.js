@@ -651,8 +651,48 @@ class WordPracticeApp {
   }
 
   showCompletion() {
-    // To be implemented
-    this.appElement.innerHTML = '<h1>Complete!</h1>';
+    const totalPracticed = this.progress.practicedWords.size;
+    const totalWords = this.wordList.length;
+    const progressPercent = (totalPracticed / totalWords) * 100;
+
+    // Cycle celebration emojis
+    const celebrations = ['🎉', '✨', '🌟', '🎊'];
+    let currentCelebration = 0;
+
+    this.appElement.innerHTML = `
+    <div class="completion-screen">
+      <div class="celebration-emojis" id="celebrationEmojis">${celebrations[0]}</div>
+      <h1 class="completion-title">Amazing Work!</h1>
+
+      <div class="stats-container">
+        <div class="stat-item">
+          You practiced <span class="stat-highlight">${this.progress.todayCount}</span> words today!
+        </div>
+        <div class="stat-item">
+          Total words practiced: <span class="stat-highlight">${totalPracticed}</span> of ${totalWords}
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: ${progressPercent}%"></div>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="practiceMoreBtn">Practice More</button>
+    </div>
+  `;
+
+    // Animate celebration emojis
+    setInterval(() => {
+      currentCelebration = (currentCelebration + 1) % celebrations.length;
+      const emojiEl = document.getElementById('celebrationEmojis');
+      if (emojiEl) {
+        emojiEl.textContent = celebrations[currentCelebration];
+      }
+    }, 500);
+
+    document.getElementById('practiceMoreBtn').addEventListener('click', () => {
+      this.shuffleWords();
+      this.startPractice();
+    });
   }
 
   checkBadges() {

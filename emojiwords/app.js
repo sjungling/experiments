@@ -468,6 +468,12 @@ class WordPracticeApp {
     // Event listeners
     document.getElementById('backBtn').addEventListener('click', () => this.returnHome());
     document.getElementById('practiceContent').addEventListener('click', () => this.handleTap());
+
+    // Add click handler to word display for pronunciation
+    document.querySelector('.word-display').addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.speakWord(word.word);
+    });
   }
 
   handleTap() {
@@ -521,6 +527,12 @@ class WordPracticeApp {
       });
     });
 
+    // Add click handler to word display for pronunciation
+    document.querySelector('.word-display').addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.speakWord(word.word);
+    });
+
     // Background tap to continue
     document.getElementById('practiceContent').addEventListener('click', () => this.handleTap());
   }
@@ -571,6 +583,70 @@ class WordPracticeApp {
 
       // Cache the audio element
       this.audioCache.set(syllable, audio);
+
+      // Cleanup URL after playing
+      audio.onended = () => {
+        URL.revokeObjectURL(audioUrl);
+      };
+
+      await audio.play();
+
+    } catch (error) {
+      console.error('TTS error:', error);
+      // Graceful degradation - continue without audio
+    }
+  }
+
+  async speakWord(word) {
+    // Visual feedback
+    const wordDisplay = document.querySelector('.word-display');
+    if (wordDisplay) {
+      wordDisplay.classList.add('playing');
+      setTimeout(() => wordDisplay.classList.remove('playing'), 600);
+    }
+
+    // Check for API key
+    if (!this.apiKey) {
+      console.log('No API key - visual feedback only');
+      return;
+    }
+
+    // Check cache with word prefix to avoid syllable collision
+    const cacheKey = `word_${word}`;
+    if (this.audioCache.has(cacheKey)) {
+      console.log('Playing word from cache:', word);
+      const cachedAudio = this.audioCache.get(cacheKey);
+      cachedAudio.currentTime = 0;
+      cachedAudio.play().catch(e => console.error('Playback error:', e));
+      return;
+    }
+
+    // Call OpenAI TTS
+    try {
+      const response = await fetch('https://api.openai.com/v1/audio/speech', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'tts-1',
+          voice: 'nova',
+          input: word,
+          speed: 0.9
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`TTS API error: ${response.status}`);
+      }
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+
+      // Cache the audio element
+      this.audioCache.set(cacheKey, audio);
 
       // Cleanup URL after playing
       audio.onended = () => {

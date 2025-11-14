@@ -314,8 +314,54 @@ class WordPracticeApp {
   }
 
   renderHome() {
+    const totalPracticed = this.progress.practicedWords.size;
+    const totalWords = this.wordList.length;
+    const progressPercent = (totalPracticed / totalWords) * 100;
+
+    const badgesHTML = BADGES.map(badge => {
+      const unlocked = this.progress.badges.has(badge.id);
+      return `
+      <div class="badge ${unlocked ? 'unlocked' : ''}">
+        <div class="badge-icon">${unlocked ? badge.emoji : '🔒'}</div>
+        <div class="badge-name">${badge.name}</div>
+      </div>
+    `;
+    }).join('');
+
+    this.appElement.innerHTML = `
+    <button class="settings-button" id="settingsBtn">⚙️</button>
+    <div class="home-screen">
+      <h1 class="app-title">📚 EmojiWords</h1>
+      <p class="app-subtitle">Learn to read with emojis!</p>
+
+      <div class="progress-display">
+        <div class="progress-text">🌟 ${totalPracticed} of ${totalWords} words practiced</div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: ${progressPercent}%"></div>
+        </div>
+      </div>
+
+      <div class="badges-container">
+        ${badgesHTML}
+      </div>
+
+      <button class="btn-primary" id="startBtn">Start Practice</button>
+    </div>
+  `;
+
+    // Event listeners
+    document.getElementById('startBtn').addEventListener('click', () => this.startPractice());
+    document.getElementById('settingsBtn').addEventListener('click', () => this.showSettings());
+  }
+
+  startPractice() {
     // To be implemented
-    this.appElement.innerHTML = '<h1>Home Screen</h1>';
+    console.log('Starting practice...');
+  }
+
+  showSettings() {
+    // To be implemented
+    console.log('Opening settings...');
   }
 }
 

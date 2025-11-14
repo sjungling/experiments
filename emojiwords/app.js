@@ -414,9 +414,14 @@ class WordPracticeApp {
 
     // Add syllable click handlers
     document.querySelectorAll('.syllable-bubble').forEach(bubble => {
-      bubble.addEventListener('click', (e) => {
+      bubble.addEventListener('click', async (e) => {
         e.stopPropagation(); // Prevent background tap
-        this.speakSyllable(bubble.dataset.syllable, bubble);
+        try {
+          await this.speakSyllable(bubble.dataset.syllable, bubble);
+        } catch (error) {
+          console.error('Error speaking syllable:', error);
+          // Visual feedback continues even on error
+        }
       });
     });
 

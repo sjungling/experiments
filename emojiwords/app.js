@@ -390,8 +390,45 @@ class WordPracticeApp {
   }
 
   revealSyllables() {
+    this.revealState = 'syllables';
+    const word = this.wordList[this.currentIndex];
+    const progressText = `Word ${this.currentIndex + 1} of ${this.wordList.length}`;
+
+    const syllablesHTML = word.syllables.map((syllable, index) =>
+      `<div class="syllable-bubble" data-syllable="${syllable}">${syllable}</div>`
+    ).join('');
+
+    this.appElement.innerHTML = `
+    <div class="practice-screen">
+      <div class="practice-top">${progressText}</div>
+      <div class="practice-content" id="practiceContent">
+        <div class="word-emoji small">${word.emoji}</div>
+        <div class="word-display small">${word.word}</div>
+        <div class="syllables-container" id="syllablesContainer">
+          ${syllablesHTML}
+        </div>
+        <div class="tap-hint">Tap syllables to hear them, or tap background to continue</div>
+      </div>
+    </div>
+  `;
+
+    // Add syllable click handlers
+    document.querySelectorAll('.syllable-bubble').forEach(bubble => {
+      bubble.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent background tap
+        this.speakSyllable(bubble.dataset.syllable, bubble);
+      });
+    });
+
+    // Background tap to continue
+    document.getElementById('practiceContent').addEventListener('click', () => this.handleTap());
+  }
+
+  async speakSyllable(syllable, bubbleElement) {
     // To be implemented
-    console.log('Revealing syllables...');
+    console.log('Speaking:', syllable);
+    bubbleElement.classList.add('playing');
+    setTimeout(() => bubbleElement.classList.remove('playing'), 600);
   }
 
   revealExamples() {

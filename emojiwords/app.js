@@ -661,6 +661,70 @@ class WordPracticeApp {
     }
   }
 
+  async speakSentence(sentence) {
+    // Visual feedback
+    const sentenceEl = document.querySelector('.example-sentence');
+    if (sentenceEl) {
+      sentenceEl.classList.add('playing');
+      setTimeout(() => sentenceEl.classList.remove('playing'), 600);
+    }
+
+    // Check for API key
+    if (!this.apiKey) {
+      console.log('No API key - visual feedback only');
+      return;
+    }
+
+    // Check cache (use sentence as key with prefix)
+    const cacheKey = `sentence_${sentence}`;
+    if (this.audioCache.has(cacheKey)) {
+      console.log('Playing sentence from cache:', sentence);
+      const cachedAudio = this.audioCache.get(cacheKey);
+      cachedAudio.currentTime = 0;
+      cachedAudio.play().catch(e => console.error('Playback error:', e));
+      return;
+    }
+
+    // Call OpenAI TTS for sentence
+    try {
+      const response = await fetch('https://api.openai.com/v1/audio/speech', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'tts-1',
+          voice: 'nova',
+          input: sentence,
+          speed: 0.9
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`TTS API error: ${response.status}`);
+      }
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+
+      // Cache the audio element with sentence_ prefix
+      this.audioCache.set(cacheKey, audio);
+
+      // Cleanup URL after playing
+      audio.onended = () => {
+        URL.revokeObjectURL(audioUrl);
+      };
+
+      await audio.play();
+
+    } catch (error) {
+      console.error('TTS error:', error);
+      // Graceful degradation - continue without audio
+    }
+  }
+
   revealExamples() {
     this.revealState = 'examples';
     this.currentExampleIndex = 0;
@@ -713,6 +777,11 @@ class WordPracticeApp {
           console.error('Error speaking syllable:', error);
         }
       });
+    });
+
+    // Add click handler to sentence
+    document.querySelector('.example-sentence').addEventListener('click', () => {
+      this.speakSentence(example);
     });
 
     // Example navigation

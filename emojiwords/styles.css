@@ -445,6 +445,17 @@ body {
   padding: 1.5rem;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   border-radius: 15px;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.example-sentence:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #e8ecf7 0%, #d5dce8 100%);
+}
+
+.example-sentence.playing {
+  animation: pulse 0.6s ease;
 }
 
 .practice-buttons {

@@ -118,74 +118,70 @@ const svgDiagrams = [
         <text x="68" y="168" fill="#ffc233" font-size="9">3" Screws</text>
     </svg>`,
 
-    // Step 5: Left Wall
+    // Step 5: Left Wall (isolated view)
     `<svg viewBox="0 0 500 380" xmlns="http://www.w3.org/2000/svg">
         <defs>
             <linearGradient id="spf2" x1="0%" y1="0%" x2="0%" y2="100%">
                 <stop offset="0%" stop-color="#d4a574"/>
+                <stop offset="50%" stop-color="#c49464"/>
                 <stop offset="100%" stop-color="#b48454"/>
             </linearGradient>
         </defs>
-        <rect x="100" y="260" width="300" height="15" fill="#c4a35a" stroke="#8b7355" stroke-width="2"/>
-        <rect x="110" y="110" width="10" height="150" fill="url(#spf2)" stroke="#8b5a2b" opacity="0.5"/>
-        <rect x="380" y="110" width="10" height="150" fill="url(#spf2)" stroke="#8b5a2b" opacity="0.5"/>
-        <rect x="110" y="100" width="280" height="10" fill="url(#spf2)" stroke="#8b5a2b" opacity="0.5"/>
-        <rect x="110" y="250" width="280" height="10" fill="url(#spf2)" stroke="#8b5a2b" opacity="0.5"/>
-        <text x="250" y="180" text-anchor="middle" fill="#555" font-size="10">Back Wall (built)</text>
-        <g transform="translate(55,0)">
-            <rect x="30" y="100" width="8" height="160" fill="url(#spf2)" stroke="#8b5a2b"/>
-            <rect x="30" y="92" width="75" height="8" fill="url(#spf2)" stroke="#8b5a2b"/>
-            <rect x="30" y="260" width="75" height="8" fill="url(#spf2)" stroke="#8b5a2b"/>
-            ${[48,66,84].map(x=>`<rect x="${x}" y="100" width="8" height="160" fill="url(#spf2)" stroke="#8b5a2b"/>`).join('')}
-            <text x="67" y="290" text-anchor="middle" fill="#51cf66" font-size="11" font-weight="bold">LEFT</text>
-        </g>
-        <g transform="translate(295,0)" opacity="0.3">
-            <rect x="97" y="100" width="8" height="160" fill="url(#spf2)" stroke="#8b5a2b"/>
-            <rect x="30" y="92" width="75" height="8" fill="url(#spf2)" stroke="#8b5a2b"/>
-            <rect x="30" y="260" width="75" height="8" fill="url(#spf2)" stroke="#8b5a2b"/>
-            ${[48,66,84].map(x=>`<rect x="${x}" y="100" width="8" height="160" fill="url(#spf2)" stroke="#8b5a2b"/>`).join('')}
-            <text x="67" y="290" text-anchor="middle" fill="#555" font-size="10">Right (next)</text>
-        </g>
-        <line x1="85" y1="320" x2="160" y2="320" stroke="#ff6b35"/>
-        <text x="122" y="340" text-anchor="middle" fill="#ff6b35" font-family="monospace" font-size="11">7'-5"</text>
-        <rect x="180" y="40" width="140" height="50" fill="#242424" stroke="#3d3d3d" rx="4"/>
-        <text x="250" y="60" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Left Wall</text>
-        <text x="250" y="78" text-anchor="middle" fill="#a0a0a0" font-size="10">7 studs @ 16" O.C.</text>
+        <rect x="100" y="280" width="300" height="15" fill="#c4a35a" stroke="#8b7355" stroke-width="2"/>
+        <text x="250" y="310" text-anchor="middle" fill="#666" font-size="10">Floor Deck</text>
+        <rect x="110" y="100" width="280" height="10" fill="url(#spf2)" stroke="#8b5a2b"/>
+        <rect x="110" y="110" width="280" height="10" fill="url(#spf2)" stroke="#8b5a2b"/>
+        <rect x="110" y="270" width="280" height="10" fill="url(#spf2)" stroke="#8b5a2b"/>
+        ${[120,160,200,240,280,320,360].map(x=>`
+            <rect x="${x}" y="120" width="10" height="150" fill="url(#spf2)" stroke="#8b5a2b"/>
+        `).join('')}
+        <line x1="120" y1="330" x2="160" y2="330" stroke="#4dabf7"/>
+        <text x="140" y="350" text-anchor="middle" fill="#4dabf7" font-family="monospace" font-size="10">16" O.C.</text>
+        <line x1="420" y1="100" x2="420" y2="280" stroke="#ff6b35" stroke-dasharray="5,5"/>
+        <text x="445" y="190" text-anchor="middle" fill="#ff6b35" font-family="monospace" font-size="12" transform="rotate(90,445,190)">6'-0"</text>
+        <line x1="110" y1="55" x2="390" y2="55" stroke="#ff6b35" stroke-dasharray="5,5"/>
+        <text x="250" y="45" text-anchor="middle" fill="#ff6b35" font-family="monospace" font-size="12">7'-5"</text>
+        <rect x="30" y="90" width="120" height="85" fill="#242424" stroke="#3d3d3d" rx="4"/>
+        <text x="90" y="110" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Left Wall</text>
+        <rect x="40" y="125" width="20" height="6" fill="url(#spf2)" stroke="#8b5a2b"/>
+        <text x="68" y="132" fill="white" font-size="9">2×4 Studs (7)</text>
+        <rect x="40" y="145" width="20" height="6" fill="url(#spf2)" stroke="#8b5a2b"/>
+        <text x="68" y="152" fill="white" font-size="9">2×4 Plates (3)</text>
+        <circle cx="50" cy="165" r="3" fill="#ffc233"/>
+        <text x="68" y="168" fill="#ffc233" font-size="9">3" Screws</text>
     </svg>`,
 
-    // Step 6: Right Wall
+    // Step 6: Right Wall (isolated view)
     `<svg viewBox="0 0 500 380" xmlns="http://www.w3.org/2000/svg">
         <defs>
             <linearGradient id="spf2r" x1="0%" y1="0%" x2="0%" y2="100%">
                 <stop offset="0%" stop-color="#d4a574"/>
+                <stop offset="50%" stop-color="#c49464"/>
                 <stop offset="100%" stop-color="#b48454"/>
             </linearGradient>
         </defs>
-        <rect x="100" y="260" width="300" height="15" fill="#c4a35a" stroke="#8b7355" stroke-width="2"/>
-        <rect x="110" y="110" width="10" height="150" fill="url(#spf2r)" stroke="#8b5a2b" opacity="0.5"/>
-        <rect x="380" y="110" width="10" height="150" fill="url(#spf2r)" stroke="#8b5a2b" opacity="0.5"/>
-        <rect x="110" y="100" width="280" height="10" fill="url(#spf2r)" stroke="#8b5a2b" opacity="0.5"/>
-        <rect x="110" y="250" width="280" height="10" fill="url(#spf2r)" stroke="#8b5a2b" opacity="0.5"/>
-        <text x="250" y="180" text-anchor="middle" fill="#555" font-size="10">Back Wall (built)</text>
-        <g transform="translate(55,0)" opacity="0.5">
-            <rect x="30" y="100" width="8" height="160" fill="url(#spf2r)" stroke="#8b5a2b"/>
-            <rect x="30" y="92" width="75" height="8" fill="url(#spf2r)" stroke="#8b5a2b"/>
-            <rect x="30" y="260" width="75" height="8" fill="url(#spf2r)" stroke="#8b5a2b"/>
-            ${[48,66,84].map(x=>`<rect x="${x}" y="100" width="8" height="160" fill="url(#spf2r)" stroke="#8b5a2b"/>`).join('')}
-            <text x="67" y="290" text-anchor="middle" fill="#555" font-size="10">Left (done)</text>
-        </g>
-        <g transform="translate(295,0)">
-            <rect x="97" y="100" width="8" height="160" fill="url(#spf2r)" stroke="#8b5a2b"/>
-            <rect x="30" y="92" width="75" height="8" fill="url(#spf2r)" stroke="#8b5a2b"/>
-            <rect x="30" y="260" width="75" height="8" fill="url(#spf2r)" stroke="#8b5a2b"/>
-            ${[48,66,84].map(x=>`<rect x="${x}" y="100" width="8" height="160" fill="url(#spf2r)" stroke="#8b5a2b"/>`).join('')}
-            <text x="67" y="290" text-anchor="middle" fill="#51cf66" font-size="11" font-weight="bold">RIGHT</text>
-        </g>
-        <line x1="325" y1="320" x2="400" y2="320" stroke="#ff6b35"/>
-        <text x="362" y="340" text-anchor="middle" fill="#ff6b35" font-family="monospace" font-size="11">7'-5"</text>
-        <rect x="180" y="40" width="140" height="50" fill="#242424" stroke="#3d3d3d" rx="4"/>
-        <text x="250" y="60" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Right Wall</text>
-        <text x="250" y="78" text-anchor="middle" fill="#a0a0a0" font-size="10">7 studs @ 16" O.C.</text>
+        <rect x="100" y="280" width="300" height="15" fill="#c4a35a" stroke="#8b7355" stroke-width="2"/>
+        <text x="250" y="310" text-anchor="middle" fill="#666" font-size="10">Floor Deck</text>
+        <rect x="110" y="100" width="280" height="10" fill="url(#spf2r)" stroke="#8b5a2b"/>
+        <rect x="110" y="110" width="280" height="10" fill="url(#spf2r)" stroke="#8b5a2b"/>
+        <rect x="110" y="270" width="280" height="10" fill="url(#spf2r)" stroke="#8b5a2b"/>
+        ${[120,160,200,240,280,320,360].map(x=>`
+            <rect x="${x}" y="120" width="10" height="150" fill="url(#spf2r)" stroke="#8b5a2b"/>
+        `).join('')}
+        <line x1="120" y1="330" x2="160" y2="330" stroke="#4dabf7"/>
+        <text x="140" y="350" text-anchor="middle" fill="#4dabf7" font-family="monospace" font-size="10">16" O.C.</text>
+        <line x1="420" y1="100" x2="420" y2="280" stroke="#ff6b35" stroke-dasharray="5,5"/>
+        <text x="445" y="190" text-anchor="middle" fill="#ff6b35" font-family="monospace" font-size="12" transform="rotate(90,445,190)">6'-0"</text>
+        <line x1="110" y1="55" x2="390" y2="55" stroke="#ff6b35" stroke-dasharray="5,5"/>
+        <text x="250" y="45" text-anchor="middle" fill="#ff6b35" font-family="monospace" font-size="12">7'-5"</text>
+        <rect x="30" y="90" width="120" height="85" fill="#242424" stroke="#3d3d3d" rx="4"/>
+        <text x="90" y="110" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Right Wall</text>
+        <rect x="40" y="125" width="20" height="6" fill="url(#spf2r)" stroke="#8b5a2b"/>
+        <text x="68" y="132" fill="white" font-size="9">2×4 Studs (7)</text>
+        <rect x="40" y="145" width="20" height="6" fill="url(#spf2r)" stroke="#8b5a2b"/>
+        <text x="68" y="152" fill="white" font-size="9">2×4 Plates (3)</text>
+        <circle cx="50" cy="165" r="3" fill="#ffc233"/>
+        <text x="68" y="168" fill="#ffc233" font-size="9">3" Screws</text>
     </svg>`,
 
     // Step 7: Front Wall with Door

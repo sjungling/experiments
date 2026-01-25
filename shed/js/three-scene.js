@@ -157,8 +157,12 @@ function update3DView(stepIndex) {
         const sg = new THREE.BoxGeometry(0.1, H-0.3, 0.1);
         const pg = new THREE.BoxGeometry(L, 0.1, 0.1);
         const z = W/2 - 0.1;
-        scene.add(Object.assign(new THREE.Mesh(pg, mats.wood), { position: new THREE.Vector3(0, 1.15, z) }));
-        scene.add(Object.assign(new THREE.Mesh(pg, mats.wood), { position: new THREE.Vector3(0, 1.15+H-0.15, z) }));
+        const bp1 = new THREE.Mesh(pg, mats.wood);
+        bp1.position.set(0, 1.15, z);
+        scene.add(bp1);
+        const bp2 = new THREE.Mesh(pg, mats.wood);
+        bp2.position.set(0, 1.15+H-0.15, z);
+        scene.add(bp2);
         for (let x = -L/2+0.5; x <= L/2-0.5; x += 1.375) {
             const s = new THREE.Mesh(sg, mats.wood);
             s.position.set(x, 1.15+(H-0.3)/2+0.1, z);
@@ -171,8 +175,12 @@ function update3DView(stepIndex) {
         const sg = new THREE.BoxGeometry(0.1, H-0.3, 0.1);
         const pg = new THREE.BoxGeometry(0.1, 0.1, W);
         const x = -L/2+0.1;
-        scene.add(Object.assign(new THREE.Mesh(pg, mats.wood), { position: new THREE.Vector3(x, 1.15, 0) }));
-        scene.add(Object.assign(new THREE.Mesh(pg, mats.wood), { position: new THREE.Vector3(x, 1.15+H-0.15, 0) }));
+        const lp1 = new THREE.Mesh(pg, mats.wood);
+        lp1.position.set(x, 1.15, 0);
+        scene.add(lp1);
+        const lp2 = new THREE.Mesh(pg, mats.wood);
+        lp2.position.set(x, 1.15+H-0.15, 0);
+        scene.add(lp2);
         for (let z = -W/2+0.8; z <= W/2-0.8; z += 1.375) {
             const s = new THREE.Mesh(sg, mats.wood);
             s.position.set(x, 1.15+(H-0.3)/2+0.1, z);
@@ -185,8 +193,12 @@ function update3DView(stepIndex) {
         const sg = new THREE.BoxGeometry(0.1, H-0.3, 0.1);
         const pg = new THREE.BoxGeometry(0.1, 0.1, W);
         const x = L/2-0.1;
-        scene.add(Object.assign(new THREE.Mesh(pg, mats.wood), { position: new THREE.Vector3(x, 1.15, 0) }));
-        scene.add(Object.assign(new THREE.Mesh(pg, mats.wood), { position: new THREE.Vector3(x, 1.15+H-0.15, 0) }));
+        const rp1 = new THREE.Mesh(pg, mats.wood);
+        rp1.position.set(x, 1.15, 0);
+        scene.add(rp1);
+        const rp2 = new THREE.Mesh(pg, mats.wood);
+        rp2.position.set(x, 1.15+H-0.15, 0);
+        scene.add(rp2);
         for (let z = -W/2+0.8; z <= W/2-0.8; z += 1.375) {
             const s = new THREE.Mesh(sg, mats.wood);
             s.position.set(x, 1.15+(H-0.3)/2+0.1, z);
@@ -199,8 +211,12 @@ function update3DView(stepIndex) {
         const sg = new THREE.BoxGeometry(0.1, H-0.3, 0.1);
         const pg = new THREE.BoxGeometry(L, 0.1, 0.1);
         const z = -W/2 + 0.1;
-        scene.add(Object.assign(new THREE.Mesh(pg, mats.wood), { position: new THREE.Vector3(0, 1.15, z) }));
-        scene.add(Object.assign(new THREE.Mesh(pg, mats.wood), { position: new THREE.Vector3(0, 1.15+H-0.15, z) }));
+        const fp1 = new THREE.Mesh(pg, mats.wood);
+        fp1.position.set(0, 1.15, z);
+        scene.add(fp1);
+        const fp2 = new THREE.Mesh(pg, mats.wood);
+        fp2.position.set(0, 1.15+H-0.15, z);
+        scene.add(fp2);
         for (let x = -L/2+0.5; x <= L/2-0.5; x += 1.375) {
             if (x > -1.5 && x < 1.5) continue;
             const s = new THREE.Mesh(sg, mats.wood);

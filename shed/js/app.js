@@ -140,12 +140,23 @@ function prevStep() {
 
 function setView(view) {
     currentView = view;
-    
+
     document.getElementById('btn-2d').classList.toggle('active', view === '2d');
     document.getElementById('btn-3d').classList.toggle('active', view === '3d');
+    document.getElementById('btn-parts').classList.toggle('active', view === 'parts');
+
     document.getElementById('svg-container').style.display = view === '2d' ? 'block' : 'none';
     document.getElementById('webgl-container').style.display = view === '3d' ? 'block' : 'none';
     document.getElementById('controls-overlay').classList.toggle('visible', view === '3d');
+
+    // Toggle diagram container and parts grid
+    document.querySelector('.diagram-container').style.display = view === 'parts' ? 'none' : 'block';
+
+    if (view === 'parts') {
+        PartsGrid.show();
+    } else {
+        PartsGrid.hide();
+    }
 
     if (view === '3d') {
         update3DView(currentStep);

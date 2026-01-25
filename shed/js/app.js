@@ -67,7 +67,7 @@ function loadStep(stepIndex) {
                     Pieces for This Step
                 </h3>
                 <div class="pieces-grid">
-                    ${step.pieces.map(p => `<span class="piece-tag">${p}</span>`).join('')}
+                    ${step.pieces.map(p => `<button class="piece-tag" data-part-id="${p}">${p}</button>`).join('')}
                 </div>
             </div>
         `;
@@ -200,6 +200,16 @@ document.addEventListener('click', (e) => {
     if (link) {
         e.preventDefault();
         const partId = link.dataset.partId;
+        PartsModal.open(partId);
+    }
+});
+
+// Handle piece tag clicks
+document.addEventListener('click', (e) => {
+    const tag = e.target.closest('.piece-tag');
+    if (tag) {
+        e.preventDefault();
+        const partId = tag.dataset.partId;
         PartsModal.open(partId);
     }
 });

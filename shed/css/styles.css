@@ -458,6 +458,8 @@ header {
     font-size: 0.75rem;
     color: var(--accent-yellow);
     font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
 .piece-tag:hover {

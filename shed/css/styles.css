@@ -237,6 +237,16 @@ header {
     color: white;
 }
 
+.view-btn.download-btn {
+    text-decoration: none;
+    border: 1px solid var(--border-color);
+}
+
+.view-btn.download-btn:hover {
+    border-color: var(--accent-green);
+    color: var(--accent-green);
+}
+
 /* Diagram Container */
 .diagram-container {
     background: var(--bg-panel);

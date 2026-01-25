@@ -44,15 +44,15 @@ const steps = [
     {
         title: "Step 3: Floor Deck",
         materials: [
-            { name: "3/4\" OSB T&G Subfloor (FL-DK-01 to FL-DK-03)", qty: "3 sheets" },
+            { name: "3/4\" OSB Subfloor (FL-DK-01 to FL-DK-03)", qty: "3 sheets" },
             { name: "Construction Adhesive", qty: "1 tube" },
             { name: "2\" Exterior Screws", qty: "1 lb" }
         ],
         instructions: [
-            "Start at back-left corner with <strong>FL-DK-01</strong> (full 4'×8' sheet), tongue side facing front",
+            "Start at back-left corner with <strong>FL-DK-01</strong> (full 4'×8' sheet)",
             "Apply construction adhesive in a zigzag pattern on joists",
             "Lay <strong>FL-DK-01</strong> and screw every 6\" on edges, 12\" in field",
-            "Install <strong>FL-DK-02</strong> at back-right, engaging tongue and groove joint with FL-DK-01",
+            "Install <strong>FL-DK-02</strong> at back-right, butting tightly against FL-DK-01",
             "Rip <strong>FL-DK-03</strong> to 4' wide and install along the front edge",
             "Stagger end joints between sheets for strength",
             "Ensure all edges are supported by joists <strong>FL-JST-01</strong> through <strong>FL-JST-08</strong>"
@@ -82,29 +82,49 @@ const steps = [
         pieces: ["BW-BP-01", "BW-TP-01", "BW-TP-02", "BW-ST-01", "BW-ST-02", "BW-ST-03", "BW-ST-04", "BW-ST-05", "BW-ST-06", "BW-ST-07", "BW-ST-08", "BW-ST-09"]
     },
     {
-        title: "Step 5: Side Walls",
+        title: "Step 5: Left Wall",
         materials: [
-            { name: "2×4 Bottom Plates (LW-BP-01, RW-BP-01)", qty: "2 pcs @ 7'-5\"" },
-            { name: "2×4 Top Plates (LW-TP-01/02, RW-TP-01/02)", qty: "4 pcs @ 7'-5\"" },
-            { name: "2×4 Studs - Left (LW-ST-01 to LW-ST-07)", qty: "7 pcs @ 69\"" },
-            { name: "2×4 Studs - Right (RW-ST-01 to RW-ST-07)", qty: "7 pcs @ 69\"" },
-            { name: "3\" Framing Screws", qty: "1 lb" }
+            { name: "2×4 Bottom Plate (LW-BP-01)", qty: "1 pc @ 7'-5\"" },
+            { name: "2×4 Top Plates (LW-TP-01, LW-TP-02)", qty: "2 pcs @ 7'-5\"" },
+            { name: "2×4 Studs (LW-ST-01 to LW-ST-07)", qty: "7 pcs @ 69\"" },
+            { name: "3\" Framing Screws", qty: "0.5 lb" }
         ],
         instructions: [
-            "Cut all 14 studs to 69\" — <strong>LW-ST-01</strong> to <strong>LW-ST-07</strong> for left wall, <strong>RW-ST-01</strong> to <strong>RW-ST-07</strong> for right wall",
-            "Cut plates <strong>LW-BP-01</strong>, <strong>LW-TP-01</strong>, <strong>LW-TP-02</strong> to 7'-5\" (89\") for left wall",
-            "Cut plates <strong>RW-BP-01</strong>, <strong>RW-TP-01</strong>, <strong>RW-TP-02</strong> to 7'-5\" (89\") for right wall",
-            "Build left wall: screw studs <strong>LW-ST-01</strong> through <strong>LW-ST-07</strong> between plates (2 screws each end)",
-            "Raise left wall, butt <strong>LW-ST-07</strong> against <strong>BW-ST-01</strong> at back wall corner",
+            "Cut 7 studs <strong>LW-ST-01</strong> through <strong>LW-ST-07</strong> to 69\" each",
+            "Cut plates <strong>LW-BP-01</strong>, <strong>LW-TP-01</strong>, <strong>LW-TP-02</strong> to 7'-5\" (89\")",
+            "Mark stud layout on plates at 16.5\" O.C., starting with <strong>LW-ST-01</strong> at front",
+            "Build wall flat on deck: screw studs between plates (2 screws each end)",
+            "Raise wall, butt <strong>LW-ST-07</strong> against <strong>BW-ST-01</strong> at back wall corner",
             "Screw through <strong>LW-ST-07</strong> into back wall corner (4-5 screws)",
-            "Repeat for right wall: raise and connect <strong>RW-ST-07</strong> to <strong>BW-ST-09</strong>",
-            "Check both walls for plumb and brace temporarily"
+            "Screw <strong>LW-BP-01</strong> to floor deck with 3\" screws every 16\"",
+            "Check wall for plumb and brace temporarily"
         ],
         tip: "The side walls are shorter (7'-5\") to fit between the front and back walls (each 3.5\" thick). Measure your actual opening before cutting plates.",
-        pieces: ["LW-BP-01", "LW-TP-01", "LW-TP-02", "LW-ST-01", "LW-ST-02", "LW-ST-03", "LW-ST-04", "LW-ST-05", "LW-ST-06", "LW-ST-07", "RW-BP-01", "RW-TP-01", "RW-TP-02", "RW-ST-01", "RW-ST-02", "RW-ST-03", "RW-ST-04", "RW-ST-05", "RW-ST-06", "RW-ST-07"]
+        pieces: ["LW-BP-01", "LW-TP-01", "LW-TP-02", "LW-ST-01", "LW-ST-02", "LW-ST-03", "LW-ST-04", "LW-ST-05", "LW-ST-06", "LW-ST-07"]
     },
     {
-        title: "Step 6: Front Wall",
+        title: "Step 6: Right Wall",
+        materials: [
+            { name: "2×4 Bottom Plate (RW-BP-01)", qty: "1 pc @ 7'-5\"" },
+            { name: "2×4 Top Plates (RW-TP-01, RW-TP-02)", qty: "2 pcs @ 7'-5\"" },
+            { name: "2×4 Studs (RW-ST-01 to RW-ST-07)", qty: "7 pcs @ 69\"" },
+            { name: "3\" Framing Screws", qty: "0.5 lb" }
+        ],
+        instructions: [
+            "Cut 7 studs <strong>RW-ST-01</strong> through <strong>RW-ST-07</strong> to 69\" each",
+            "Cut plates <strong>RW-BP-01</strong>, <strong>RW-TP-01</strong>, <strong>RW-TP-02</strong> to 7'-5\" (89\")",
+            "Mark stud layout on plates at 16.5\" O.C., starting with <strong>RW-ST-01</strong> at front",
+            "Build wall flat on deck: screw studs between plates (2 screws each end)",
+            "Raise wall, butt <strong>RW-ST-07</strong> against <strong>BW-ST-09</strong> at back wall corner",
+            "Screw through <strong>RW-ST-07</strong> into back wall corner (4-5 screws)",
+            "Screw <strong>RW-BP-01</strong> to floor deck with 3\" screws every 16\"",
+            "Check wall for plumb and brace temporarily"
+        ],
+        tip: "Mirror the left wall construction. With both side walls up and braced, the structure is now stable enough to proceed with the front wall.",
+        pieces: ["RW-BP-01", "RW-TP-01", "RW-TP-02", "RW-ST-01", "RW-ST-02", "RW-ST-03", "RW-ST-04", "RW-ST-05", "RW-ST-06", "RW-ST-07"]
+    },
+    {
+        title: "Step 7: Front Wall",
         materials: [
             { name: "2×4 Bottom Plates (FW-BP-01, FW-BP-02)", qty: "2 pcs @ 31\"" },
             { name: "2×4 Top Plates (FW-TP-01, FW-TP-02)", qty: "2 pcs @ 10'" },
@@ -129,7 +149,7 @@ const steps = [
         pieces: ["FW-BP-01", "FW-BP-02", "FW-TP-01", "FW-TP-02", "FW-KS-01", "FW-KS-02", "FW-JS-01", "FW-JS-02", "FW-HD-01", "FW-HD-02", "FW-HD-03", "FW-CR-01", "FW-CR-02", "FW-CR-03", "FW-ST-01", "FW-ST-02", "FW-ST-03", "FW-ST-04"]
     },
     {
-        title: "Step 7: Roof Framing",
+        title: "Step 8: Roof Framing",
         materials: [
             { name: "2×6 Ridge Board (RF-RDG-01)", qty: "1 pc @ 10'-6\"" },
             { name: "2×4 Rafters (RF-RAF-01 to RF-RAF-18)", qty: "18 pcs @ 51\"" },
@@ -154,7 +174,7 @@ const steps = [
         pieces: ["RF-RDG-01", "RF-RAF-01", "RF-RAF-02", "RF-RAF-03", "RF-RAF-04", "RF-RAF-05", "RF-RAF-06", "RF-RAF-07", "RF-RAF-08", "RF-RAF-09", "RF-RAF-10", "RF-RAF-11", "RF-RAF-12", "RF-RAF-13", "RF-RAF-14", "RF-RAF-15", "RF-RAF-16", "RF-RAF-17", "RF-RAF-18", "RF-CT-01", "RF-CT-02", "RF-CT-03", "RF-CT-04", "RF-CT-05", "RF-GB-01", "RF-GB-02", "RF-GB-03", "RF-GB-04", "RF-GB-05", "RF-GB-06"]
     },
     {
-        title: "Step 8: Sheathing & Siding",
+        title: "Step 9: Sheathing & Siding",
         materials: [
             { name: "7/16\" OSB Roof Sheathing (SH-RF-01 to SH-RF-05)", qty: "5 sheets" },
             { name: "LP SmartSide Panels (SD-BW-01/02, SD-FW-01/02, SD-LW-01, SD-RW-01, SD-GB-01)", qty: "7 panels" },
@@ -178,7 +198,7 @@ const steps = [
         pieces: ["SH-RF-01", "SH-RF-02", "SH-RF-03", "SH-RF-04", "SH-RF-05", "SD-BW-01", "SD-BW-02", "SD-FW-01", "SD-FW-02", "SD-LW-01", "SD-RW-01", "SD-GB-01", "TR-CN-01", "TR-CN-02", "TR-CN-03", "TR-CN-04", "TR-CN-05", "TR-CN-06", "TR-CN-07", "TR-CN-08"]
     },
     {
-        title: "Step 9: Build the Door",
+        title: "Step 10: Build the Door",
         materials: [
             { name: "Door Panel (DR-PN-01 - from SD-FW-02 cutout)", qty: "1 pc @ 35\"×79\"" },
             { name: "2×4 Stiles (DR-ST-01, DR-ST-02)", qty: "2 pcs @ 79\"" },
@@ -208,7 +228,7 @@ const steps = [
         pieces: ["DR-PN-01", "DR-ST-01", "DR-ST-02", "DR-RL-01", "DR-RL-02", "DR-RL-03", "DR-TR-01", "DR-TR-02", "DR-TR-03", "DR-JB-01", "DR-JB-02", "DR-JB-03", "DR-ST-03", "DR-ST-04", "DR-ST-05"]
     },
     {
-        title: "Step 10: Roofing & Finish",
+        title: "Step 11: Roofing & Finish",
         materials: [
             { name: "Drip Edge (RF-DE-01 to RF-DE-06)", qty: "6 pcs" },
             { name: "15# Roofing Felt (RF-FT-01)", qty: "1 roll" },

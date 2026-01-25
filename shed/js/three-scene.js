@@ -6,6 +6,9 @@ let theta = 0.5;
 let phi = 1.0;
 let radius = 22;
 
+// Cached materials (created once to allow material comparisons)
+let mats = null;
+
 function initThreeJS() {
     const container = document.getElementById('webgl-container');
     
@@ -95,7 +98,7 @@ function updateCameraPosition() {
         radius * Math.cos(phi),
         radius * Math.sin(phi) * Math.sin(theta)
     );
-    camera.lookAt(0, 2, 0);
+    camera.lookAt(0, 4, 0);
 }
 
 function update3DView(stepIndex) {
@@ -104,17 +107,19 @@ function update3DView(stepIndex) {
     scene.traverse(c => { if (c.isMesh) toRemove.push(c); });
     toRemove.forEach(o => scene.remove(o));
 
-    // Materials
-    const mats = {
-        conc: new THREE.MeshLambertMaterial({ color: 0x808080 }),
-        pt: new THREE.MeshLambertMaterial({ color: 0x5a7d4a }),
-        wood: new THREE.MeshLambertMaterial({ color: 0xc49464 }),
-        osb: new THREE.MeshLambertMaterial({ color: 0xc4a35a }),
-        siding: new THREE.MeshLambertMaterial({ color: 0xa0522d }),
-        roof: new THREE.MeshLambertMaterial({ color: 0x4a4a4a }),
-        door: new THREE.MeshLambertMaterial({ color: 0x8b4513 }),
-        header: new THREE.MeshLambertMaterial({ color: 0x51cf66 })
-    };
+    // Initialize materials once (allows material comparisons for shingle swap)
+    if (!mats) {
+        mats = {
+            conc: new THREE.MeshLambertMaterial({ color: 0x808080 }),
+            pt: new THREE.MeshLambertMaterial({ color: 0x5a7d4a }),
+            wood: new THREE.MeshLambertMaterial({ color: 0xc49464 }),
+            osb: new THREE.MeshLambertMaterial({ color: 0xc4a35a }),
+            siding: new THREE.MeshLambertMaterial({ color: 0xa0522d }),
+            roof: new THREE.MeshLambertMaterial({ color: 0x4a4a4a }),
+            door: new THREE.MeshLambertMaterial({ color: 0x8b4513 }),
+            header: new THREE.MeshLambertMaterial({ color: 0x51cf66 })
+        };
+    }
 
     const W = 8, L = 10, H = 6, P = 1.33;
 
@@ -161,23 +166,36 @@ function update3DView(stepIndex) {
         }
     }
 
-    // Side walls (step 4+)
+    // Left wall (step 4+)
     if (stepIndex >= 4) {
         const sg = new THREE.BoxGeometry(0.1, H-0.3, 0.1);
         const pg = new THREE.BoxGeometry(0.1, 0.1, W);
-        [-L/2+0.1, L/2-0.1].forEach(x => {
-            scene.add(Object.assign(new THREE.Mesh(pg, mats.wood), { position: new THREE.Vector3(x, 1.15, 0) }));
-            scene.add(Object.assign(new THREE.Mesh(pg, mats.wood), { position: new THREE.Vector3(x, 1.15+H-0.15, 0) }));
-            for (let z = -W/2+0.8; z <= W/2-0.8; z += 1.375) {
-                const s = new THREE.Mesh(sg, mats.wood);
-                s.position.set(x, 1.15+(H-0.3)/2+0.1, z);
-                scene.add(s);
-            }
-        });
+        const x = -L/2+0.1;
+        scene.add(Object.assign(new THREE.Mesh(pg, mats.wood), { position: new THREE.Vector3(x, 1.15, 0) }));
+        scene.add(Object.assign(new THREE.Mesh(pg, mats.wood), { position: new THREE.Vector3(x, 1.15+H-0.15, 0) }));
+        for (let z = -W/2+0.8; z <= W/2-0.8; z += 1.375) {
+            const s = new THREE.Mesh(sg, mats.wood);
+            s.position.set(x, 1.15+(H-0.3)/2+0.1, z);
+            scene.add(s);
+        }
     }
 
-    // Front wall (step 5+)
+    // Right wall (step 5+)
     if (stepIndex >= 5) {
+        const sg = new THREE.BoxGeometry(0.1, H-0.3, 0.1);
+        const pg = new THREE.BoxGeometry(0.1, 0.1, W);
+        const x = L/2-0.1;
+        scene.add(Object.assign(new THREE.Mesh(pg, mats.wood), { position: new THREE.Vector3(x, 1.15, 0) }));
+        scene.add(Object.assign(new THREE.Mesh(pg, mats.wood), { position: new THREE.Vector3(x, 1.15+H-0.15, 0) }));
+        for (let z = -W/2+0.8; z <= W/2-0.8; z += 1.375) {
+            const s = new THREE.Mesh(sg, mats.wood);
+            s.position.set(x, 1.15+(H-0.3)/2+0.1, z);
+            scene.add(s);
+        }
+    }
+
+    // Front wall (step 6+)
+    if (stepIndex >= 6) {
         const sg = new THREE.BoxGeometry(0.1, H-0.3, 0.1);
         const pg = new THREE.BoxGeometry(L, 0.1, 0.1);
         const z = -W/2 + 0.1;
@@ -195,8 +213,8 @@ function update3DView(stepIndex) {
         scene.add(h);
     }
 
-    // Roof (step 6+)
-    if (stepIndex >= 6) {
+    // Roof (step 7+)
+    if (stepIndex >= 7) {
         const rg = new THREE.BoxGeometry(L+0.5, 0.15, 0.1);
         const r = new THREE.Mesh(rg, mats.wood);
         r.position.set(0, 1.15+H+P, 0);
@@ -216,35 +234,51 @@ function update3DView(stepIndex) {
         }
     }
 
-    // Siding (step 7+)
-    if (stepIndex >= 7) {
+    // Siding (step 8+)
+    if (stepIndex >= 8) {
         const sfg = new THREE.BoxGeometry(L, H, 0.05);
-        scene.add(Object.assign(new THREE.Mesh(sfg, mats.siding), { position: new THREE.Vector3(0, 1.15+H/2, -W/2) }));
-        scene.add(Object.assign(new THREE.Mesh(sfg, mats.siding), { position: new THREE.Vector3(0, 1.15+H/2, W/2) }));
+        const sf = new THREE.Mesh(sfg, mats.siding);
+        sf.position.set(0, 1.15+H/2, -W/2);
+        sf.castShadow = true;
+        sf.receiveShadow = true;
+        scene.add(sf);
+        const sb = new THREE.Mesh(sfg, mats.siding);
+        sb.position.set(0, 1.15+H/2, W/2);
+        sb.castShadow = true;
+        sb.receiveShadow = true;
+        scene.add(sb);
         const ssg = new THREE.BoxGeometry(0.05, H, W);
-        [-L/2, L/2].forEach(x => scene.add(Object.assign(new THREE.Mesh(ssg, mats.siding), { position: new THREE.Vector3(x, 1.15+H/2, 0) })));
+        [-L/2, L/2].forEach(x => {
+            const sw = new THREE.Mesh(ssg, mats.siding);
+            sw.position.set(x, 1.15+H/2, 0);
+            sw.castShadow = true;
+            sw.receiveShadow = true;
+            scene.add(sw);
+        });
         const ra = Math.atan2(P, W/2);
         const rog = new THREE.BoxGeometry(L+1, Math.sqrt((W/2+0.5)**2+P**2), 0.08);
         const rol = new THREE.Mesh(rog, mats.osb);
         rol.position.set(0, 1.15+H+P/2+0.1, -W/4-0.1);
         rol.rotation.x = -ra;
+        rol.castShadow = true;
         scene.add(rol);
         const ror = new THREE.Mesh(rog, mats.osb);
         ror.position.set(0, 1.15+H+P/2+0.1, W/4+0.1);
         ror.rotation.x = ra;
+        ror.castShadow = true;
         scene.add(ror);
     }
 
-    // Door (step 8+)
-    if (stepIndex >= 8) {
+    // Door (step 9+)
+    if (stepIndex >= 9) {
         const dg = new THREE.BoxGeometry(2.8, 6.5, 0.15);
         const d = new THREE.Mesh(dg, mats.door);
         d.position.set(0, 1.15+3.25, -W/2-0.1);
         scene.add(d);
     }
 
-    // Shingles (step 9)
-    if (stepIndex >= 9) {
+    // Shingles (step 10+)
+    if (stepIndex >= 10) {
         scene.traverse(c => {
             if (c.material === mats.osb && c.position.y > 5) c.material = mats.roof;
         });

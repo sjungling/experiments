@@ -79,10 +79,10 @@ const svgDiagrams = [
         <circle cx="156" cy="260" r="20" fill="#242424" stroke="#ff6b35" stroke-width="2"/>
         <text x="156" y="265" text-anchor="middle" fill="#ff6b35" font-family="monospace" font-size="16" font-weight="bold">3</text>
         <line x1="252" y1="65" x2="252" y2="215" stroke="#ffc233" stroke-width="3"/>
-        <text x="262" y="140" fill="#ffc233" font-size="10" transform="rotate(90,262,140)">T&G Joint</text>
+        <text x="262" y="140" fill="#ffc233" font-size="10" transform="rotate(90,262,140)">Seam</text>
         <rect x="300" y="85" width="130" height="60" fill="#242424" stroke="#3d3d3d" rx="4"/>
         <rect x="310" y="100" width="24" height="16" fill="url(#osb)" stroke="#8b7355"/>
-        <text x="342" y="112" fill="white" font-size="10">3/4" OSB T&G</text>
+        <text x="342" y="112" fill="white" font-size="10">3/4" OSB</text>
         <circle cx="320" cy="130" r="3" fill="#ffc233"/>
         <text x="332" y="133" fill="#ffc233" font-size="10">2" Screws</text>
     </svg>`,
@@ -118,7 +118,7 @@ const svgDiagrams = [
         <text x="68" y="168" fill="#ffc233" font-size="9">3" Screws</text>
     </svg>`,
 
-    // Step 5: Side Walls
+    // Step 5: Left Wall
     `<svg viewBox="0 0 500 380" xmlns="http://www.w3.org/2000/svg">
         <defs>
             <linearGradient id="spf2" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -139,21 +139,56 @@ const svgDiagrams = [
             ${[48,66,84].map(x=>`<rect x="${x}" y="100" width="8" height="160" fill="url(#spf2)" stroke="#8b5a2b"/>`).join('')}
             <text x="67" y="290" text-anchor="middle" fill="#51cf66" font-size="11" font-weight="bold">LEFT</text>
         </g>
-        <g transform="translate(295,0)">
+        <g transform="translate(295,0)" opacity="0.3">
             <rect x="97" y="100" width="8" height="160" fill="url(#spf2)" stroke="#8b5a2b"/>
             <rect x="30" y="92" width="75" height="8" fill="url(#spf2)" stroke="#8b5a2b"/>
             <rect x="30" y="260" width="75" height="8" fill="url(#spf2)" stroke="#8b5a2b"/>
             ${[48,66,84].map(x=>`<rect x="${x}" y="100" width="8" height="160" fill="url(#spf2)" stroke="#8b5a2b"/>`).join('')}
-            <text x="67" y="290" text-anchor="middle" fill="#51cf66" font-size="11" font-weight="bold">RIGHT</text>
+            <text x="67" y="290" text-anchor="middle" fill="#555" font-size="10">Right (next)</text>
         </g>
         <line x1="85" y1="320" x2="160" y2="320" stroke="#ff6b35"/>
         <text x="122" y="340" text-anchor="middle" fill="#ff6b35" font-family="monospace" font-size="11">7'-5"</text>
         <rect x="180" y="40" width="140" height="50" fill="#242424" stroke="#3d3d3d" rx="4"/>
-        <text x="250" y="60" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Side Walls (×2)</text>
-        <text x="250" y="78" text-anchor="middle" fill="#a0a0a0" font-size="10">7 studs each</text>
+        <text x="250" y="60" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Left Wall</text>
+        <text x="250" y="78" text-anchor="middle" fill="#a0a0a0" font-size="10">7 studs @ 16" O.C.</text>
     </svg>`,
 
-    // Step 6: Front Wall with Door
+    // Step 6: Right Wall
+    `<svg viewBox="0 0 500 380" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="spf2r" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#d4a574"/>
+                <stop offset="100%" stop-color="#b48454"/>
+            </linearGradient>
+        </defs>
+        <rect x="100" y="260" width="300" height="15" fill="#c4a35a" stroke="#8b7355" stroke-width="2"/>
+        <rect x="110" y="110" width="10" height="150" fill="url(#spf2r)" stroke="#8b5a2b" opacity="0.5"/>
+        <rect x="380" y="110" width="10" height="150" fill="url(#spf2r)" stroke="#8b5a2b" opacity="0.5"/>
+        <rect x="110" y="100" width="280" height="10" fill="url(#spf2r)" stroke="#8b5a2b" opacity="0.5"/>
+        <rect x="110" y="250" width="280" height="10" fill="url(#spf2r)" stroke="#8b5a2b" opacity="0.5"/>
+        <text x="250" y="180" text-anchor="middle" fill="#555" font-size="10">Back Wall (built)</text>
+        <g transform="translate(55,0)" opacity="0.5">
+            <rect x="30" y="100" width="8" height="160" fill="url(#spf2r)" stroke="#8b5a2b"/>
+            <rect x="30" y="92" width="75" height="8" fill="url(#spf2r)" stroke="#8b5a2b"/>
+            <rect x="30" y="260" width="75" height="8" fill="url(#spf2r)" stroke="#8b5a2b"/>
+            ${[48,66,84].map(x=>`<rect x="${x}" y="100" width="8" height="160" fill="url(#spf2r)" stroke="#8b5a2b"/>`).join('')}
+            <text x="67" y="290" text-anchor="middle" fill="#555" font-size="10">Left (done)</text>
+        </g>
+        <g transform="translate(295,0)">
+            <rect x="97" y="100" width="8" height="160" fill="url(#spf2r)" stroke="#8b5a2b"/>
+            <rect x="30" y="92" width="75" height="8" fill="url(#spf2r)" stroke="#8b5a2b"/>
+            <rect x="30" y="260" width="75" height="8" fill="url(#spf2r)" stroke="#8b5a2b"/>
+            ${[48,66,84].map(x=>`<rect x="${x}" y="100" width="8" height="160" fill="url(#spf2r)" stroke="#8b5a2b"/>`).join('')}
+            <text x="67" y="290" text-anchor="middle" fill="#51cf66" font-size="11" font-weight="bold">RIGHT</text>
+        </g>
+        <line x1="325" y1="320" x2="400" y2="320" stroke="#ff6b35"/>
+        <text x="362" y="340" text-anchor="middle" fill="#ff6b35" font-family="monospace" font-size="11">7'-5"</text>
+        <rect x="180" y="40" width="140" height="50" fill="#242424" stroke="#3d3d3d" rx="4"/>
+        <text x="250" y="60" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Right Wall</text>
+        <text x="250" y="78" text-anchor="middle" fill="#a0a0a0" font-size="10">7 studs @ 16" O.C.</text>
+    </svg>`,
+
+    // Step 7: Front Wall with Door
     `<svg viewBox="0 0 500 380" xmlns="http://www.w3.org/2000/svg">
         <defs>
             <linearGradient id="spf3" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -191,7 +226,7 @@ const svgDiagrams = [
         <text x="60" y="166" fill="white" font-size="9">Header (2×6)</text>
     </svg>`,
 
-    // Step 7: Roof Framing
+    // Step 8: Roof Framing
     `<svg viewBox="0 0 500 380" xmlns="http://www.w3.org/2000/svg">
         <defs>
             <linearGradient id="raft" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -222,7 +257,7 @@ const svgDiagrams = [
         <text x="358" y="345" fill="white" font-size="10">Hurricane Ties</text>
     </svg>`,
 
-    // Step 8: Sheathing & Siding
+    // Step 9: Sheathing & Siding
     `<svg viewBox="0 0 500 380" xmlns="http://www.w3.org/2000/svg">
         <defs>
             <pattern id="ss" patternUnits="userSpaceOnUse" width="100" height="20">
@@ -254,7 +289,7 @@ const svgDiagrams = [
         <text x="180" y="102" text-anchor="middle" fill="#ffc233" font-size="9">2" screws</text>
     </svg>`,
 
-    // Step 9: Build the Door
+    // Step 10: Build the Door
     `<svg viewBox="0 0 500 380" xmlns="http://www.w3.org/2000/svg">
         <defs>
             <pattern id="ssd" patternUnits="userSpaceOnUse" width="80" height="16">
@@ -294,7 +329,7 @@ const svgDiagrams = [
         <text x="130" y="372" text-anchor="middle" fill="#ff6b35" font-family="monospace" font-size="11">35" × 79"</text>
     </svg>`,
 
-    // Step 10: Roofing & Finish
+    // Step 11: Roofing & Finish
     `<svg viewBox="0 0 500 380" xmlns="http://www.w3.org/2000/svg">
         <defs>
             <pattern id="shin" patternUnits="userSpaceOnUse" width="30" height="15">

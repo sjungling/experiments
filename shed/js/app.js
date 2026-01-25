@@ -16,11 +16,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Convert <strong>PART-ID</strong> to clickable links
+// Convert part IDs to clickable links
 function linkifyPartIds(html) {
-    // Match part IDs in strong tags - pattern covers all ID formats
-    return html.replace(/<strong>([A-Z]+-[A-Z0-9]+-\d+)<\/strong>/g,
+    // First, match part IDs in strong tags
+    let result = html.replace(/<strong>([A-Z]+-[A-Z0-9]+-\d+)<\/strong>/g,
         '<a href="#" class="part-link" data-part-id="$1">$1</a>');
+    // Handle range format: (ID-01 to ID-12)
+    result = result.replace(/\(([A-Z]+-[A-Z0-9]+-\d+) to ([A-Z]+-[A-Z0-9]+-\d+)\)/g,
+        '(<a href="#" class="part-link" data-part-id="$1">$1</a> to <a href="#" class="part-link" data-part-id="$2">$2</a>)');
+    // Handle comma-separated IDs in parentheses: (ID-01, ID-02)
+    result = result.replace(/\(([A-Z]+-[A-Z0-9]+-\d+(?:,\s*[A-Z]+-[A-Z0-9]+-\d+)+)\)/g, (match, ids) => {
+        const linkedIds = ids.split(/,\s*/).map(id =>
+            `<a href="#" class="part-link" data-part-id="${id}">${id}</a>`
+        ).join(', ');
+        return `(${linkedIds})`;
+    });
+    // Handle single ID in parentheses: (ID-01)
+    result = result.replace(/\(([A-Z]+-[A-Z0-9]+-\d+)\)/g,
+        '(<a href="#" class="part-link" data-part-id="$1">$1</a>)');
+    return result;
 }
 
 function loadStep(stepIndex) {
@@ -86,7 +100,7 @@ function loadStep(stepIndex) {
             <ul class="materials-list">
                 ${step.materials.map(m => `
                     <li>
-                        <span>${m.name}</span>
+                        <span>${linkifyPartIds(m.name)}</span>
                         <span class="material-qty">${m.qty}</span>
                     </li>
                 `).join('')}

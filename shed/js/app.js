@@ -16,6 +16,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// Convert <strong>PART-ID</strong> to clickable links
+function linkifyPartIds(html) {
+    // Match part IDs in strong tags - pattern covers all ID formats
+    return html.replace(/<strong>([A-Z]+-[A-Z0-9]+-\d+)<\/strong>/g,
+        '<a href="#" class="part-link" data-part-id="$1">$1</a>');
+}
+
 function loadStep(stepIndex) {
     currentStep = stepIndex;
     const step = steps[stepIndex];
@@ -98,7 +105,7 @@ function loadStep(stepIndex) {
                 Instructions
             </h3>
             <ol class="steps-list">
-                ${step.instructions.map(inst => `<li>${inst}</li>`).join('')}
+                ${step.instructions.map(inst => `<li>${linkifyPartIds(inst)}</li>`).join('')}
             </ol>
             <div class="tip-box">
                 <strong>💡 Pro Tip:</strong> ${step.tip}
@@ -175,3 +182,13 @@ function resetView() {
         reset3DView();
     }
 }
+
+// Handle part link clicks
+document.addEventListener('click', (e) => {
+    const link = e.target.closest('.part-link');
+    if (link) {
+        e.preventDefault();
+        const partId = link.dataset.partId;
+        PartsModal.open(partId);
+    }
+});

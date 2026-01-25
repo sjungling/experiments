@@ -475,6 +475,25 @@ header {
     border-radius: 3px;
 }
 
+/* Clickable part links in instructions */
+.part-link {
+    color: var(--accent-yellow);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    background: rgba(255, 194, 51, 0.15);
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    text-decoration: none;
+    cursor: pointer;
+    border-bottom: 1px dashed var(--accent-yellow);
+    transition: all 0.2s;
+}
+
+.part-link:hover {
+    background: rgba(255, 194, 51, 0.3);
+    border-bottom-style: solid;
+}
+
 /* Navigation Buttons */
 .nav-buttons {
     display: flex;

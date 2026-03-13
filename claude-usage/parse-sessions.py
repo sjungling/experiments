@@ -605,6 +605,16 @@ def main():
 
     analysis = build_analysis(sessions, args.hours)
 
+    # Detect CLAUDE.md changes as timeline markers
+    markers = []
+    claude_md = Path.home() / ".claude" / "CLAUDE.md"
+    if claude_md.exists():
+        mtime = claude_md.stat().st_mtime
+        marker_dt = datetime.fromtimestamp(mtime, tz=timezone.utc)
+        marker_hour = marker_dt.strftime("%Y-%m-%dT%H")
+        markers.append({"time": marker_hour, "label": "CLAUDE.md updated"})
+    analysis["markers"] = markers
+
     output_path = Path(args.output)
     with open(output_path, "w") as f:
         json.dump(analysis, f, indent=2)

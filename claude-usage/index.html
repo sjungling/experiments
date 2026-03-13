@@ -520,6 +520,19 @@
   </div>
 
   <div class="card" style="margin-bottom: 24px;">
+    <h2>Opus Mechanical Trend <span class="badge" id="comboTrendBadge"></span></h2>
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">
+      Dashed line = % of opus turns that are mechanical (lower is better). Bars show volume.
+    </p>
+    <div class="legend" id="comboTrendLegend"></div>
+    <div style="position:relative;height:200px;" id="comboTrendContainer">
+      <canvas id="comboTrendCanvas" style="width:100%;height:100%;"></canvas>
+    </div>
+    <div class="timeline-labels" id="comboTrendLabels"></div>
+    <div id="comboTrendStats" style="display:flex;gap:16px;margin-top:12px;font-size:12px;color:var(--text-muted);"></div>
+  </div>
+
+  <div class="card" style="margin-bottom: 24px;">
     <h2>Smart vs Mechanical Over Time <span class="badge" id="smTimelineBadge"></span></h2>
     <p style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">
       Track this after CLAUDE.md changes — the green (mechanical on cheaper models) should grow over time
@@ -1053,6 +1066,211 @@ function renderTurnAnalysis(data) {
   `;
 }
 
+function renderComboTrendChart(data) {
+  const ta = data.turn_analysis;
+  if (!ta || !ta.smart_mech_timeline) return;
+  const smTimeline = ta.smart_mech_timeline;
+  const hours = Object.keys(smTimeline).sort();
+  if (!hours.length) return;
+
+  const markers = data.markers || [];
+
+  document.getElementById('comboTrendBadge').textContent = hours.length + ' hours';
+
+  const SM_COLORS = {
+    opus_smart: '#d2a8ff',
+    opus_mechanical: '#ff7b72',
+    other_smart: '#58a6ff',
+    other_mechanical: '#3fb950',
+  };
+
+  // Legend
+  document.getElementById('comboTrendLegend').innerHTML = [
+    ...Object.entries({
+      opus_smart: 'Opus (smart)', opus_mechanical: 'Opus (mechanical)',
+      other_smart: 'Other (smart)', other_mechanical: 'Other (mechanical)',
+    }).map(([k, label]) =>
+      `<div class="legend-item"><div class="legend-dot" style="background:${SM_COLORS[k]}"></div>${label}</div>`
+    ),
+    `<div class="legend-item"><div class="legend-dot" style="background:transparent;border:2px dashed #ff7b72;width:14px;height:2px;border-radius:0;"></div>Opus mech %</div>`,
+  ].join('');
+
+  // Compute data per hour
+  const keys = ['opus_smart', 'opus_mechanical', 'other_smart', 'other_mechanical'];
+  let maxTotal = 0;
+  const hourData = hours.map(h => {
+    const b = smTimeline[h];
+    const vals = {};
+    keys.forEach(k => vals[k] = b[k] || 0);
+    const total = keys.reduce((a, k) => a + vals[k], 0);
+    const opusTotal = vals.opus_smart + vals.opus_mechanical;
+    const mechPct = opusTotal > 0 ? (vals.opus_mechanical / opusTotal) * 100 : null;
+    if (total > maxTotal) maxTotal = total;
+    return { hour: h, vals, total, mechPct };
+  });
+
+  // Canvas rendering
+  const canvas = document.getElementById('comboTrendCanvas');
+  const container = document.getElementById('comboTrendContainer');
+  const dpr = window.devicePixelRatio || 1;
+  const rect = container.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  canvas.style.width = rect.width + 'px';
+  canvas.style.height = rect.height + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const W = rect.width, H = rect.height;
+
+  const padL = 40, padR = 40, padT = 20, padB = 4;
+  const chartW = W - padL - padR;
+  const chartH = H - padT - padB;
+  const barW = Math.max(4, (chartW / hours.length) - 3);
+  const gap = (chartW - barW * hours.length) / (hours.length + 1);
+
+  // Draw grid lines and left axis labels
+  ctx.fillStyle = '#8b949e';
+  ctx.font = '10px -apple-system, sans-serif';
+  ctx.textAlign = 'right';
+  for (let i = 0; i <= 4; i++) {
+    const y = padT + (chartH * i / 4);
+    const val = Math.round(maxTotal * (1 - i / 4));
+    ctx.fillText(val, padL - 6, y + 3);
+    if (i > 0 && i < 4) {
+      ctx.strokeStyle = '#21262d';
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(padL, y);
+      ctx.lineTo(W - padR, y);
+      ctx.stroke();
+    }
+  }
+
+  // Right axis labels (%)
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#ff7b72';
+  for (let i = 0; i <= 4; i++) {
+    const y = padT + (chartH * i / 4);
+    const pct = Math.round(100 * (1 - i / 4));
+    ctx.fillText(pct + '%', W - padR + 6, y + 3);
+  }
+
+  // Draw stacked bars
+  hourData.forEach((d, i) => {
+    const x = padL + gap + i * (barW + gap);
+    const stack = ['other_mechanical', 'other_smart', 'opus_mechanical', 'opus_smart'];
+    let currentY = padT + chartH; // bottom
+    stack.forEach(k => {
+      const count = d.vals[k];
+      if (!count) return;
+      const h = maxTotal ? (count / maxTotal) * chartH : 0;
+      ctx.fillStyle = SM_COLORS[k];
+      ctx.globalAlpha = 0.85;
+      ctx.fillRect(x, currentY - h, barW, h);
+      currentY -= h;
+    });
+    ctx.globalAlpha = 1;
+  });
+
+  // Draw marker annotations
+  markers.forEach(m => {
+    const idx = hours.indexOf(m.time);
+    if (idx === -1) return;
+    const x = padL + gap + idx * (barW + gap) + barW / 2;
+    ctx.strokeStyle = '#58a6ff';
+    ctx.setLineDash([5, 3]);
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(x, padT);
+    ctx.lineTo(x, padT + chartH);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    // Label
+    ctx.fillStyle = '#58a6ff';
+    ctx.font = '9px -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(m.label, x, padT - 4);
+  });
+
+  // Draw ratio line
+  ctx.setLineDash([6, 3]);
+  ctx.strokeStyle = '#ff7b72';
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  let started = false;
+  const linePoints = [];
+  hourData.forEach((d, i) => {
+    if (d.mechPct === null) return;
+    const x = padL + gap + i * (barW + gap) + barW / 2;
+    const y = padT + chartH - (d.mechPct / 100) * chartH;
+    linePoints.push({ x, y, pct: d.mechPct });
+    if (!started) { ctx.moveTo(x, y); started = true; }
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Draw dots on line
+  linePoints.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+    ctx.fillStyle = '#ff7b72';
+    ctx.fill();
+    ctx.strokeStyle = '#0d1117';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  });
+
+  // Tooltip on hover
+  canvas.onmousemove = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    hourData.forEach((d, i) => {
+      const x = padL + gap + i * (barW + gap);
+      if (mx >= x && mx <= x + barW) {
+        const pctStr = d.mechPct !== null ? Math.round(d.mechPct) + '%' : 'n/a';
+        showTooltip(e, d.hour.split('T')[1] + ':00', [
+          ['Opus smart', d.vals.opus_smart],
+          ['Opus mechanical', d.vals.opus_mechanical],
+          ['Other smart', d.vals.other_smart],
+          ['Other mechanical', d.vals.other_mechanical],
+          ['Opus mech %', pctStr],
+          ['Total', d.total],
+        ]);
+      }
+    });
+  };
+  canvas.onmouseleave = () => hideTooltip();
+
+  // X-axis labels
+  document.getElementById('comboTrendLabels').innerHTML = hours.map((h, i) => {
+    const show = hours.length <= 14 || i % Math.ceil(hours.length / 14) === 0;
+    return `<span>${show ? h.split('T')[1] + ':00' : ''}</span>`;
+  }).join('');
+
+  // Stats: before vs after marker
+  const markerIdx = markers.length ? hours.indexOf(markers[0].time) : -1;
+  if (markerIdx > 0) {
+    const before = hourData.slice(0, markerIdx);
+    const after = hourData.slice(markerIdx);
+    const calcAvg = (arr) => {
+      const valid = arr.filter(d => d.mechPct !== null);
+      return valid.length ? Math.round(valid.reduce((a, d) => a + d.mechPct, 0) / valid.length) : null;
+    };
+    const beforeAvg = calcAvg(before);
+    const afterAvg = calcAvg(after);
+    const delta = beforeAvg !== null && afterAvg !== null ? afterAvg - beforeAvg : null;
+    const deltaColor = delta !== null ? (delta < 0 ? '#3fb950' : delta > 0 ? '#ff7b72' : '#8b949e') : '#8b949e';
+    const deltaStr = delta !== null ? (delta > 0 ? '+' : '') + delta + ' pp' : '';
+    document.getElementById('comboTrendStats').innerHTML = `
+      <span>Before marker: <strong>${beforeAvg !== null ? beforeAvg + '%' : 'n/a'}</strong></span>
+      <span>After marker: <strong>${afterAvg !== null ? afterAvg + '%' : 'n/a'}</strong></span>
+      ${delta !== null ? `<span style="color:${deltaColor}">Change: <strong>${deltaStr}</strong> ${delta < 0 ? '(improving)' : delta > 0 ? '(worsening)' : '(stable)'}</span>` : ''}
+    `;
+  }
+}
+
 function renderBashDeepDive(data) {
   const bash = data.bash_deep_dive;
   if (!bash) return;
@@ -1210,6 +1428,7 @@ function render(data) {
   renderSessions(data);
 
   // Turn analysis
+  renderComboTrendChart(data);
   renderTurnAnalysis(data);
 
   // Optimization

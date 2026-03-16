@@ -4,6 +4,10 @@
   box-sizing: border-box;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 body {
   font-family: 'Google Sans', Roboto, Arial, sans-serif;
   font-size: 13px;

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="sidepanel.css">
+  <title>Tab Groups</title>
+</head>
+<body>
+  <!-- Default header -->
+  <header id="header" class="header">
+    <h1 class="header-title">Tab Groups</h1>
+  </header>
+
+  <!-- Selection action bar (hidden by default) -->
+  <header id="action-bar" class="action-bar" hidden>
+    <span id="selection-count" class="action-bar-count"></span>
+    <div class="action-bar-actions">
+      <button id="cancel-btn" class="btn-text">Cancel</button>
+      <button id="delete-btn" class="btn-text btn-danger">Delete</button>
+    </div>
+  </header>
+
+  <!-- Group list -->
+  <main id="group-list"></main>
+
+  <!-- Empty state -->
+  <div id="empty-state" class="empty-state" hidden>
+    <p>No open tab groups found.</p>
+  </div>
+
+  <!-- Confirmation dialog -->
+  <div id="confirm-dialog" class="confirm-overlay" hidden>
+    <div class="confirm-dialog">
+      <p id="confirm-title" class="confirm-title"></p>
+      <p id="confirm-subtitle" class="confirm-subtitle"></p>
+      <div id="confirm-groups" class="confirm-groups"></div>
+      <div class="confirm-actions">
+        <button id="confirm-cancel" class="btn-text">Cancel</button>
+        <button id="confirm-delete" class="btn-text btn-danger"></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="sidepanel.js"></script>
+</body>
+</html>

@@ -85,6 +85,7 @@ function render(windowData) {
   }
 
   emptyStateEl.hidden = true;
+  headerEl.hidden = false;
 
   for (const win of windowData) {
     const section = document.createElement('div');
@@ -120,7 +121,7 @@ function render(windowData) {
         } else {
           expandedGroups.add(group.id);
         }
-        refresh();
+        rerender();
       });
 
       section.appendChild(row);
@@ -164,9 +165,15 @@ function render(windowData) {
   }
 }
 
+let lastWindowData = [];
+
 async function refresh() {
-  const data = await fetchData();
-  render(data);
+  lastWindowData = await fetchData();
+  render(lastWindowData);
+}
+
+function rerender() {
+  render(lastWindowData);
 }
 
 // Initial load

@@ -124,6 +124,49 @@ function updateSelectionUI() {
 
 cancelBtn.addEventListener('click', exitSelectionMode);
 
+deleteBtn.addEventListener('click', async () => {
+  const data = await fetchData();
+  const allGroups = data.flatMap(w => w.groups);
+  const toDelete = allGroups.filter(g => selectedGroups.has(g.id));
+
+  if (toDelete.length === 0) return;
+
+  const totalTabs = toDelete.reduce((sum, g) => sum + g.tabs.length, 0);
+
+  confirmTitle.textContent = `Delete ${toDelete.length} tab group${toDelete.length !== 1 ? 's' : ''}?`;
+  confirmSubtitle.textContent = `This will close ${totalTabs} tab${totalTabs !== 1 ? 's' : ''}`;
+
+  confirmGroupsEl.innerHTML = toDelete.map(g => `
+    <span class="confirm-group-chip">
+      <span class="confirm-group-dot" style="background: ${GROUP_COLORS[g.color] || '#5f6368'}"></span>
+      ${escapeHtml(g.title || 'Unnamed')} (${g.tabs.length})
+    </span>
+  `).join('');
+
+  confirmDeleteBtn.textContent = `Delete ${toDelete.length} Group${toDelete.length !== 1 ? 's' : ''}`;
+  confirmDialog.hidden = false;
+});
+
+confirmCancel.addEventListener('click', () => {
+  confirmDialog.hidden = true;
+});
+
+confirmDeleteBtn.addEventListener('click', async () => {
+  confirmDialog.hidden = true;
+
+  const data = await fetchData();
+  const allGroups = data.flatMap(w => w.groups);
+  const toDelete = allGroups.filter(g => selectedGroups.has(g.id));
+
+  const removals = toDelete.map(g => {
+    const tabIds = g.tabs.map(t => t.id);
+    return chrome.tabs.remove(tabIds).catch(() => {});
+  });
+  await Promise.allSettled(removals);
+
+  exitSelectionMode();
+});
+
 function render(windowData) {
   groupListEl.innerHTML = '';
 

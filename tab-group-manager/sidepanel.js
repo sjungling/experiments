@@ -66,11 +66,63 @@ const headerEl = document.getElementById('header');
 // Track expanded groups (persists across re-renders)
 const expandedGroups = new Set();
 
+const selectedGroups = new Set();
+let lastClickedIndex = null;
+let selectionMode = false;
+
+const actionBarEl = document.getElementById('action-bar');
+const selectionCountEl = document.getElementById('selection-count');
+const cancelBtn = document.getElementById('cancel-btn');
+const deleteBtn = document.getElementById('delete-btn');
+const confirmDialog = document.getElementById('confirm-dialog');
+const confirmTitle = document.getElementById('confirm-title');
+const confirmSubtitle = document.getElementById('confirm-subtitle');
+const confirmGroupsEl = document.getElementById('confirm-groups');
+const confirmCancel = document.getElementById('confirm-cancel');
+const confirmDeleteBtn = document.getElementById('confirm-delete');
+
 function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
 }
+
+function enterSelectionMode() {
+  selectionMode = true;
+  document.body.classList.add('selection-mode');
+  headerEl.hidden = true;
+  actionBarEl.hidden = false;
+  updateSelectionUI();
+}
+
+function exitSelectionMode() {
+  selectionMode = false;
+  selectedGroups.clear();
+  lastClickedIndex = null;
+  document.body.classList.remove('selection-mode');
+  headerEl.hidden = false;
+  actionBarEl.hidden = true;
+  refresh();
+}
+
+function updateSelectionUI() {
+  const count = selectedGroups.size;
+  selectionCountEl.textContent = `${count} selected`;
+
+  document.querySelectorAll('.group-row').forEach(row => {
+    const id = Number(row.dataset.groupId);
+    row.classList.toggle('selected', selectedGroups.has(id));
+    const checkbox = row.querySelector('.group-checkbox');
+    if (checkbox) {
+      checkbox.classList.toggle('checked', selectedGroups.has(id));
+      checkbox.innerHTML = selectedGroups.has(id)
+        ? '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+        : '';
+    }
+  });
+}
+
+cancelBtn.addEventListener('click', exitSelectionMode);
 
 function render(windowData) {
   groupListEl.innerHTML = '';
@@ -105,6 +157,9 @@ function render(windowData) {
       row.dataset.groupId = group.id;
 
       row.innerHTML = `
+        <div class="group-checkbox${selectedGroups.has(group.id) ? ' checked' : ''}">
+          ${selectedGroups.has(group.id) ? '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ''}
+        </div>
         <svg class="group-chevron" width="12" height="12" viewBox="0 0 12 12">
           <path d="M3 4.5l3 3 3-3"/>
         </svg>
@@ -115,13 +170,51 @@ function render(windowData) {
         </div>
       `;
 
-      row.addEventListener('click', () => {
-        if (expandedGroups.has(group.id)) {
-          expandedGroups.delete(group.id);
+      if (selectedGroups.has(group.id)) row.classList.add('selected');
+
+      const flatIndex = allGroups.indexOf(group);
+
+      row.addEventListener('click', (e) => {
+        if (e.metaKey || e.ctrlKey) {
+          if (selectedGroups.has(group.id)) {
+            selectedGroups.delete(group.id);
+          } else {
+            selectedGroups.add(group.id);
+          }
+          lastClickedIndex = flatIndex;
+          if (!selectionMode) enterSelectionMode();
+          else if (selectedGroups.size === 0) exitSelectionMode();
+          else updateSelectionUI();
+        } else if (e.shiftKey) {
+          if (lastClickedIndex === null) {
+            selectedGroups.add(group.id);
+            lastClickedIndex = flatIndex;
+          } else {
+            const start = Math.min(lastClickedIndex, flatIndex);
+            const end = Math.max(lastClickedIndex, flatIndex);
+            for (let i = start; i <= end; i++) {
+              selectedGroups.add(allGroups[i].id);
+            }
+          }
+          lastClickedIndex = flatIndex;
+          if (!selectionMode) enterSelectionMode();
+          else updateSelectionUI();
+        } else if (selectionMode) {
+          if (selectedGroups.has(group.id)) {
+            selectedGroups.delete(group.id);
+          } else {
+            selectedGroups.add(group.id);
+          }
+          if (selectedGroups.size === 0) exitSelectionMode();
+          else updateSelectionUI();
         } else {
-          expandedGroups.add(group.id);
+          if (expandedGroups.has(group.id)) {
+            expandedGroups.delete(group.id);
+          } else {
+            expandedGroups.add(group.id);
+          }
+          rerender();
         }
-        rerender();
       });
 
       section.appendChild(row);

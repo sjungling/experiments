@@ -13,13 +13,21 @@ Chrome provides no built-in way to view tab groups across windows or bulk-delete
 **Type:** Chrome Extension (Manifest V3)
 **UI Surface:** Chrome Side Panel API
 **Tech Stack:** Vanilla HTML/CSS/JS — no framework, no build step
-**Permissions:** `tabGroups`, `tabs`, `sidePanel`
+**Permissions:** `tabGroups`, `tabs`, `sidePanel`, `windows`
+
+### Manifest
+
+The `manifest.json` must declare:
+- `"side_panel": { "default_path": "sidepanel.html" }` to wire up the side panel
+- `"action": {}` for the toolbar icon
+- A background service worker that calls `chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true })` so clicking the toolbar icon opens the side panel
 
 ### File Structure
 
 ```
 tab-group-manager/
 ├── manifest.json          # Extension manifest (MV3)
+├── background.js          # Service worker: sets side panel open behavior
 ├── sidepanel.html         # Side panel markup
 ├── sidepanel.css          # Chrome-native styling
 ├── sidepanel.js           # All logic: data fetching, rendering, selection, deletion
@@ -29,7 +37,7 @@ tab-group-manager/
     └── icon-128.png
 ```
 
-Single JS file is appropriate given the small scope. No modules or splitting needed.
+`sidepanel.js` handles all UI logic. `background.js` is minimal — just the `setPanelBehavior` call.
 
 ## UI Design
 
@@ -41,14 +49,14 @@ Chrome-native: white background, Google Sans/Roboto, standard Chrome grays (#202
 
 **Header:** Title "Tab Groups" — replaced by a blue action bar (#e8f0fe) when groups are selected.
 
-**Group List:** Organized by window with labeled section dividers ("Window 1", "Window 2", etc.). Each group row shows:
+**Group List:** Organized by window with labeled section dividers ("Window 1", "Window 2", etc.). Window labels are assigned by stable window ID order within a render cycle — if windows change between renders, labels may shift, which is acceptable for this scope. Each group row shows:
 - Collapse/expand chevron
 - Chrome color dot (maps to the group's `color` property)
 - Group name (or "Unnamed" for unnamed groups)
 - Tab count
 
 **Expanded Tab List:** Indented under the group. Each tab shows:
-- Favicon (from `tab.favIconUrl`)
+- Favicon (from `tab.favIconUrl`, with a generic page icon fallback for missing/broken/chrome:// URLs)
 - Page title (truncated with ellipsis)
 
 **Groups are collapsed by default.** Click the group row to expand/collapse.
@@ -95,13 +103,14 @@ chrome.tabs.query({})      → all tabs, filtered by groupId
 chrome.windows.getAll()    → window list for labeling
 ```
 
-Group tabs by `groupId`, then organize groups by `windowId`.
+Group tabs by `groupId`, then organize groups by `windowId`. `TabGroup.windowId` is the join key between groups and the windows list.
 
 ### Keeping State Fresh
 
 Listen to these events to re-render automatically:
 - `chrome.tabGroups.onCreated` / `onRemoved` / `onUpdated`
 - `chrome.tabs.onCreated` / `onRemoved` / `onUpdated` / `onAttached` / `onDetached`
+- `chrome.windows.onRemoved` (to update window labels when a window closes)
 
 On any event: re-fetch all data and re-render. The dataset is small enough that this is simpler and safer than incremental updates.
 
@@ -128,7 +137,8 @@ Click (no modifier):
   - Update lastClickedIndex
 
 ⇧+Click:
-  - Select range from lastClickedIndex to clicked index (inclusive)
+  - If lastClickedIndex is null (no prior ⌘+Click), treat as a ⌘+Click (select just the clicked group)
+  - Otherwise, select range from lastClickedIndex to clicked index (inclusive)
   - Enter selection mode if not already active
 
 Cancel:
@@ -140,7 +150,7 @@ Flat ordering for range selection: groups are ordered as rendered (Window 1 grou
 
 ## Error Handling
 
-- If a tab/group is closed between render and user action, `chrome.tabs.remove()` will reject for that ID — catch and ignore stale IDs, re-render.
+- `chrome.tabs.remove()` rejects the entire promise if any ID is invalid. Remove tabs per-group (one `remove()` call per group's tab array), use `Promise.allSettled()` to allow partial success, then re-render from fresh data. If some groups fail to delete, they'll simply remain visible after re-render.
 - If no tab groups exist, show a centered empty state: "No tab groups found."
 
 ## Testing

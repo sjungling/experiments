@@ -179,8 +179,12 @@ function render(windowData) {
     if (!existingIds.has(id)) selectedGroups.delete(id);
   }
   if (selectionMode && selectedGroups.size === 0) {
-    exitSelectionMode();
-    return;
+    selectionMode = false;
+    lastClickedIndex = null;
+    document.body.classList.remove('selection-mode');
+    headerEl.hidden = false;
+    actionBarEl.hidden = true;
+    // Don't call exitSelectionMode() here to avoid recursive refresh
   }
 
   if (allGroups.length === 0) {
@@ -190,7 +194,7 @@ function render(windowData) {
   }
 
   emptyStateEl.hidden = true;
-  headerEl.hidden = false;
+  if (!selectionMode) headerEl.hidden = false;
 
   for (const win of windowData) {
     const section = document.createElement('div');
@@ -297,8 +301,12 @@ function render(windowData) {
 
         tabRow.addEventListener('click', async (e) => {
           e.stopPropagation();
-          await chrome.tabs.update(tab.id, { active: true });
-          await chrome.windows.update(tab.windowId, { focused: true });
+          try {
+            await chrome.tabs.update(tab.id, { active: true });
+            await chrome.windows.update(tab.windowId, { focused: true });
+          } catch {
+            refresh();
+          }
         });
 
         tabList.appendChild(tabRow);

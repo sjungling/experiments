@@ -322,8 +322,12 @@ function render(windowData) {
 let lastWindowData = [];
 
 async function refresh() {
-  lastWindowData = await fetchData();
-  render(lastWindowData);
+  try {
+    lastWindowData = await fetchData();
+    render(lastWindowData);
+  } catch (err) {
+    console.error('Tab Group Manager:', err);
+  }
 }
 
 function rerender() {

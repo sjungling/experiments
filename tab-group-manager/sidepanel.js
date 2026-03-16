@@ -173,6 +173,16 @@ function render(windowData) {
   // Flatten for indexing
   const allGroups = windowData.flatMap(w => w.groups);
 
+  // Clean up selections for groups that no longer exist
+  const existingIds = new Set(allGroups.map(g => g.id));
+  for (const id of selectedGroups) {
+    if (!existingIds.has(id)) selectedGroups.delete(id);
+  }
+  if (selectionMode && selectedGroups.size === 0) {
+    exitSelectionMode();
+    return;
+  }
+
   if (allGroups.length === 0) {
     emptyStateEl.hidden = false;
     headerEl.hidden = false;
@@ -311,6 +321,25 @@ async function refresh() {
 function rerender() {
   render(lastWindowData);
 }
+
+// Debounced refresh for event listeners
+let refreshTimer = null;
+function debouncedRefresh() {
+  clearTimeout(refreshTimer);
+  refreshTimer = setTimeout(refresh, 100);
+}
+
+// Re-render when tabs, groups, or windows change
+chrome.tabGroups.onCreated.addListener(debouncedRefresh);
+chrome.tabGroups.onRemoved.addListener(debouncedRefresh);
+chrome.tabGroups.onUpdated.addListener(debouncedRefresh);
+chrome.tabs.onCreated.addListener(debouncedRefresh);
+chrome.tabs.onRemoved.addListener(debouncedRefresh);
+chrome.tabs.onUpdated.addListener(debouncedRefresh);
+chrome.tabs.onAttached.addListener(debouncedRefresh);
+chrome.tabs.onDetached.addListener(debouncedRefresh);
+chrome.windows.onRemoved.addListener(debouncedRefresh);
+chrome.windows.onCreated.addListener(debouncedRefresh);
 
 // Initial load
 refresh();

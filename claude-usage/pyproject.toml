@@ -1,0 +1,12 @@
+[project]
+name = "claude-usage"
+version = "0.1.0"
+description = "Claude Code session usage dashboard"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+]
+
+[project.scripts]
+claude-usage = "server:main"

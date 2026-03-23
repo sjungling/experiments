@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Usage Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface-hover: #1c2128;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --opus: #d2a8ff;
+    --sonnet: #58a6ff;
+    --haiku: #3fb950;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* Connection status bar */
+  .status-bar {
+    position: fixed; top: 0; left: 0; right: 0;
+    padding: 6px 24px;
+    font-size: 12px;
+    z-index: 100;
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--text-muted);
+  }
+  .status-dot.connected { background: var(--haiku); }
+  .status-dot.disconnected { background: #f85149; }
+  .status-dot.connecting { background: #d29922; }
+
+  /* Dashboard layout */
+  .dashboard {
+    padding: 48px 24px 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .header h1 { font-size: 22px; font-weight: 600; }
+  .header .meta { color: var(--text-muted); font-size: 14px; }
+
+  /* Stats row */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .stat-card .label { color: var(--text-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-card .value { font-size: 28px; font-weight: 600; margin-top: 4px; }
+  .stat-card .detail { color: var(--text-muted); font-size: 12px; margin-top: 4px; }
+
+  /* Chart sections */
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .section h2 { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* Sessions table */
+  .sessions-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .sessions-table th, .sessions-table td {
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .sessions-table th {
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .sessions-table tr:hover { background: var(--surface-hover); }
+
+  /* Loading state */
+  .loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    color: var(--text-muted);
+    font-size: 16px;
+  }
+
+  /* Refresh button */
+  .refresh-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 4px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .refresh-btn:hover { color: var(--text); border-color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="status-bar">
+  <span class="status-dot connecting" id="statusDot"></span>
+  <span id="statusText">Connecting...</span>
+</div>
+
+<div class="loading" id="loading">Connecting to server...</div>
+
+<div class="dashboard" id="dashboard" style="display:none">
+  <div class="header">
+    <h1>Claude Usage Dashboard</h1>
+    <span class="meta" id="headerMeta"></span>
+    <button class="refresh-btn" onclick="refresh()">Refresh</button>
+  </div>
+
+  <div class="stats-row" id="statsRow"></div>
+
+  <!-- Activity Timeline -->
+  <div class="section">
+    <h2>Activity Timeline</h2>
+    <canvas id="timelineChart" height="100"></canvas>
+  </div>
+
+  <!-- Tool calls + Model distribution -->
+  <div class="grid-2">
+    <div class="section">
+      <h2>Tool Calls by Model</h2>
+      <canvas id="toolsChart"></canvas>
+    </div>
+    <div class="section">
+      <h2>Model Distribution</h2>
+      <canvas id="modelChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Smart vs Mechanical -->
+  <div class="grid-2">
+    <div class="section">
+      <h2>Smart vs Mechanical (Trend)</h2>
+      <canvas id="smartMechChart" height="100"></canvas>
+    </div>
+    <div class="section">
+      <h2>Smart vs Mechanical (Total)</h2>
+      <canvas id="smartMechTotalChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Turn Types -->
+  <div class="section">
+    <h2>Turn Types</h2>
+    <canvas id="turnTypesChart"></canvas>
+  </div>
+
+  <!-- Bash Commands -->
+  <div class="section">
+    <h2>Bash Commands</h2>
+    <canvas id="bashCmdChart"></canvas>
+  </div>
+
+  <!-- Skills + Agents -->
+  <div class="grid-2">
+    <div class="section">
+      <h2>Skills by Model</h2>
+      <canvas id="skillsChart"></canvas>
+    </div>
+    <div class="section">
+      <h2>Agent Types by Model</h2>
+      <canvas id="agentsChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Subagent breakdown -->
+  <div class="section">
+    <h2>Subagent Model Usage</h2>
+    <canvas id="subagentChart" height="100"></canvas>
+  </div>
+
+  <!-- Sessions table -->
+  <div class="section">
+    <h2>Sessions</h2>
+    <div id="sessionsTable"></div>
+  </div>
+</div>
+
+<script>
+// ---------------------------------------------------------------------------
+// Color scheme
+// ---------------------------------------------------------------------------
+const MODEL_COLORS = {
+  'claude-opus-4-6': '#d2a8ff',
+  'claude-sonnet-4-6': '#58a6ff',
+  'claude-sonnet-4-20250514': '#58a6ff',
+  'claude-haiku-4-5-20251001': '#3fb950',
+};
+
+const TOOL_COLORS = {
+  'Bash': '#f85149',
+  'Read': '#58a6ff',
+  'Edit': '#3fb950',
+  'Write': '#d2a8ff',
+  'Agent': '#f78166',
+  'Skill': '#ff7b72',
+  'Grep': '#d29922',
+  'Glob': '#a5d6ff',
+  'TaskCreate': '#8b949e',
+  'TaskUpdate': '#8b949e',
+};
+
+const SMART_MECH_COLORS = {
+  opus_smart: '#d2a8ff',
+  opus_mechanical: 'rgba(210, 168, 255, 0.35)',
+  other_smart: '#58a6ff',
+  other_mechanical: 'rgba(88, 166, 255, 0.35)',
+};
+
+function modelColor(name) {
+  for (const [key, color] of Object.entries(MODEL_COLORS)) {
+    if (name.includes(key) || key.includes(name)) return color;
+  }
+  if (name.includes('opus')) return '#d2a8ff';
+  if (name.includes('sonnet')) return '#58a6ff';
+  if (name.includes('haiku')) return '#3fb950';
+  return '#8b949e';
+}
+
+function toolColor(name) {
+  return TOOL_COLORS[name] || '#8b949e';
+}
+
+// ---------------------------------------------------------------------------
+// Chart.js defaults
+// ---------------------------------------------------------------------------
+Chart.defaults.color = '#e6edf3';
+Chart.defaults.borderColor = '#30363d';
+Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif";
+Chart.defaults.font.size = 12;
+Chart.defaults.plugins.legend.labels.boxWidth = 12;
+
+// ---------------------------------------------------------------------------
+// State
+// ---------------------------------------------------------------------------
+let ws;
+let charts = {};
+
+// ---------------------------------------------------------------------------
+// WebSocket
+// ---------------------------------------------------------------------------
+function connect() {
+  updateStatus('connecting');
+  ws = new WebSocket(`ws://${location.host}/ws`);
+
+  ws.onopen = () => updateStatus('connected');
+
+  ws.onclose = () => {
+    updateStatus('disconnected');
+    setTimeout(connect, 3000);
+  };
+
+  ws.onerror = () => updateStatus('disconnected');
+
+  ws.onmessage = (e) => {
+    const data = JSON.parse(e.data);
+    render(data);
+  };
+}
+
+function refresh() {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send('refresh');
+  }
+}
+
+function updateStatus(state) {
+  const dot = document.getElementById('statusDot');
+  const text = document.getElementById('statusText');
+  dot.className = 'status-dot ' + state;
+  const labels = { connecting: 'Connecting...', connected: 'Connected', disconnected: 'Disconnected — retrying...' };
+  text.textContent = labels[state] || state;
+}
+
+// ---------------------------------------------------------------------------
+// Formatting helpers
+// ---------------------------------------------------------------------------
+function fmtNum(n) {
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
+  if (n >= 1_000) return (n / 1_000).toFixed(1) + 'K';
+  return n.toLocaleString();
+}
+
+function fmtTime(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+function fmtHour(hourStr) {
+  // "2026-03-21T15" -> "Mar 21 3PM"
+  if (!hourStr || hourStr.length < 13) return hourStr;
+  const d = new Date(hourStr + ':00:00Z');
+  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' ' +
+         d.toLocaleTimeString(undefined, { hour: 'numeric' });
+}
+
+// ---------------------------------------------------------------------------
+// Render
+// ---------------------------------------------------------------------------
+function render(data) {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+
+  renderHeader(data);
+  renderStats(data);
+  renderTimeline(data);
+  renderToolsByModel(data);
+  renderModelDist(data);
+  renderSmartMechTrend(data);
+  renderSmartMechTotal(data);
+  renderTurnTypes(data);
+  renderBashCmds(data);
+  renderSkills(data);
+  renderAgents(data);
+  renderSubagents(data);
+  renderSessions(data);
+}
+
+// ---------------------------------------------------------------------------
+// Header
+// ---------------------------------------------------------------------------
+function renderHeader(data) {
+  const m = data.metadata;
+  document.getElementById('headerMeta').textContent =
+    `${m.total_sessions} sessions | ${fmtNum(m.total_tool_calls)} tool calls | Generated ${fmtTime(m.generated_at)}`;
+}
+
+// ---------------------------------------------------------------------------
+// Stats row
+// ---------------------------------------------------------------------------
+function renderStats(data) {
+  const m = data.metadata;
+  const tokens = data.model_token_usage || {};
+  let totalInput = 0, totalOutput = 0;
+  for (const u of Object.values(tokens)) {
+    totalInput += u.input || 0;
+    totalOutput += u.output || 0;
+  }
+
+  const sm = data.turn_analysis?.smart_vs_mechanical || {};
+  const totalTurns = (sm.opus_smart || 0) + (sm.opus_mechanical || 0) + (sm.other_smart || 0) + (sm.other_mechanical || 0);
+  const mechPct = totalTurns > 0 ? Math.round(((sm.opus_mechanical || 0) + (sm.other_mechanical || 0)) / totalTurns * 100) : 0;
+
+  const topModel = Object.keys(data.model_counts || {})[0] || '—';
+  const topModelShort = topModel.replace('claude-', '').replace(/-\d.*/, '');
+
+  document.getElementById('statsRow').innerHTML = [
+    card('Sessions', m.total_sessions, `+ ${m.total_subagent_sessions} subagent`),
+    card('Tool Calls', fmtNum(m.total_tool_calls), ''),
+    card('Input Tokens', fmtNum(totalInput), `Output: ${fmtNum(totalOutput)}`),
+    card('Mechanical %', mechPct + '%', `of ${totalTurns} turns`),
+    card('Top Model', topModelShort, `${fmtNum(data.model_counts?.[topModel] || 0)} turns`),
+  ].join('');
+}
+
+function card(label, value, detail) {
+  return `<div class="stat-card"><div class="label">${label}</div><div class="value">${value}</div><div class="detail">${detail}</div></div>`;
+}
+
+// ---------------------------------------------------------------------------
+// Activity Timeline (line chart)
+// ---------------------------------------------------------------------------
+function renderTimeline(data) {
+  const timeline = data.timeline || {};
+  const hours = Object.keys(timeline).sort();
+  if (!hours.length) return;
+
+  // Find top 6 tools across all hours
+  const toolTotals = {};
+  for (const h of hours) {
+    for (const [tool, cnt] of Object.entries(timeline[h])) {
+      toolTotals[tool] = (toolTotals[tool] || 0) + cnt;
+    }
+  }
+  const topTools = Object.entries(toolTotals).sort((a, b) => b[1] - a[1]).slice(0, 6).map(e => e[0]);
+
+  const datasets = topTools.map(tool => ({
+    label: tool,
+    data: hours.map(h => timeline[h][tool] || 0),
+    borderColor: toolColor(tool),
+    backgroundColor: toolColor(tool) + '20',
+    borderWidth: 2,
+    pointRadius: 2,
+    pointHoverRadius: 5,
+    tension: 0.3,
+    fill: false,
+  }));
+
+  updateChart('timelineChart', {
+    type: 'line',
+    data: { labels: hours.map(fmtHour), datasets },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { position: 'top' } },
+      scales: {
+        x: { grid: { display: false } },
+        y: { beginAtZero: true, title: { display: true, text: 'Tool Calls' } },
+      },
+    },
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Tool Calls by Model (horizontal stacked bar)
+// ---------------------------------------------------------------------------
+function renderToolsByModel(data) {
+  const toolByModel = data.tool_by_model || {};
+  const toolCounts = data.tool_counts || {};
+  const tools = Object.keys(toolCounts);
+  if (!tools.length) return;
+
+  const allModels = new Set();
+  for (const models of Object.values(toolByModel)) {
+    for (const m of Object.keys(models)) allModels.add(m);
+  }
+  const models = [...allModels];
+
+  const datasets = models.map(model => ({
+    label: model.replace('claude-', '').replace(/-\d.*/, ''),
+    data: tools.map(t => toolByModel[t]?.[model] || 0),
+    backgroundColor: modelColor(model),
+    borderWidth: 0,
+  }));
+
+  updateChart('toolsChart', {
+    type: 'bar',
+    data: { labels: tools, datasets },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      plugins: { legend: { position: 'top' } },
+      scales: {
+        x: { stacked: true, beginAtZero: true },
+        y: { stacked: true, grid: { display: false } },
+      },
+    },
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Model Distribution (bar)
+// ---------------------------------------------------------------------------
+function renderModelDist(data) {
+  const mc = data.model_counts || {};
+  const models = Object.keys(mc);
+  if (!models.length) return;
+
+  const shortNames = models.map(m => m.replace('claude-', '').replace(/-\d.*/, ''));
+
+  updateChart('modelChart', {
+    type: 'bar',
+    data: {
+      labels: shortNames,
+      datasets: [{
+        label: 'Turns',
+        data: models.map(m => mc[m]),
+        backgroundColor: models.map(m => modelColor(m)),
+        borderWidth: 0,
+      }],
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { beginAtZero: true },
+        y: { grid: { display: false } },
+      },
+    },
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Smart vs Mechanical Trend (line chart)
+// ---------------------------------------------------------------------------
+function renderSmartMechTrend(data) {
+  const tl = data.turn_analysis?.smart_mech_timeline || {};
+  const hours = Object.keys(tl).sort();
+  if (!hours.length) return;
+
+  const keys = ['opus_smart', 'opus_mechanical', 'other_smart', 'other_mechanical'];
+  const labels = { opus_smart: 'Opus Smart', opus_mechanical: 'Opus Mechanical', other_smart: 'Other Smart', other_mechanical: 'Other Mechanical' };
+
+  // Solid lines for smart, dashed for mechanical
+  const dashed = { opus_mechanical: true, other_mechanical: true };
+
+  const datasets = keys.map(key => ({
+    label: labels[key],
+    data: hours.map(h => tl[h][key] || 0),
+    borderColor: SMART_MECH_COLORS[key],
+    backgroundColor: SMART_MECH_COLORS[key],
+    borderWidth: 2,
+    borderDash: dashed[key] ? [5, 3] : [],
+    pointRadius: 2,
+    pointHoverRadius: 5,
+    tension: 0.3,
+    fill: false,
+  }));
+
+  updateChart('smartMechChart', {
+    type: 'line',
+    data: { labels: hours.map(fmtHour), datasets },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { position: 'top' } },
+      scales: {
+        x: { grid: { display: false } },
+        y: { beginAtZero: true, title: { display: true, text: 'Turns' } },
+      },
+    },
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Smart vs Mechanical Total (doughnut)
+// ---------------------------------------------------------------------------
+function renderSmartMechTotal(data) {
+  const sm = data.turn_analysis?.smart_vs_mechanical || {};
+  const keys = ['opus_smart', 'opus_mechanical', 'other_smart', 'other_mechanical'];
+  const labels = { opus_smart: 'Opus Smart', opus_mechanical: 'Opus Mechanical', other_smart: 'Other Smart', other_mechanical: 'Other Mechanical' };
+  const values = keys.map(k => sm[k] || 0);
+
+  if (values.every(v => v === 0)) return;
+
+  updateChart('smartMechTotalChart', {
+    type: 'doughnut',
+    data: {
+      labels: keys.map(k => labels[k]),
+      datasets: [{
+        data: values,
+        backgroundColor: keys.map(k => SMART_MECH_COLORS[k]),
+        borderWidth: 1,
+        borderColor: '#161b22',
+      }],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom' },
+      },
+    },
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Turn Types (horizontal bar)
+// ---------------------------------------------------------------------------
+function renderTurnTypes(data) {
+  const ttc = data.turn_analysis?.turn_type_counts || {};
+  const types = Object.keys(ttc);
+  if (!types.length) return;
+
+  const typeColors = {
+    bash_exec: '#f85149',
+    code_read: '#58a6ff',
+    code_write: '#3fb950',
+    text_response: '#d2a8ff',
+    orchestration: '#f78166',
+    task_mgmt: '#8b949e',
+    thinking_only: '#484f58',
+    other_tool: '#6e7681',
+    other: '#484f58',
+  };
+
+  updateChart('turnTypesChart', {
+    type: 'bar',
+    data: {
+      labels: types,
+      datasets: [{
+        label: 'Turns',
+        data: types.map(t => ttc[t]),
+        backgroundColor: types.map(t => typeColors[t] || '#8b949e'),
+        borderWidth: 0,
+      }],
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { beginAtZero: true },
+        y: { grid: { display: false } },
+      },
+    },
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Bash Commands (horizontal bar by binary name)
+// ---------------------------------------------------------------------------
+function renderBashCmds(data) {
+  const cmds = data.bash_commands || {};
+  const names = Object.keys(cmds);
+  if (!names.length) return;
+
+  const cmdColors = {
+    git: '#f85149', grep: '#7ee787', find: '#7ee787', rg: '#7ee787',
+    ls: '#d29922', cp: '#d29922', mv: '#d29922', rm: '#d29922', mkdir: '#d29922',
+    npm: '#3fb950', npx: '#3fb950', pnpm: '#3fb950', yarn: '#3fb950',
+    python: '#58a6ff', python3: '#58a6ff', uv: '#58a6ff', pip: '#58a6ff',
+    xcodebuild: '#d2a8ff', swift: '#d2a8ff', make: '#d2a8ff', cargo: '#d2a8ff',
+    docker: '#79c0ff', gh: '#a5d6ff', curl: '#f78166', wget: '#f78166',
+    cat: '#388bfd', head: '#388bfd', tail: '#388bfd', wc: '#388bfd',
+    open: '#ffa657', echo: '#8b949e', cd: '#6e7681',
+  };
+
+  updateChart('bashCmdChart', {
+    type: 'bar',
+    data: {
+      labels: names,
+      datasets: [{
+        label: 'Calls',
+        data: names.map(n => cmds[n]),
+        backgroundColor: names.map(n => cmdColors[n] || '#8b949e'),
+        borderWidth: 0,
+      }],
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { beginAtZero: true },
+        y: { grid: { display: false } },
+      },
+    },
+  });
+}
+
+
+// ---------------------------------------------------------------------------
+// Skills by Model (horizontal stacked bar)
+// ---------------------------------------------------------------------------
+function renderSkills(data) {
+  const skillByModel = data.skill_by_model || {};
+  const skillCounts = data.skill_counts || {};
+  const skills = Object.keys(skillCounts);
+  if (!skills.length) {
+    updateChart('skillsChart', { type: 'bar', data: { labels: ['No skills used'], datasets: [] }, options: { indexAxis: 'y' } });
+    return;
+  }
+
+  const allModels = new Set();
+  for (const models of Object.values(skillByModel)) {
+    for (const m of Object.keys(models)) allModels.add(m);
+  }
+
+  const datasets = [...allModels].map(model => ({
+    label: model.replace('claude-', '').replace(/-\d.*/, ''),
+    data: skills.map(s => skillByModel[s]?.[model] || 0),
+    backgroundColor: modelColor(model),
+    borderWidth: 0,
+  }));
+
+  updateChart('skillsChart', {
+    type: 'bar',
+    data: { labels: skills, datasets },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      plugins: { legend: { position: 'top' } },
+      scales: {
+        x: { stacked: true, beginAtZero: true },
+        y: { stacked: true, grid: { display: false } },
+      },
+    },
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Agent Types by Model (horizontal stacked bar)
+// ---------------------------------------------------------------------------
+function renderAgents(data) {
+  const agentByModel = data.agent_by_model || {};
+  const agentCounts = data.agent_counts || {};
+  const agents = Object.keys(agentCounts);
+  if (!agents.length) {
+    updateChart('agentsChart', { type: 'bar', data: { labels: ['No agents used'], datasets: [] }, options: { indexAxis: 'y' } });
+    return;
+  }
+
+  const allModels = new Set();
+  for (const models of Object.values(agentByModel)) {
+    for (const m of Object.keys(models)) allModels.add(m);
+  }
+
+  const datasets = [...allModels].map(model => ({
+    label: model.replace('claude-', '').replace(/-\d.*/, ''),
+    data: agents.map(a => agentByModel[a]?.[model] || 0),
+    backgroundColor: modelColor(model),
+    borderWidth: 0,
+  }));
+
+  updateChart('agentsChart', {
+    type: 'bar',
+    data: { labels: agents, datasets },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      plugins: { legend: { position: 'top' } },
+      scales: {
+        x: { stacked: true, beginAtZero: true },
+        y: { stacked: true, grid: { display: false } },
+      },
+    },
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Subagent Model Usage (line chart over time)
+// ---------------------------------------------------------------------------
+function renderSubagents(data) {
+  const tl = data.subagent_timeline || {};
+  const hours = Object.keys(tl).sort();
+  if (!hours.length) {
+    updateChart('subagentChart', { type: 'line', data: { labels: ['No subagent data'], datasets: [] }, options: {} });
+    return;
+  }
+
+  // Collect all models seen in subagent timeline
+  const allModels = new Set();
+  for (const models of Object.values(tl)) {
+    for (const m of Object.keys(models)) allModels.add(m);
+  }
+
+  const datasets = [...allModels].map(model => ({
+    label: model.replace('claude-', '').replace(/-\d.*/, ''),
+    data: hours.map(h => tl[h][model] || 0),
+    borderColor: modelColor(model),
+    backgroundColor: modelColor(model) + '20',
+    borderWidth: 2,
+    pointRadius: 2,
+    pointHoverRadius: 5,
+    tension: 0.3,
+    fill: false,
+  }));
+
+  // Add total tokens annotation in the legend
+  const tu = data.subagent_token_usage || {};
+  for (const ds of datasets) {
+    const fullModel = [...allModels].find(m => ds.label === m.replace('claude-', '').replace(/-\d.*/, ''));
+    if (fullModel && tu[fullModel]) {
+      const total = tu[fullModel].input + tu[fullModel].output;
+      ds.label += ` (${fmtNum(total)} tokens)`;
+    }
+  }
+
+  updateChart('subagentChart', {
+    type: 'line',
+    data: { labels: hours.map(fmtHour), datasets },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { position: 'top' } },
+      scales: {
+        x: { grid: { display: false } },
+        y: { beginAtZero: true, title: { display: true, text: 'Turns' } },
+      },
+    },
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Sessions Table
+// ---------------------------------------------------------------------------
+function renderSessions(data) {
+  const sessions = data.sessions || [];
+  if (!sessions.length) {
+    document.getElementById('sessionsTable').innerHTML = '<p style="color:var(--text-muted)">No sessions</p>';
+    return;
+  }
+
+  const rows = sessions.map(s => {
+    const models = Object.entries(s.models_used || {})
+      .map(([m, c]) => `<span style="color:${modelColor(m)}">${m.replace('claude-', '').replace(/-\d.*/, '')}:${c}</span>`)
+      .join(' ');
+    const tools = Object.entries(s.tool_calls || {})
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([t, c]) => `${t}:${c}`)
+      .join(', ');
+
+    return `<tr>
+      <td>${s.project || '—'}</td>
+      <td>${s.git_branch || '—'}</td>
+      <td>${fmtTime(s.start_time)}</td>
+      <td>${models}</td>
+      <td>${s.total_tools || 0}</td>
+      <td style="font-size:11px;color:var(--text-muted)">${tools}</td>
+      <td>${fmtNum(s.input_tokens || 0)}</td>
+      <td>${fmtNum(s.output_tokens || 0)}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('sessionsTable').innerHTML = `
+    <table class="sessions-table">
+      <thead><tr>
+        <th>Project</th><th>Branch</th><th>Started</th><th>Models</th>
+        <th>Tools</th><th>Top Tools</th><th>Input</th><th>Output</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+// ---------------------------------------------------------------------------
+// Chart update helper (create or update)
+// ---------------------------------------------------------------------------
+function updateChart(canvasId, config) {
+  if (charts[canvasId]) {
+    charts[canvasId].destroy();
+  }
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  charts[canvasId] = new Chart(ctx, config);
+}
+
+// ---------------------------------------------------------------------------
+// Start
+// ---------------------------------------------------------------------------
+connect();
+</script>
+</body>
+</html>

@@ -88,10 +88,43 @@
     padding: 20px;
     margin-bottom: 16px;
   }
-  .section h2 { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+  .section h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
 
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
   @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* View toggle tabs */
+  .view-toggle {
+    display: inline-flex;
+    margin-left: auto;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    font-size: 11px;
+  }
+  .view-toggle button {
+    background: transparent;
+    color: var(--text-muted);
+    border: none;
+    padding: 3px 10px;
+    cursor: pointer;
+    font-size: 11px;
+    font-family: inherit;
+  }
+  .view-toggle button.active {
+    background: rgba(88, 166, 255, 0.15);
+    color: var(--accent);
+  }
+  .view-toggle button:not(:last-child) {
+    border-right: 1px solid var(--border);
+  }
 
   /* Sessions table */
   .sessions-table {
@@ -154,10 +187,21 @@
 
   <div class="stats-row" id="statsRow"></div>
 
-  <!-- Activity Timeline -->
+  <!-- Activity / Model timeline with toggle -->
   <div class="section">
-    <h2>Activity Timeline</h2>
-    <canvas id="timelineChart" height="100"></canvas>
+    <h2>
+      <span>Activity</span>
+      <div class="view-toggle" id="timelineToggle">
+        <button class="active" data-view="tools">Tools</button>
+        <button data-view="models">Models</button>
+      </div>
+    </h2>
+    <div id="timelineToolsView">
+      <canvas id="timelineChart" height="100"></canvas>
+    </div>
+    <div id="timelineModelsView" style="display:none">
+      <canvas id="modelTimelineChart" height="100"></canvas>
+    </div>
   </div>
 
   <!-- Tool calls + Model distribution -->
@@ -172,28 +216,16 @@
     </div>
   </div>
 
-  <!-- Smart vs Mechanical -->
+  <!-- Turn Types + Bash Commands side by side -->
   <div class="grid-2">
     <div class="section">
-      <h2>Smart vs Mechanical (Trend)</h2>
-      <canvas id="smartMechChart" height="100"></canvas>
+      <h2>Turn Types</h2>
+      <canvas id="turnTypesChart"></canvas>
     </div>
     <div class="section">
-      <h2>Smart vs Mechanical (Total)</h2>
-      <canvas id="smartMechTotalChart"></canvas>
+      <h2>Bash Commands</h2>
+      <canvas id="bashCmdChart"></canvas>
     </div>
-  </div>
-
-  <!-- Turn Types -->
-  <div class="section">
-    <h2>Turn Types</h2>
-    <canvas id="turnTypesChart"></canvas>
-  </div>
-
-  <!-- Bash Commands -->
-  <div class="section">
-    <h2>Bash Commands</h2>
-    <canvas id="bashCmdChart"></canvas>
   </div>
 
   <!-- Skills + Agents -->
@@ -208,10 +240,16 @@
     </div>
   </div>
 
-  <!-- Subagent breakdown -->
-  <div class="section">
-    <h2>Subagent Model Usage</h2>
-    <canvas id="subagentChart" height="100"></canvas>
+  <!-- MCP Servers + Subagent side by side -->
+  <div class="grid-2">
+    <div class="section" id="mcpSection" style="display:none">
+      <h2>MCP Servers</h2>
+      <canvas id="mcpChart"></canvas>
+    </div>
+    <div class="section">
+      <h2>Subagent Model Usage</h2>
+      <canvas id="subagentChart" height="80"></canvas>
+    </div>
   </div>
 
   <!-- Sessions table -->
@@ -225,11 +263,10 @@
 // ---------------------------------------------------------------------------
 // Color scheme
 // ---------------------------------------------------------------------------
-const MODEL_COLORS = {
-  'claude-opus-4-6': '#d2a8ff',
-  'claude-sonnet-4-6': '#58a6ff',
-  'claude-sonnet-4-20250514': '#58a6ff',
-  'claude-haiku-4-5-20251001': '#3fb950',
+const FAMILY_COLORS = {
+  opus: '#d2a8ff',
+  sonnet: '#58a6ff',
+  haiku: '#3fb950',
 };
 
 const TOOL_COLORS = {
@@ -245,25 +282,33 @@ const TOOL_COLORS = {
   'TaskUpdate': '#8b949e',
 };
 
-const SMART_MECH_COLORS = {
-  opus_smart: '#d2a8ff',
-  opus_mechanical: 'rgba(210, 168, 255, 0.35)',
-  other_smart: '#58a6ff',
-  other_mechanical: 'rgba(88, 166, 255, 0.35)',
-};
+function modelFamily(name) {
+  for (const family of ['opus', 'sonnet', 'haiku']) {
+    if (name.includes(family)) return family;
+  }
+  return 'unknown';
+}
+
+function isRealModel(name) {
+  return modelFamily(name) !== 'unknown';
+}
 
 function modelColor(name) {
-  for (const [key, color] of Object.entries(MODEL_COLORS)) {
-    if (name.includes(key) || key.includes(name)) return color;
-  }
-  if (name.includes('opus')) return '#d2a8ff';
-  if (name.includes('sonnet')) return '#58a6ff';
-  if (name.includes('haiku')) return '#3fb950';
-  return '#8b949e';
+  return FAMILY_COLORS[modelFamily(name)] || '#8b949e';
+}
+
+function modelShort(name) {
+  const family = modelFamily(name);
+  if (family === 'unknown') return name;
+  return family.charAt(0).toUpperCase() + family.slice(1);
 }
 
 function toolColor(name) {
   return TOOL_COLORS[name] || '#8b949e';
+}
+
+function cleanMcpServer(name) {
+  return name.replace(/^plugin_/, '').replace(/^on-call_/, '');
 }
 
 // ---------------------------------------------------------------------------
@@ -274,6 +319,7 @@ Chart.defaults.borderColor = '#30363d';
 Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif";
 Chart.defaults.font.size = 12;
 Chart.defaults.plugins.legend.labels.boxWidth = 12;
+Chart.defaults.animation = false;
 
 // ---------------------------------------------------------------------------
 // State
@@ -318,6 +364,24 @@ function updateStatus(state) {
 }
 
 // ---------------------------------------------------------------------------
+// View toggle wiring
+// ---------------------------------------------------------------------------
+function setupViewToggle(toggleId, views) {
+  const toggle = document.getElementById(toggleId);
+  if (!toggle) return;
+  toggle.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      toggle.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const view = btn.dataset.view;
+      for (const [key, elId] of Object.entries(views)) {
+        document.getElementById(elId).style.display = key === view ? '' : 'none';
+      }
+    });
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Formatting helpers
 // ---------------------------------------------------------------------------
 function fmtNum(n) {
@@ -333,7 +397,6 @@ function fmtTime(iso) {
 }
 
 function fmtHour(hourStr) {
-  // "2026-03-21T15" -> "Mar 21 3PM"
   if (!hourStr || hourStr.length < 13) return hourStr;
   const d = new Date(hourStr + ':00:00Z');
   return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' ' +
@@ -350,10 +413,11 @@ function render(data) {
   renderHeader(data);
   renderStats(data);
   renderTimeline(data);
+  renderModelTimeline(data);
+  setupViewToggle('timelineToggle', { tools: 'timelineToolsView', models: 'timelineModelsView' });
   renderToolsByModel(data);
   renderModelDist(data);
-  renderSmartMechTrend(data);
-  renderSmartMechTotal(data);
+  renderMcp(data);
   renderTurnTypes(data);
   renderBashCmds(data);
   renderSkills(data);
@@ -387,8 +451,8 @@ function renderStats(data) {
   const totalTurns = (sm.opus_smart || 0) + (sm.opus_mechanical || 0) + (sm.other_smart || 0) + (sm.other_mechanical || 0);
   const mechPct = totalTurns > 0 ? Math.round(((sm.opus_mechanical || 0) + (sm.other_mechanical || 0)) / totalTurns * 100) : 0;
 
-  const topModel = Object.keys(data.model_counts || {})[0] || '—';
-  const topModelShort = topModel.replace('claude-', '').replace(/-\d.*/, '');
+  const topModel = Object.keys(data.model_counts || {}).filter(isRealModel)[0] || '—';
+  const topModelShort = modelShort(topModel);
 
   document.getElementById('statsRow').innerHTML = [
     card('Sessions', m.total_sessions, `+ ${m.total_subagent_sessions} subagent`),
@@ -411,7 +475,6 @@ function renderTimeline(data) {
   const hours = Object.keys(timeline).sort();
   if (!hours.length) return;
 
-  // Find top 6 tools across all hours
   const toolTotals = {};
   for (const h of hours) {
     for (const [tool, cnt] of Object.entries(timeline[h])) {
@@ -448,6 +511,109 @@ function renderTimeline(data) {
 }
 
 // ---------------------------------------------------------------------------
+// Model Usage Over Time (line chart)
+// ---------------------------------------------------------------------------
+function renderModelTimeline(data) {
+  const mt = data.model_timeline || {};
+  const hours = Object.keys(mt).sort();
+  if (!hours.length) return;
+
+  const allModels = new Set();
+  for (const bucket of Object.values(mt)) {
+    for (const m of Object.keys(bucket)) {
+      if (isRealModel(m)) allModels.add(m);
+    }
+  }
+
+  const models = [...allModels];
+  const tu = data.model_token_usage || {};
+
+  const datasets = models.map(model => {
+    const total = tu[model] ? (tu[model].input || 0) + (tu[model].output || 0) : 0;
+    return {
+      label: modelShort(model) + (total ? ` (${fmtNum(total)} tokens)` : ''),
+      data: hours.map(h => mt[h][model] || 0),
+      borderColor: modelColor(model),
+      backgroundColor: modelColor(model) + '20',
+      borderWidth: 2,
+      pointRadius: 2,
+      pointHoverRadius: 5,
+      tension: 0.3,
+      fill: false,
+    };
+  });
+
+  updateChart('modelTimelineChart', {
+    type: 'line',
+    data: { labels: hours.map(fmtHour), datasets },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { position: 'top' } },
+      scales: {
+        x: { grid: { display: false } },
+        y: { beginAtZero: true, title: { display: true, text: 'Turns' } },
+      },
+    },
+  });
+}
+
+// ---------------------------------------------------------------------------
+// MCP Servers (horizontal stacked bar by model)
+// ---------------------------------------------------------------------------
+function renderMcp(data) {
+  const serverCounts = data.mcp_server_counts || {};
+  const methodCounts = data.mcp_method_counts || {};
+  const mcpByModel = data.mcp_by_model || {};
+  const servers = Object.keys(serverCounts);
+  if (!servers.length) return;
+
+  document.getElementById('mcpSection').style.display = '';
+
+  const items = [];
+  for (const server of servers) {
+    const methods = methodCounts[server] || {};
+    for (const [method, count] of Object.entries(methods)) {
+      items.push({ label: `${cleanMcpServer(server)} / ${method}`, count, server });
+    }
+  }
+  items.sort((a, b) => b.count - a.count);
+
+  const labels = items.map(i => i.label);
+
+  const allModels = new Set();
+  for (const models of Object.values(mcpByModel)) {
+    for (const m of Object.keys(models)) allModels.add(m);
+  }
+  const models = [...allModels];
+
+  const datasets = models.map(model => ({
+    label: modelShort(model),
+    data: items.map(item => {
+      const serverModels = mcpByModel[item.server] || {};
+      const serverTotal = Object.values(serverModels).reduce((a, b) => a + b, 0) || 1;
+      return Math.round(item.count * (serverModels[model] || 0) / serverTotal);
+    }),
+    backgroundColor: modelColor(model),
+    borderWidth: 0,
+  }));
+
+  updateChart('mcpChart', {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      plugins: { legend: { position: 'top' } },
+      scales: {
+        x: { stacked: true, beginAtZero: true },
+        y: { stacked: true, grid: { display: false } },
+      },
+    },
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Tool Calls by Model (horizontal stacked bar)
 // ---------------------------------------------------------------------------
 function renderToolsByModel(data) {
@@ -460,10 +626,9 @@ function renderToolsByModel(data) {
   for (const models of Object.values(toolByModel)) {
     for (const m of Object.keys(models)) allModels.add(m);
   }
-  const models = [...allModels];
 
-  const datasets = models.map(model => ({
-    label: model.replace('claude-', '').replace(/-\d.*/, ''),
+  const datasets = [...allModels].map(model => ({
+    label: modelShort(model),
     data: tools.map(t => toolByModel[t]?.[model] || 0),
     backgroundColor: modelColor(model),
     borderWidth: 0,
@@ -485,19 +650,17 @@ function renderToolsByModel(data) {
 }
 
 // ---------------------------------------------------------------------------
-// Model Distribution (bar)
+// Model Distribution (bar) — filter synthetic/unknown
 // ---------------------------------------------------------------------------
 function renderModelDist(data) {
   const mc = data.model_counts || {};
-  const models = Object.keys(mc);
+  const models = Object.keys(mc).filter(isRealModel);
   if (!models.length) return;
-
-  const shortNames = models.map(m => m.replace('claude-', '').replace(/-\d.*/, ''));
 
   updateChart('modelChart', {
     type: 'bar',
     data: {
-      labels: shortNames,
+      labels: models.map(m => modelShort(m)),
       datasets: [{
         label: 'Turns',
         data: models.map(m => mc[m]),
@@ -518,84 +681,11 @@ function renderModelDist(data) {
 }
 
 // ---------------------------------------------------------------------------
-// Smart vs Mechanical Trend (line chart)
-// ---------------------------------------------------------------------------
-function renderSmartMechTrend(data) {
-  const tl = data.turn_analysis?.smart_mech_timeline || {};
-  const hours = Object.keys(tl).sort();
-  if (!hours.length) return;
-
-  const keys = ['opus_smart', 'opus_mechanical', 'other_smart', 'other_mechanical'];
-  const labels = { opus_smart: 'Opus Smart', opus_mechanical: 'Opus Mechanical', other_smart: 'Other Smart', other_mechanical: 'Other Mechanical' };
-
-  // Solid lines for smart, dashed for mechanical
-  const dashed = { opus_mechanical: true, other_mechanical: true };
-
-  const datasets = keys.map(key => ({
-    label: labels[key],
-    data: hours.map(h => tl[h][key] || 0),
-    borderColor: SMART_MECH_COLORS[key],
-    backgroundColor: SMART_MECH_COLORS[key],
-    borderWidth: 2,
-    borderDash: dashed[key] ? [5, 3] : [],
-    pointRadius: 2,
-    pointHoverRadius: 5,
-    tension: 0.3,
-    fill: false,
-  }));
-
-  updateChart('smartMechChart', {
-    type: 'line',
-    data: { labels: hours.map(fmtHour), datasets },
-    options: {
-      responsive: true,
-      interaction: { mode: 'index', intersect: false },
-      plugins: { legend: { position: 'top' } },
-      scales: {
-        x: { grid: { display: false } },
-        y: { beginAtZero: true, title: { display: true, text: 'Turns' } },
-      },
-    },
-  });
-}
-
-// ---------------------------------------------------------------------------
-// Smart vs Mechanical Total (doughnut)
-// ---------------------------------------------------------------------------
-function renderSmartMechTotal(data) {
-  const sm = data.turn_analysis?.smart_vs_mechanical || {};
-  const keys = ['opus_smart', 'opus_mechanical', 'other_smart', 'other_mechanical'];
-  const labels = { opus_smart: 'Opus Smart', opus_mechanical: 'Opus Mechanical', other_smart: 'Other Smart', other_mechanical: 'Other Mechanical' };
-  const values = keys.map(k => sm[k] || 0);
-
-  if (values.every(v => v === 0)) return;
-
-  updateChart('smartMechTotalChart', {
-    type: 'doughnut',
-    data: {
-      labels: keys.map(k => labels[k]),
-      datasets: [{
-        data: values,
-        backgroundColor: keys.map(k => SMART_MECH_COLORS[k]),
-        borderWidth: 1,
-        borderColor: '#161b22',
-      }],
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { position: 'bottom' },
-      },
-    },
-  });
-}
-
-// ---------------------------------------------------------------------------
-// Turn Types (horizontal bar)
+// Turn Types (horizontal bar) — limit to top 8
 // ---------------------------------------------------------------------------
 function renderTurnTypes(data) {
   const ttc = data.turn_analysis?.turn_type_counts || {};
-  const types = Object.keys(ttc);
+  const types = Object.keys(ttc).slice(0, 8);
   if (!types.length) return;
 
   const typeColors = {
@@ -634,11 +724,11 @@ function renderTurnTypes(data) {
 }
 
 // ---------------------------------------------------------------------------
-// Bash Commands (horizontal bar by binary name)
+// Bash Commands (horizontal bar) — limit to top 12
 // ---------------------------------------------------------------------------
 function renderBashCmds(data) {
   const cmds = data.bash_commands || {};
-  const names = Object.keys(cmds);
+  const names = Object.keys(cmds).slice(0, 12);
   if (!names.length) return;
 
   const cmdColors = {
@@ -675,7 +765,6 @@ function renderBashCmds(data) {
   });
 }
 
-
 // ---------------------------------------------------------------------------
 // Skills by Model (horizontal stacked bar)
 // ---------------------------------------------------------------------------
@@ -694,7 +783,7 @@ function renderSkills(data) {
   }
 
   const datasets = [...allModels].map(model => ({
-    label: model.replace('claude-', '').replace(/-\d.*/, ''),
+    label: modelShort(model),
     data: skills.map(s => skillByModel[s]?.[model] || 0),
     backgroundColor: modelColor(model),
     borderWidth: 0,
@@ -733,7 +822,7 @@ function renderAgents(data) {
   }
 
   const datasets = [...allModels].map(model => ({
-    label: model.replace('claude-', '').replace(/-\d.*/, ''),
+    label: modelShort(model),
     data: agents.map(a => agentByModel[a]?.[model] || 0),
     backgroundColor: modelColor(model),
     borderWidth: 0,
@@ -765,14 +854,15 @@ function renderSubagents(data) {
     return;
   }
 
-  // Collect all models seen in subagent timeline
   const allModels = new Set();
   for (const models of Object.values(tl)) {
-    for (const m of Object.keys(models)) allModels.add(m);
+    for (const m of Object.keys(models)) {
+      if (isRealModel(m)) allModels.add(m);
+    }
   }
 
   const datasets = [...allModels].map(model => ({
-    label: model.replace('claude-', '').replace(/-\d.*/, ''),
+    label: modelShort(model),
     data: hours.map(h => tl[h][model] || 0),
     borderColor: modelColor(model),
     backgroundColor: modelColor(model) + '20',
@@ -783,10 +873,9 @@ function renderSubagents(data) {
     fill: false,
   }));
 
-  // Add total tokens annotation in the legend
   const tu = data.subagent_token_usage || {};
   for (const ds of datasets) {
-    const fullModel = [...allModels].find(m => ds.label === m.replace('claude-', '').replace(/-\d.*/, ''));
+    const fullModel = [...allModels].find(m => ds.label === modelShort(m));
     if (fullModel && tu[fullModel]) {
       const total = tu[fullModel].input + tu[fullModel].output;
       ds.label += ` (${fmtNum(total)} tokens)`;
@@ -809,7 +898,7 @@ function renderSubagents(data) {
 }
 
 // ---------------------------------------------------------------------------
-// Sessions Table
+// Sessions Table — split models and turns columns
 // ---------------------------------------------------------------------------
 function renderSessions(data) {
   const sessions = data.sessions || [];
@@ -819,9 +908,9 @@ function renderSessions(data) {
   }
 
   const rows = sessions.map(s => {
-    const models = Object.entries(s.models_used || {})
-      .map(([m, c]) => `<span style="color:${modelColor(m)}">${m.replace('claude-', '').replace(/-\d.*/, '')}:${c}</span>`)
-      .join(' ');
+    const modelEntries = Object.entries(s.models_used || {}).filter(([m]) => isRealModel(m)).sort((a, b) => b[1] - a[1]);
+    const models = modelEntries.map(([m]) => `<span style="color:${modelColor(m)}">${modelShort(m)}</span>`).join(' ');
+    const turns = modelEntries.map(([m, c]) => `<span style="color:${modelColor(m)}">${c}</span>`).join(' / ');
     const tools = Object.entries(s.tool_calls || {})
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5)
@@ -833,7 +922,7 @@ function renderSessions(data) {
       <td>${s.git_branch || '—'}</td>
       <td>${fmtTime(s.start_time)}</td>
       <td>${models}</td>
-      <td>${s.total_tools || 0}</td>
+      <td style="white-space:nowrap">${turns}</td>
       <td style="font-size:11px;color:var(--text-muted)">${tools}</td>
       <td>${fmtNum(s.input_tokens || 0)}</td>
       <td>${fmtNum(s.output_tokens || 0)}</td>
@@ -844,7 +933,7 @@ function renderSessions(data) {
     <table class="sessions-table">
       <thead><tr>
         <th>Project</th><th>Branch</th><th>Started</th><th>Models</th>
-        <th>Tools</th><th>Top Tools</th><th>Input</th><th>Output</th>
+        <th>Turns</th><th>Top Tools</th><th>Input</th><th>Output</th>
       </tr></thead>
       <tbody>${rows}</tbody>
     </table>`;

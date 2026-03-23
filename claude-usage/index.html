@@ -298,6 +298,36 @@
     border-left: 1px dashed rgba(88, 166, 255, 0.25);
   }
 
+  /* View toggle */
+  .view-toggle {
+    display: inline-flex;
+    gap: 0;
+    margin-left: auto;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    font-size: 11px;
+  }
+
+  .view-toggle button {
+    background: transparent;
+    color: var(--text-muted);
+    border: none;
+    padding: 3px 10px;
+    cursor: pointer;
+    font-size: 11px;
+    font-family: inherit;
+  }
+
+  .view-toggle button.active {
+    background: rgba(88, 166, 255, 0.15);
+    color: var(--accent);
+  }
+
+  .view-toggle button:not(:last-child) {
+    border-right: 1px solid var(--border);
+  }
+
   /* Model legend */
   .legend {
     display: flex;
@@ -544,13 +574,37 @@
 
   <div class="grid-2">
     <div class="card">
-      <h2>Tool Calls <span class="badge" id="toolBadge"></span></h2>
-      <div class="bar-chart" id="toolChart"></div>
+      <h2>Tool Calls <span class="badge" id="toolBadge"></span>
+        <div class="view-toggle" id="toolViewToggle">
+          <button class="active" data-view="bar">Totals</button>
+          <button data-view="timeline">Timeline</button>
+        </div>
+      </h2>
+      <div id="toolBarView">
+        <div class="bar-chart" id="toolChart"></div>
+      </div>
+      <div id="toolTimelineView" style="display:none">
+        <div class="legend" id="toolTimelineLegend"></div>
+        <div class="timeline-chart" id="toolTimelineChart"></div>
+        <div class="timeline-labels" id="toolTimelineLabels"></div>
+      </div>
     </div>
     <div class="card">
-      <h2>Model Usage by Tool</h2>
-      <div class="legend" id="modelLegend"></div>
-      <div class="bar-chart" id="modelToolChart"></div>
+      <h2>Model Usage by Tool
+        <div class="view-toggle" id="modelToolViewToggle">
+          <button class="active" data-view="bar">Totals</button>
+          <button data-view="timeline">Timeline</button>
+        </div>
+      </h2>
+      <div id="modelToolBarView">
+        <div class="legend" id="modelLegend"></div>
+        <div class="bar-chart" id="modelToolChart"></div>
+      </div>
+      <div id="modelToolTimelineView" style="display:none">
+        <div class="legend" id="modelToolTimelineLegend"></div>
+        <div class="timeline-chart" id="modelToolTimelineChart"></div>
+        <div class="timeline-labels" id="modelToolTimelineLabels"></div>
+      </div>
     </div>
   </div>
 
@@ -589,6 +643,13 @@
     </div>
   </div>
 
+  <div class="card" id="mcpCard" style="margin-bottom: 24px; display:none">
+    <h2>MCP Servers <span class="badge" id="mcpBadge"></span></h2>
+    <p class="card-subtitle">External tool servers used via Model Context Protocol</p>
+    <div class="legend" id="mcpModelLegend"></div>
+    <div class="bar-chart bar-chart--wide" id="mcpChart"></div>
+  </div>
+
   <div class="grid-2">
     <div class="card">
       <h2>Subagent Runtime Models <span class="badge" id="subagentBadge"></span></h2>
@@ -596,8 +657,20 @@
       <div class="bar-chart" id="subagentModelChart"></div>
     </div>
     <div class="card">
-      <h2>Overall Model Distribution <span class="badge" id="modelBadge"></span></h2>
-      <div class="bar-chart" id="modelChart"></div>
+      <h2>Overall Model Distribution <span class="badge" id="modelBadge"></span>
+        <div class="view-toggle" id="modelViewToggle">
+          <button class="active" data-view="bar">Totals</button>
+          <button data-view="timeline">Timeline</button>
+        </div>
+      </h2>
+      <div id="modelBarView">
+        <div class="bar-chart" id="modelChart"></div>
+      </div>
+      <div id="modelTimelineView" style="display:none">
+        <div class="legend" id="modelTimelineLegend"></div>
+        <div class="timeline-chart" id="modelTimelineChart"></div>
+        <div class="timeline-labels" id="modelTimelineLabels"></div>
+      </div>
     </div>
   </div>
 
@@ -666,6 +739,7 @@
             <th>Branch</th>
             <th>Time</th>
             <th>Models</th>
+            <th>Turns</th>
             <th>Tools</th>
             <th>Messages</th>
             <th>Tokens (in/out)</th>
@@ -683,25 +757,31 @@
 </div>
 
 <script>
-const MODEL_COLORS = {
-  'claude-opus-4-6': '#d2a8ff',
-  'claude-sonnet-4-6': '#58a6ff',
-  'claude-haiku-4-5-20251001': '#3fb950',
-  'sonnet': '#58a6ff',
-  'haiku': '#3fb950',
-  '<synthetic>': '#8b949e',
-  'unknown': '#484f58',
+const FAMILY_COLORS = {
+  opus: '#d2a8ff',
+  sonnet: '#58a6ff',
+  haiku: '#3fb950',
+  synthetic: '#8b949e',
+  unknown: '#484f58',
 };
 
-const MODEL_SHORT = {
-  'claude-opus-4-6': 'Opus',
-  'claude-sonnet-4-6': 'Sonnet',
-  'claude-haiku-4-5-20251001': 'Haiku',
-  'sonnet': 'Sonnet',
-  'haiku': 'Haiku',
-  '<synthetic>': 'Synthetic',
-  'unknown': 'Unknown',
-};
+function modelFamily(name) {
+  for (const family of ['opus', 'sonnet', 'haiku']) {
+    if (name.includes(family)) return family;
+  }
+  if (name === '<synthetic>') return 'synthetic';
+  return 'unknown';
+}
+
+function modelColor(name) {
+  return FAMILY_COLORS[modelFamily(name)] || '#484f58';
+}
+
+function modelShort(name) {
+  const family = modelFamily(name);
+  if (family === 'unknown') return name;
+  return family.charAt(0).toUpperCase() + family.slice(1);
+}
 
 const TOOL_COLORS = {
   'Bash': '#f78166',
@@ -715,11 +795,11 @@ const TOOL_COLORS = {
 };
 
 function getModelColor(model) {
-  return MODEL_COLORS[model] || '#8b949e';
+  return modelColor(model);
 }
 
 function getModelShort(model) {
-  return MODEL_SHORT[model] || model.split('-').pop();
+  return modelShort(model);
 }
 
 function getToolColor(tool) {
@@ -964,6 +1044,107 @@ function renderModelLegend(data) {
   document.getElementById('modelLegend').innerHTML = models.map(m =>
     `<div class="legend-item"><div class="legend-dot" style="background:${getModelColor(m)}"></div>${getModelShort(m)}</div>`
   ).join('');
+}
+
+// ---------------------------------------------------------------------------
+// Generic stacked-bar timeline renderer
+// ---------------------------------------------------------------------------
+function renderStackedTimeline(chartId, labelsId, legendId, hourlyData, itemKeys, colorFn, labelFn) {
+  const hours = Object.keys(hourlyData).sort();
+  if (!hours.length) return;
+
+  let maxTotal = 0;
+  hours.forEach(h => {
+    const total = itemKeys.reduce((sum, k) => sum + (hourlyData[h][k] || 0), 0);
+    if (total > maxTotal) maxTotal = total;
+  });
+
+  const chart = document.getElementById(chartId);
+  chart.innerHTML = hours.map((h, i) => {
+    const buckets = hourlyData[h];
+    const segments = itemKeys.map(k => {
+      const count = buckets[k] || 0;
+      const height = maxTotal ? (count / maxTotal) * 100 : 0;
+      return height > 0 ? `<div class="segment" style="height:${height}%;background:${colorFn(k)}"
+        onmouseenter="showTooltip(event, '${h}:00', ${JSON.stringify(itemKeys.filter(kk => (buckets[kk] || 0) > 0).map(kk => [labelFn(kk), (buckets[kk] || 0) + '']))})"
+        onmouseleave="hideTooltip()"></div>` : '';
+    }).join('');
+
+    const date = h.split('T')[0];
+    const prevDate = i > 0 ? hours[i-1].split('T')[0] : null;
+    const isNewDay = prevDate && date !== prevDate;
+    return `<div class="timeline-bar${isNewDay ? ' timeline-day-sep' : ''}">${segments}</div>`;
+  }).join('');
+
+  document.getElementById(labelsId).innerHTML = hours.map((h, i) => {
+    const show = hours.length <= 12 || i % Math.ceil(hours.length / 12) === 0;
+    const label = h.split('T')[1] + ':00';
+    const date = h.split('T')[0];
+    const prevDate = i > 0 ? hours[i-1].split('T')[0] : null;
+    const isNewDay = prevDate && date !== prevDate;
+    const dayLabel = isNewDay ? new Date(date + 'T00:00').toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' }) : '';
+    return `<span>${show ? label : ''}${isNewDay ? `<br><span style="color:var(--accent);font-weight:600;font-size:9px;">${dayLabel}</span>` : ''}</span>`;
+  }).join('');
+
+  if (legendId) {
+    document.getElementById(legendId).innerHTML = itemKeys.map(k =>
+      `<div class="legend-item"><div class="legend-dot" style="background:${colorFn(k)}"></div>${labelFn(k)}</div>`
+    ).join('');
+  }
+}
+
+function renderModelTimeline(data) {
+  const mt = data.model_timeline || {};
+  const models = Object.keys(data.model_counts).filter(m => !m.startsWith('<'));
+  renderStackedTimeline('modelTimelineChart', 'modelTimelineLabels', 'modelTimelineLegend',
+    mt, models, getModelColor, getModelShort);
+}
+
+function renderToolTimeline(data) {
+  const timeline = data.timeline;
+  const topTools = Object.entries(data.tool_counts).slice(0, 8).map(([t]) => t);
+  renderStackedTimeline('toolTimelineChart', 'toolTimelineLabels', 'toolTimelineLegend',
+    timeline, topTools, getToolColor, t => t);
+}
+
+function renderToolModelTimeline(data) {
+  const tmt = data.tool_model_timeline || {};
+  const hours = Object.keys(tmt).sort();
+  if (!hours.length) return;
+
+  // Flatten to per-hour, per-model totals (all tools summed by model)
+  const models = Object.keys(data.model_counts).filter(m => !m.startsWith('<'));
+  const byModel = {};
+  hours.forEach(h => {
+    byModel[h] = {};
+    models.forEach(m => {
+      let total = 0;
+      for (const tool in tmt[h]) {
+        total += (tmt[h][tool][m] || 0);
+      }
+      byModel[h][m] = total;
+    });
+  });
+  renderStackedTimeline('modelToolTimelineChart', 'modelToolTimelineLabels', 'modelToolTimelineLegend',
+    byModel, models, getModelColor, getModelShort);
+}
+
+// ---------------------------------------------------------------------------
+// View toggle wiring
+// ---------------------------------------------------------------------------
+function setupViewToggle(toggleId, views) {
+  const toggle = document.getElementById(toggleId);
+  if (!toggle) return;
+  toggle.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      toggle.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const view = btn.dataset.view;
+      for (const [key, elId] of Object.entries(views)) {
+        document.getElementById(elId).style.display = key === view ? '' : 'none';
+      }
+    });
+  });
 }
 
 const BASH_CAT_COLORS = {
@@ -1455,11 +1636,15 @@ function renderSessions(data) {
   document.getElementById('sessionBadge').textContent = data.sessions.length;
   const tbody = document.getElementById('sessionBody');
   tbody.innerHTML = data.sessions.map(s => {
-    const models = Object.entries(s.models_used)
+    const modelEntries = Object.entries(s.models_used)
       .filter(([m]) => !m.startsWith('<'))
-      .sort((a, b) => b[1] - a[1])
-      .map(([m, c]) => `<span class="model-tag ${getModelClass(m)}">${getModelShort(m)} ${c}</span>`)
+      .sort((a, b) => b[1] - a[1]);
+    const models = modelEntries
+      .map(([m]) => `<span class="model-tag ${getModelClass(m)}">${getModelShort(m)}</span>`)
       .join(' ');
+    const turns = modelEntries
+      .map(([m, c]) => `<span style="color:${getModelColor(m)}">${c}</span>`)
+      .join(' / ');
 
     const topTools = Object.entries(s.tool_breakdown)
       .sort((a, b) => b[1] - a[1])
@@ -1472,6 +1657,7 @@ function renderSessions(data) {
       <td style="color:var(--text-muted);font-size:12px" title="${s.git_branch || ''}">${(s.git_branch || '-').slice(0, 35)}</td>
       <td style="white-space:nowrap">${formatTime(s.start_time)}-${formatTime(s.end_time)}</td>
       <td>${models}</td>
+      <td style="white-space:nowrap">${turns}</td>
       <td style="font-size:12px;color:var(--text-muted)">${topTools}</td>
       <td class="token-num">${s.user_messages}/${s.assistant_messages}</td>
       <td class="token-num">${formatNum(s.total_input_tokens)}/${formatNum(s.total_output_tokens)}</td>
@@ -1614,14 +1800,18 @@ function render(data) {
   renderTimeline(data);
   renderModelLegend(data);
 
-  // Tool calls
+  // Tool calls (bar + timeline views)
   const tools = Object.entries(data.tool_counts);
   const maxTool = tools.length ? tools[0][1] : 1;
   document.getElementById('toolBadge').textContent = m.total_tool_calls;
   renderBarChart('toolChart', tools.slice(0, 15), maxTool, getToolColor);
+  renderToolTimeline(data);
+  setupViewToggle('toolViewToggle', { bar: 'toolBarView', timeline: 'toolTimelineView' });
 
-  // Model by tool stacked
+  // Model by tool stacked (bar + timeline views)
   renderStackedBarChart('modelToolChart', data, data.tool_by_model);
+  renderToolModelTimeline(data);
+  setupViewToggle('modelToolViewToggle', { bar: 'modelToolBarView', timeline: 'modelToolTimelineView' });
 
   // Bash deep dive
   renderBashDeepDive(data);
@@ -1638,17 +1828,46 @@ function render(data) {
   renderGenericStackedChart('agentChart', agents, data.agent_type_by_model || {}, data);
   copyModelLegend('agentModelLegend', data);
 
+  // MCP servers
+  const mcpServers = Object.entries(data.mcp_server_counts || {});
+  if (mcpServers.length) {
+    document.getElementById('mcpCard').style.display = '';
+    const totalMcp = mcpServers.reduce((a, [, v]) => a + v, 0);
+    document.getElementById('mcpBadge').textContent = totalMcp + ' calls';
+    // Build items as "server: method" with counts for stacked chart
+    const mcpItems = [];
+    const mcpByModel = {};
+    for (const [server, methods] of Object.entries(data.mcp_method_counts || {})) {
+      for (const [method, count] of Object.entries(methods)) {
+        const label = `${server} / ${method}`;
+        mcpItems.push([label, count]);
+        mcpByModel[label] = {};
+        const serverModels = (data.mcp_by_model || {})[server] || {};
+        // Approximate: distribute method count proportionally by server model ratio
+        const serverTotal = Object.values(serverModels).reduce((a, b) => a + b, 0) || 1;
+        for (const [m, mc] of Object.entries(serverModels)) {
+          mcpByModel[label][m] = Math.round(count * mc / serverTotal);
+        }
+      }
+    }
+    mcpItems.sort((a, b) => b[1] - a[1]);
+    renderGenericStackedChart('mcpChart', mcpItems, mcpByModel, data);
+    copyModelLegend('mcpModelLegend', data);
+  }
+
   // Subagent runtime models
   const subModels = Object.entries(data.subagent_model_totals || {}).filter(([m]) => !m.startsWith('<'));
   const maxSubModel = subModels.length ? Math.max(...subModels.map(([,v]) => v)) : 1;
   document.getElementById('subagentBadge').textContent = subModels.reduce((a, [, v]) => a + v, 0) + ' messages';
   renderBarChart('subagentModelChart', subModels, maxSubModel, getModelColor);
 
-  // Overall models
+  // Overall models (bar + timeline views)
   const models = Object.entries(data.model_counts).filter(([m]) => !m.startsWith('<'));
   const maxModel = models.length ? models[0][1] : 1;
   document.getElementById('modelBadge').textContent = models.reduce((a, [, v]) => a + v, 0) + ' messages';
   renderBarChart('modelChart', models, maxModel, getModelColor);
+  renderModelTimeline(data);
+  setupViewToggle('modelViewToggle', { bar: 'modelBarView', timeline: 'modelTimelineView' });
 
   // Sessions
   renderSessions(data);

@@ -26,6 +26,24 @@ def parse_args():
     return p.parse_args()
 
 
+def normalize_model_id(model: str) -> str:
+    """Strip context-window suffixes like [1m] from model IDs."""
+    return re.sub(r'\[.*?\]$', '', model)
+
+
+def model_family(model: str) -> str:
+    """Extract model family (opus, sonnet, haiku) from any model ID."""
+    for family in ("opus", "sonnet", "haiku"):
+        if family in model:
+            return family
+    return "other"
+
+
+def is_expensive_model(model: str) -> bool:
+    """Return True if the model is an expensive tier (opus)."""
+    return model_family(model) == "opus"
+
+
 def find_session_files(hours: int) -> list[Path]:
     """Find all .jsonl files modified within the last `hours` hours."""
     base = Path.home() / ".claude" / "projects"
@@ -167,7 +185,7 @@ def parse_session_file(file_path: Path) -> dict:
                 if entry_type == "assistant":
                     session_data["assistant_messages"] += 1
                     msg = entry.get("message", {})
-                    model = msg.get("model", "unknown")
+                    model = normalize_model_id(msg.get("model", "unknown"))
                     session_data["models_used"][model] += 1
 
                     # Token accounting
@@ -222,6 +240,13 @@ def parse_session_file(file_path: Path) -> dict:
                                 tool_record["pattern"] = tool_input.get("pattern", "")
                             elif tool_name == "Glob":
                                 tool_record["pattern"] = tool_input.get("pattern", "")
+
+                            # Parse MCP server tools: mcp__<server>__<method>
+                            if tool_name.startswith("mcp__"):
+                                parts = tool_name.split("__", 2)
+                                if len(parts) >= 3:
+                                    tool_record["mcp_server"] = parts[1]
+                                    tool_record["mcp_method"] = parts[2]
 
                             session_data["tool_calls"].append(tool_record)
 
@@ -420,7 +445,7 @@ def build_analysis(sessions: list[dict], hours: int) -> dict:
         turn_type_output_tokens[tt] += t["output_tokens"]
         turn_type_total[tt] += 1
 
-        is_opus = model == "claude-opus-4-6"
+        is_opus = is_expensive_model(model)
         if is_opus and t["needs_smart"]:
             smart_needed["opus_smart"] += 1
         elif is_opus and not t["needs_smart"]:
@@ -535,7 +560,7 @@ def build_analysis(sessions: list[dict], hours: int) -> dict:
     model_optimization = []
     cheap_eligible_tools = {"Bash", "Read", "Write", "Edit", "Grep", "Glob"}
     for tc in all_tool_calls:
-        if tc["name"] in cheap_eligible_tools and tc["model"] == "claude-opus-4-6":
+        if tc["name"] in cheap_eligible_tools and is_expensive_model(tc["model"]):
             model_optimization.append({
                 "tool": tc["name"],
                 "model": tc["model"],

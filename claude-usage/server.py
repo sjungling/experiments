@@ -65,6 +65,7 @@ def init_db():
             skill_usage JSON NOT NULL DEFAULT '{}',
             agent_usage JSON NOT NULL DEFAULT '{}',
             bash_usage JSON NOT NULL DEFAULT '{}',
+            mcp_usage JSON NOT NULL DEFAULT '{}',
             ingested_at TEXT NOT NULL
         )
     """)
@@ -96,6 +97,10 @@ def upsert_session(conn: sqlite3.Connection, session: dict):
         "kubectl", "terraform", "uv", "pip", "pip3", "swift", "xcodebuild",
     }
     bash_usage: dict[str, int] = defaultdict(int)
+    # Build mcp_usage: {server: {method: {model: count}}}
+    mcp_usage: dict[str, dict[str, dict[str, int]]] = defaultdict(
+        lambda: defaultdict(lambda: defaultdict(int))
+    )
 
     for tc in session["tool_calls"]:
         tool_calls[tc["name"]][tc["model"]] += 1
@@ -106,6 +111,8 @@ def upsert_session(conn: sqlite3.Connection, session: dict):
         elif tc["name"] == "Agent":
             agent_type = tc.get("agent_type", "general-purpose")
             agent_usage[agent_type][tc["model"]] += 1
+        elif tc.get("mcp_server"):
+            mcp_usage[tc["mcp_server"]][tc.get("mcp_method", "unknown")][tc["model"]] += 1
         elif tc["name"] == "Bash":
             preview = tc.get("bash_command_preview", "")
             cmd = preview.strip()
@@ -178,8 +185,8 @@ def upsert_session(conn: sqlite3.Connection, session: dict):
         INSERT OR REPLACE INTO sessions
         (file_path, project_name, git_branch, start_time, end_time, is_subagent,
          tool_calls, model_usage, turn_types, skill_usage, agent_usage, bash_usage,
-         ingested_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         mcp_usage, ingested_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """,
         (
             session["file"],
@@ -194,6 +201,10 @@ def upsert_session(conn: sqlite3.Connection, session: dict):
             json.dumps({k: dict(v) for k, v in skill_usage.items()}),
             json.dumps({k: dict(v) for k, v in agent_usage.items()}),
             json.dumps(dict(bash_usage)),  # {label: count}
+            json.dumps({
+                server: {method: dict(models) for method, models in methods.items()}
+                for server, methods in mcp_usage.items()
+            }),
             datetime.now(timezone.utc).isoformat(),
         ),
     )
@@ -277,6 +288,14 @@ def build_dashboard_payload() -> dict:
     subagent_model_counts: dict[str, int] = defaultdict(int)
     subagent_token_usage: dict = defaultdict(lambda: {"input": 0, "output": 0})
     subagent_timeline: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
+    # MCP: {server: {method: count}} and {server: {method: {model: count}}}
+    mcp_server_counts: dict[str, int] = defaultdict(int)
+    mcp_method_counts: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
+    mcp_by_model: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
+    model_timeline: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
+    tool_model_timeline: dict[str, dict[str, dict[str, int]]] = defaultdict(
+        lambda: defaultdict(lambda: defaultdict(int))
+    )
     sessions_list = []
     total_tool_calls = 0
 
@@ -298,10 +317,13 @@ def build_dashboard_payload() -> dict:
         if hour:
             for tool, models in tc.items():
                 timeline[hour][tool] += sum(models.values())
+                for model, cnt in models.items():
+                    tool_model_timeline[hour][tool][model] += cnt
 
         # Model usage
         for model, usage in mu.items():
-            model_counts[model] += usage.get("turns", 0)
+            turns = usage.get("turns", 0)
+            model_counts[model] += turns
             model_token_usage[model]["input"] += usage.get("input_tokens", 0)
             model_token_usage[model]["output"] += usage.get("output_tokens", 0)
             model_token_usage[model]["cache_read"] += usage.get(
@@ -310,6 +332,8 @@ def build_dashboard_payload() -> dict:
             model_token_usage[model]["cache_create"] += usage.get(
                 "cache_creation_tokens", 0
             )
+            if hour:
+                model_timeline[hour][model] += turns
 
         # Turn types
         for ttype, cnt in tt.get("by_type", {}).items():
@@ -343,6 +367,17 @@ def build_dashboard_payload() -> dict:
         bu = json.loads(row["bash_usage"])
         for label, count in bu.items():
             bash_commands[label] += count
+
+        # MCP usage
+        mu_mcp = json.loads(row["mcp_usage"]) if row["mcp_usage"] else {}
+        for server, methods in mu_mcp.items():
+            for method, models in methods.items():
+                total = sum(models.values()) if isinstance(models, dict) else models
+                mcp_server_counts[server] += total
+                mcp_method_counts[server][method] += total
+                if isinstance(models, dict):
+                    for m, cnt in models.items():
+                        mcp_by_model[server][m] += cnt
 
         # Subagent breakdown
         if is_sub:
@@ -393,6 +428,11 @@ def build_dashboard_payload() -> dict:
         "model_counts": dict(sorted(model_counts.items(), key=lambda x: -x[1])),
         "model_token_usage": {k: dict(v) for k, v in model_token_usage.items()},
         "timeline": dict(sorted(timeline.items())),
+        "model_timeline": {h: dict(v) for h, v in sorted(model_timeline.items())},
+        "tool_model_timeline": {
+            h: {t: dict(m) for t, m in tools.items()}
+            for h, tools in sorted(tool_model_timeline.items())
+        },
         "turn_analysis": {
             "turn_type_counts": dict(
                 sorted(turn_type_counts.items(), key=lambda x: -x[1])
@@ -405,6 +445,9 @@ def build_dashboard_payload() -> dict:
         "agent_counts": dict(sorted(agent_counts.items(), key=lambda x: -x[1])),
         "agent_by_model": {k: dict(v) for k, v in agent_by_model.items()},
         "bash_commands": dict(sorted(bash_commands.items(), key=lambda x: -x[1])),
+        "mcp_server_counts": dict(sorted(mcp_server_counts.items(), key=lambda x: -x[1])),
+        "mcp_method_counts": {k: dict(sorted(v.items(), key=lambda x: -x[1])) for k, v in mcp_method_counts.items()},
+        "mcp_by_model": {k: dict(v) for k, v in mcp_by_model.items()},
         "subagent_model_counts": dict(sorted(subagent_model_counts.items(), key=lambda x: -x[1])),
         "subagent_token_usage": {k: dict(v) for k, v in subagent_token_usage.items()},
         "subagent_timeline": {h: dict(v) for h, v in sorted(subagent_timeline.items())},

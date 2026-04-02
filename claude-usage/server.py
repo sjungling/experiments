@@ -132,6 +132,8 @@ def upsert_session(conn: sqlite3.Connection, session: dict):
                         break  # next token is a value, not subcommand
                 if sub:
                     label = f"{binary} {sub}"
+                else:
+                    label = binary
             else:
                 label = binary
             bash_usage[label] += 1

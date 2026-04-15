@@ -917,8 +917,9 @@ function renderSessions(data) {
       .map(([t, c]) => `${t}:${c}`)
       .join(', ');
 
-    return `<tr>
-      <td>${s.project || '—'}</td>
+    const subagentBadge = s.is_subagent ? ' <span style="font-size:10px;color:var(--text-muted);opacity:0.7">[sub]</span>' : '';
+    return `<tr style="${s.is_subagent ? 'opacity:0.75' : ''}">
+      <td>${s.project || '—'}${subagentBadge}</td>
       <td>${s.git_branch || '—'}</td>
       <td>${fmtTime(s.start_time)}</td>
       <td>${models}</td>

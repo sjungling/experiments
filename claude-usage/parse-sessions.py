@@ -492,7 +492,7 @@ def build_analysis(sessions: list[dict], hours: int) -> dict:
 
     # Session summaries
     session_summaries = []
-    for s in main_sessions:
+    for s in sessions:
         total_tools = len(s["tool_calls"])
         tool_breakdown = defaultdict(int)
         for tc in s["tool_calls"]:
@@ -503,6 +503,7 @@ def build_analysis(sessions: list[dict], hours: int) -> dict:
             "slug": s["slug"],
             "project": s["project"],
             "git_branch": s["git_branch"],
+            "is_subagent": s["is_subagent"],
             "start_time": s["start_time"],
             "end_time": s["end_time"],
             "models_used": s["models_used"],

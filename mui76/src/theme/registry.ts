@@ -6,9 +6,18 @@ import aqua from './aqua';
 import nextstep from './nextstep';
 import excalidraw from './excalidraw';
 import plan9 from './plan9';
+import aero from './aero';
 
 /** The available theme identities. Also doubles as the "chrome" style key. */
-export type ThemeKey = 'mac' | 'sketch' | 'beos' | 'aqua' | 'nextstep' | 'excalidraw' | 'plan9';
+export type ThemeKey =
+  | 'mac'
+  | 'sketch'
+  | 'beos'
+  | 'aqua'
+  | 'nextstep'
+  | 'excalidraw'
+  | 'plan9'
+  | 'aero';
 
 export interface ThemeEntry {
   label: string;
@@ -23,6 +32,7 @@ export const THEMES: Record<ThemeKey, ThemeEntry> = {
   nextstep: { label: 'NeXTSTEP', theme: nextstep },
   excalidraw: { label: 'Excalidraw', theme: excalidraw },
   plan9: { label: 'Plan 9', theme: plan9 },
+  aero: { label: 'Frutiger Aero', theme: aero },
 };
 
 export const THEME_KEYS = Object.keys(THEMES) as ThemeKey[];

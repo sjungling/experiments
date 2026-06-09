@@ -351,6 +351,74 @@ function Plan9Window({ title, children, disablePadding }: WindowProps) {
   );
 }
 
+// ── Frutiger Aero chrome ─────────────────────────────────────────────────────
+/** A glossy Aero window control (minimize / maximize / close). */
+function AeroControl({ gloss }: { gloss: string }) {
+  return (
+    <Box
+      sx={{
+        width: 22,
+        height: 16,
+        borderRadius: '3px',
+        border: '1px solid rgba(255,255,255,0.55)',
+        backgroundImage: gloss,
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6)',
+      }}
+    />
+  );
+}
+
+/** A frosted-glass Aero window: translucent, rounded, glossy title bar. */
+function AeroWindow({ title, children, disablePadding }: WindowProps) {
+  const blueGloss = 'linear-gradient(to bottom, #bfe6ff, #5bb3ec)';
+  const redGloss = 'linear-gradient(to bottom, #ff9a8c, #e23b2e)';
+  return (
+    <Box
+      sx={{
+        borderRadius: '10px',
+        overflow: 'hidden',
+        border: '1px solid rgba(255,255,255,0.65)',
+        boxShadow: '0 12px 30px rgba(0,30,60,0.30)',
+        bgcolor: 'rgba(255,255,255,0.52)',
+        backdropFilter: 'blur(14px)',
+        WebkitBackdropFilter: 'blur(14px)',
+      }}
+    >
+      <Box
+        sx={{
+          position: 'relative',
+          height: 32,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          px: 1,
+          backgroundImage: 'linear-gradient(to bottom, rgba(255,255,255,0.78), rgba(255,255,255,0.32))',
+          borderBottom: '1px solid rgba(255,255,255,0.5)',
+        }}
+      >
+        <Box
+          sx={{
+            fontFamily: "'Segoe UI', 'Open Sans', sans-serif",
+            fontSize: 13,
+            fontWeight: 600,
+            color: '#16384F',
+            textShadow: '0 1px 0 rgba(255,255,255,0.85)',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {title}
+        </Box>
+        <Box sx={{ position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)', display: 'flex', gap: 0.5 }}>
+          <AeroControl gloss={blueGloss} />
+          <AeroControl gloss={blueGloss} />
+          <AeroControl gloss={redGloss} />
+        </Box>
+      </Box>
+      <Box sx={{ bgcolor: 'rgba(255,255,255,0.4)', p: disablePadding ? 0 : 2 }}>{children}</Box>
+    </Box>
+  );
+}
+
 export interface WindowProps {
   title: string;
   children: ReactNode;
@@ -403,6 +471,14 @@ export function Window({ title, children, disablePadding }: WindowProps) {
       <Plan9Window title={title} disablePadding={disablePadding}>
         {children}
       </Plan9Window>
+    );
+  }
+
+  if (themeKey === 'aero') {
+    return (
+      <AeroWindow title={title} disablePadding={disablePadding}>
+        {children}
+      </AeroWindow>
     );
   }
 

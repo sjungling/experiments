@@ -289,6 +289,37 @@ function Plan9TagBar() {
   );
 }
 
+// ── The Frutiger Aero glass top bar ──────────────────────────────────────────
+function AeroMenuBar() {
+  const links = ['File', 'Edit', 'View', 'Help'];
+  return (
+    <AppBar>
+      <Toolbar sx={{ gap: 2.5, px: 2 }}>
+        <Box
+          sx={{
+            width: 24,
+            height: 24,
+            borderRadius: '50%',
+            backgroundImage: 'radial-gradient(circle at 50% 28%, #d6f0ff, #1f8fd6 78%, #135f9c)',
+            border: '1px solid #1565A0',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.7), 0 1px 2px rgba(0,0,0,0.25)',
+          }}
+        />
+        <Typography variant="h6">Component Gallery</Typography>
+        <Stack direction="row" gap={2.5} sx={{ display: { xs: 'none', sm: 'flex' } }}>
+          {links.map((n) => (
+            <Typography key={n} variant="body2" sx={{ color: 'text.secondary', cursor: 'default' }}>
+              {n}
+            </Typography>
+          ))}
+        </Stack>
+        <Box sx={{ flexGrow: 1 }} />
+        <ThemeSwitcher />
+      </Toolbar>
+    </AppBar>
+  );
+}
+
 // ── Top bar that morphs with the active theme ────────────────────────────────
 function TopBar() {
   const { themeKey } = useThemeController();
@@ -298,6 +329,7 @@ function TopBar() {
   if (themeKey === 'nextstep') return <NextVerticalMenu />;
   if (themeKey === 'excalidraw') return <ExcalidrawMenuBar />;
   if (themeKey === 'plan9') return <Plan9TagBar />;
+  if (themeKey === 'aero') return <AeroMenuBar />;
   return <MacMenuBar />;
 }
 
@@ -335,7 +367,9 @@ export default function App() {
               ? 'A Material UI theme that looks hand-drawn in Excalidraw.'
               : themeKey === 'plan9'
                 ? 'A Material UI theme in the flat pastels of Plan 9 (rio / acme).'
-                : 'A Material UI theme dressed up as Macintosh System 7.6 & HyperCard.';
+                : themeKey === 'aero'
+                  ? 'A Material UI theme glossed up in Frutiger Aero glass.'
+                  : 'A Material UI theme dressed up as Macintosh System 7.6 & HyperCard.';
 
   const [tab, setTab] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);

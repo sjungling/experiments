@@ -111,6 +111,105 @@ function SketchTitleBar({ title }: { title: string }) {
   );
 }
 
+// ── BeOS / Haiku chrome ──────────────────────────────────────────────────────
+/** A BeOS window: the iconic yellow tab perched on a gray beveled panel. */
+function BeWindow({ title, children, disablePadding }: WindowProps) {
+  return (
+    <Box sx={{ filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))' }}>
+      <Box
+        sx={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          height: 21,
+          ml: '6px',
+          px: 1.5,
+          bgcolor: '#FFCB00',
+          border: '1px solid #4C4C4C',
+          borderBottom: 'none',
+          borderTopLeftRadius: 3,
+          borderTopRightRadius: 3,
+          boxShadow: 'inset 1px 1px 0 rgba(255,255,255,0.5)',
+          fontFamily: "'Noto Sans', sans-serif",
+          fontWeight: 700,
+          fontSize: 12,
+          color: '#101010',
+          whiteSpace: 'nowrap',
+          position: 'relative',
+          zIndex: 1,
+        }}
+      >
+        {title}
+      </Box>
+      <Paper sx={{ mt: '-1px', boxShadow: 'none' }}>
+        <Box sx={{ p: disablePadding ? 0 : 2 }}>{children}</Box>
+      </Paper>
+    </Box>
+  );
+}
+
+// ── Mac OS X Aqua chrome ─────────────────────────────────────────────────────
+const TRAFFIC_LIGHTS: Array<[string, string]> = [
+  ['#FF5F57', '#E0443E'], // close
+  ['#FEBC2E', '#DEA123'], // minimize
+  ['#28C840', '#1AAB29'], // zoom
+];
+
+/** A Mac OS X window: pinstriped title bar, traffic lights, glossy panel. */
+function AquaWindow({ title, children, disablePadding }: WindowProps) {
+  return (
+    <Box
+      sx={{
+        borderRadius: '7px',
+        overflow: 'hidden',
+        bgcolor: 'background.paper',
+        border: '1px solid rgba(0,0,0,0.18)',
+        boxShadow: '0 12px 28px rgba(0,0,0,0.22)',
+      }}
+    >
+      <Box
+        sx={{
+          position: 'relative',
+          height: 24,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundImage: 'linear-gradient(to bottom, #ededed, #d6d6d6)',
+          borderBottom: '1px solid #b0b0b0',
+        }}
+      >
+        <Box sx={{ position: 'absolute', left: 8, top: 0, bottom: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {TRAFFIC_LIGHTS.map(([fill, ring]) => (
+            <Box
+              key={fill}
+              sx={{
+                width: 12,
+                height: 12,
+                borderRadius: '50%',
+                bgcolor: fill,
+                border: `0.5px solid ${ring}`,
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.55)',
+              }}
+            />
+          ))}
+        </Box>
+        <Box
+          sx={{
+            fontFamily: "'Lucida Grande', 'Helvetica Neue', sans-serif",
+            fontSize: 13,
+            fontWeight: 500,
+            color: '#4a4a4a',
+            textShadow: '0 1px 0 rgba(255,255,255,0.6)',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {title}
+        </Box>
+      </Box>
+      <Box sx={{ p: disablePadding ? 0 : 2 }}>{children}</Box>
+    </Box>
+  );
+}
+
 export interface WindowProps {
   title: string;
   children: ReactNode;
@@ -125,8 +224,24 @@ export interface WindowProps {
  */
 export function Window({ title, children, disablePadding }: WindowProps) {
   const { themeKey } = useThemeController();
-  const sketch = themeKey === 'sketch';
 
+  if (themeKey === 'beos') {
+    return (
+      <BeWindow title={title} disablePadding={disablePadding}>
+        {children}
+      </BeWindow>
+    );
+  }
+
+  if (themeKey === 'aqua') {
+    return (
+      <AquaWindow title={title} disablePadding={disablePadding}>
+        {children}
+      </AquaWindow>
+    );
+  }
+
+  const sketch = themeKey === 'sketch';
   return (
     <Paper
       sx={{

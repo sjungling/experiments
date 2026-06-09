@@ -109,10 +109,69 @@ function SketchNavbar() {
   );
 }
 
+// ── The BeOS / Haiku application menu bar ────────────────────────────────────
+function BeMenuBar() {
+  const menus = ['File', 'Edit', 'Window', 'Settings'];
+  return (
+    <AppBar>
+      <Toolbar variant="dense" sx={{ gap: 2, px: 1.5, minHeight: 34 }}>
+        <Box
+          sx={{
+            bgcolor: '#FFCB00',
+            border: '1px solid #4C4C4C',
+            borderRadius: '3px',
+            px: 1,
+            py: '1px',
+            fontWeight: 700,
+            fontSize: 13,
+            color: '#101010',
+            boxShadow: 'inset 1px 1px 0 rgba(255,255,255,0.5)',
+            userSelect: 'none',
+          }}
+        >
+          Be
+        </Box>
+        {menus.map((m) => (
+          <Typography key={m} variant="body2" sx={{ fontWeight: 500, cursor: 'default', userSelect: 'none' }}>
+            {m}
+          </Typography>
+        ))}
+        <Box sx={{ flexGrow: 1 }} />
+        <ThemeSwitcher />
+      </Toolbar>
+    </AppBar>
+  );
+}
+
+// ── The Mac OS X Aqua menu bar ───────────────────────────────────────────────
+function AquaMenuBar() {
+  const menus = ['File', 'Edit', 'View', 'Go', 'Window', 'Help'];
+  return (
+    <AppBar>
+      <Toolbar variant="dense" sx={{ gap: 2.5, px: 2, minHeight: 30 }}>
+        <Box sx={{ fontSize: 15, lineHeight: 1, color: '#1d1d1f' }}></Box>
+        <Typography variant="body2" sx={{ fontWeight: 700, userSelect: 'none' }}>
+          Finder
+        </Typography>
+        {menus.map((m) => (
+          <Typography key={m} variant="body2" sx={{ cursor: 'default', userSelect: 'none' }}>
+            {m}
+          </Typography>
+        ))}
+        <Box sx={{ flexGrow: 1 }} />
+        <ThemeSwitcher />
+      </Toolbar>
+    </AppBar>
+  );
+}
+
 // ── Top bar that morphs with the active theme ────────────────────────────────
 function TopBar() {
   const { themeKey } = useThemeController();
-  return themeKey === 'sketch' ? <SketchNavbar /> : <MacMenuBar />;
+  if (themeKey === 'sketch') return <SketchNavbar />;
+  if (themeKey === 'beos') return <BeMenuBar />;
+  if (themeKey === 'aqua') return <AquaMenuBar />;
+  return <MacMenuBar />;
 }
 
 // ── A labelled row that groups related demo controls ─────────────────────────
@@ -139,7 +198,11 @@ export default function App() {
   const subtitle =
     themeKey === 'sketch'
       ? 'A Material UI theme styled after a lo-fi wireframe prototyping kit.'
-      : 'A Material UI theme dressed up as Macintosh System 7.6 & HyperCard.';
+      : themeKey === 'beos'
+        ? 'A Material UI theme inspired by BeOS & Haiku.'
+        : themeKey === 'aqua'
+          ? 'A Material UI theme dripping with Mac OS X Aqua gloss.'
+          : 'A Material UI theme dressed up as Macintosh System 7.6 & HyperCard.';
 
   const [tab, setTab] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);

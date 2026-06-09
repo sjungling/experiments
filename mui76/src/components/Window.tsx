@@ -419,6 +419,35 @@ function AeroWindow({ title, children, disablePadding }: WindowProps) {
   );
 }
 
+// ── CRT terminal chrome ──────────────────────────────────────────────────────
+/** A TUI "pane": a glowing green border with a prompt-style title and [X]. */
+function CrtWindow({ title, children, disablePadding }: WindowProps) {
+  return (
+    <Box sx={{ border: '1px solid #3BFF6E', bgcolor: '#0A140A', boxShadow: '0 0 8px rgba(59,255,110,0.18)' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          borderBottom: '1px solid #3BFF6E',
+          px: 1,
+          py: '1px',
+          color: '#3BFF6E',
+          fontFamily: "'VT323', monospace",
+          fontSize: 18,
+          textShadow: '0 0 3px rgba(59,255,110,0.5)',
+        }}
+      >
+        <Box sx={{ flex: 1, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {`> ${title}`}
+        </Box>
+        <Box component="span">[X]</Box>
+      </Box>
+      <Box sx={{ p: disablePadding ? 0 : 2 }}>{children}</Box>
+    </Box>
+  );
+}
+
 export interface WindowProps {
   title: string;
   children: ReactNode;
@@ -479,6 +508,14 @@ export function Window({ title, children, disablePadding }: WindowProps) {
       <AeroWindow title={title} disablePadding={disablePadding}>
         {children}
       </AeroWindow>
+    );
+  }
+
+  if (themeKey === 'crt') {
+    return (
+      <CrtWindow title={title} disablePadding={disablePadding}>
+        {children}
+      </CrtWindow>
     );
   }
 

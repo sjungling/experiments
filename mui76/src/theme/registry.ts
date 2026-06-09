@@ -7,6 +7,7 @@ import nextstep from './nextstep';
 import excalidraw from './excalidraw';
 import plan9 from './plan9';
 import aero from './aero';
+import crt from './crt';
 
 /** The available theme identities. Also doubles as the "chrome" style key. */
 export type ThemeKey =
@@ -17,7 +18,8 @@ export type ThemeKey =
   | 'nextstep'
   | 'excalidraw'
   | 'plan9'
-  | 'aero';
+  | 'aero'
+  | 'crt';
 
 export interface ThemeEntry {
   label: string;
@@ -33,6 +35,7 @@ export const THEMES: Record<ThemeKey, ThemeEntry> = {
   excalidraw: { label: 'Excalidraw', theme: excalidraw },
   plan9: { label: 'Plan 9', theme: plan9 },
   aero: { label: 'Frutiger Aero', theme: aero },
+  crt: { label: 'CRT Terminal', theme: crt },
 };
 
 export const THEME_KEYS = Object.keys(THEMES) as ThemeKey[];

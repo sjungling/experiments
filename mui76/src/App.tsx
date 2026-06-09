@@ -320,6 +320,23 @@ function AeroMenuBar() {
   );
 }
 
+// ── The CRT terminal prompt bar ──────────────────────────────────────────────
+function CrtPrompt() {
+  return (
+    <AppBar>
+      <Toolbar variant="dense" sx={{ gap: 1, px: 1.5, minHeight: 34 }}>
+        <Typography sx={{ fontFamily: "'VT323', monospace", fontSize: 18, userSelect: 'none' }}>
+          guest@mui76:~$ ./component-gallery
+        </Typography>
+        {/* blinking block cursor (keyframes defined in the CRT theme) */}
+        <Box sx={{ width: 9, height: 17, bgcolor: '#3BFF6E', animation: 'crt-blink 1.1s steps(1) infinite' }} />
+        <Box sx={{ flexGrow: 1 }} />
+        <ThemeSwitcher />
+      </Toolbar>
+    </AppBar>
+  );
+}
+
 // ── Top bar that morphs with the active theme ────────────────────────────────
 function TopBar() {
   const { themeKey } = useThemeController();
@@ -330,6 +347,7 @@ function TopBar() {
   if (themeKey === 'excalidraw') return <ExcalidrawMenuBar />;
   if (themeKey === 'plan9') return <Plan9TagBar />;
   if (themeKey === 'aero') return <AeroMenuBar />;
+  if (themeKey === 'crt') return <CrtPrompt />;
   return <MacMenuBar />;
 }
 
@@ -369,7 +387,9 @@ export default function App() {
                 ? 'A Material UI theme in the flat pastels of Plan 9 (rio / acme).'
                 : themeKey === 'aero'
                   ? 'A Material UI theme glossed up in Frutiger Aero glass.'
-                  : 'A Material UI theme dressed up as Macintosh System 7.6 & HyperCard.';
+                  : themeKey === 'crt'
+                    ? 'A Material UI theme glowing on a green-phosphor CRT.'
+                    : 'A Material UI theme dressed up as Macintosh System 7.6 & HyperCard.';
 
   const [tab, setTab] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);

@@ -210,6 +210,71 @@ function AquaWindow({ title, children, disablePadding }: WindowProps) {
   );
 }
 
+// ── NeXTSTEP chrome ──────────────────────────────────────────────────────────
+/** A small chiseled square widget used in a NeXT title bar. */
+function NextTitleWidget({ children }: { children?: ReactNode }) {
+  return (
+    <Box
+      sx={{
+        width: 17,
+        height: 17,
+        flex: 'none',
+        bgcolor: '#A8A8A8',
+        border: '1px solid #000',
+        boxShadow: 'inset 2px 2px 0 #fff, inset -2px -2px 0 #565656',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: "'Helvetica Neue', Helvetica, sans-serif",
+        fontSize: 11,
+        fontWeight: 700,
+        lineHeight: 1,
+      }}
+    >
+      {children}
+    </Box>
+  );
+}
+
+/** A NeXTSTEP window: chiseled gray title bar with miniaturize/close widgets. */
+function NextWindow({ title, children, disablePadding }: WindowProps) {
+  return (
+    <Box sx={{ border: '1px solid #000', boxShadow: '3px 3px 7px rgba(0,0,0,0.45)' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          px: '3px',
+          py: '2px',
+          bgcolor: '#A8A8A8',
+          borderBottom: '1px solid #000',
+          boxShadow: 'inset 2px 2px 0 #fff, inset 0 -2px 0 #565656',
+        }}
+      >
+        <NextTitleWidget />
+        <Box
+          sx={{
+            flex: 1,
+            textAlign: 'center',
+            fontFamily: "'Helvetica Neue', Helvetica, sans-serif",
+            fontSize: 13,
+            fontWeight: 700,
+            color: '#000',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          {title}
+        </Box>
+        <NextTitleWidget>×</NextTitleWidget>
+      </Box>
+      <Box sx={{ bgcolor: '#A8A8A8', p: disablePadding ? 0 : 2 }}>{children}</Box>
+    </Box>
+  );
+}
+
 export interface WindowProps {
   title: string;
   children: ReactNode;
@@ -238,6 +303,14 @@ export function Window({ title, children, disablePadding }: WindowProps) {
       <AquaWindow title={title} disablePadding={disablePadding}>
         {children}
       </AquaWindow>
+    );
+  }
+
+  if (themeKey === 'nextstep') {
+    return (
+      <NextWindow title={title} disablePadding={disablePadding}>
+        {children}
+      </NextWindow>
     );
   }
 

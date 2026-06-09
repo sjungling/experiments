@@ -165,12 +165,45 @@ function AquaMenuBar() {
   );
 }
 
+// ── The NeXTSTEP menu bar ────────────────────────────────────────────────────
+function NextMenuBar() {
+  const menus = ['Info', 'File', 'Edit', 'Tools', 'Windows'];
+  return (
+    <AppBar>
+      <Toolbar variant="dense" sx={{ gap: 2.5, px: 1.5, minHeight: 34 }}>
+        <Box
+          sx={{
+            bgcolor: '#3A3A3A',
+            color: '#fff',
+            border: '1px solid #000',
+            px: 1,
+            py: '2px',
+            fontWeight: 700,
+            fontSize: 13,
+            userSelect: 'none',
+          }}
+        >
+          Workspace
+        </Box>
+        {menus.map((m) => (
+          <Typography key={m} variant="body2" sx={{ fontWeight: 700, cursor: 'default', userSelect: 'none' }}>
+            {m}
+          </Typography>
+        ))}
+        <Box sx={{ flexGrow: 1 }} />
+        <ThemeSwitcher />
+      </Toolbar>
+    </AppBar>
+  );
+}
+
 // ── Top bar that morphs with the active theme ────────────────────────────────
 function TopBar() {
   const { themeKey } = useThemeController();
   if (themeKey === 'sketch') return <SketchNavbar />;
   if (themeKey === 'beos') return <BeMenuBar />;
   if (themeKey === 'aqua') return <AquaMenuBar />;
+  if (themeKey === 'nextstep') return <NextMenuBar />;
   return <MacMenuBar />;
 }
 
@@ -202,7 +235,9 @@ export default function App() {
         ? 'A Material UI theme inspired by BeOS & Haiku.'
         : themeKey === 'aqua'
           ? 'A Material UI theme dripping with Mac OS X Aqua gloss.'
-          : 'A Material UI theme dressed up as Macintosh System 7.6 & HyperCard.';
+          : themeKey === 'nextstep'
+            ? 'A Material UI theme chiseled out of NeXTSTEP gray.'
+            : 'A Material UI theme dressed up as Macintosh System 7.6 & HyperCard.';
 
   const [tab, setTab] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);

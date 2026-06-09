@@ -62,13 +62,15 @@ import SearchIcon from '@mui/icons-material/Search';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Window from './components/Window';
+import ThemeSwitcher from './components/ThemeSwitcher';
+import { useThemeController } from './theme/ThemeController';
 
 // ── The classic Mac menu bar ─────────────────────────────────────────────────
-function MenuBar() {
+function MacMenuBar() {
   const menus = ['File', 'Edit', 'View', 'Label', 'Special'];
   return (
     <AppBar>
-      <Toolbar variant="dense" sx={{ gap: 2, px: 2 }}>
+      <Toolbar variant="dense" sx={{ gap: 2, px: 2, minHeight: 36 }}>
         <Box sx={{ fontSize: 16, lineHeight: 1, pr: 1 }}></Box>
         {menus.map((m) => (
           <Typography key={m} variant="button" sx={{ cursor: 'default', userSelect: 'none' }}>
@@ -76,12 +78,41 @@ function MenuBar() {
           </Typography>
         ))}
         <Box sx={{ flexGrow: 1 }} />
-        <Typography variant="button" sx={{ userSelect: 'none' }}>
-          3:14 PM
-        </Typography>
+        <ThemeSwitcher />
       </Toolbar>
     </AppBar>
   );
+}
+
+// ── The lo-fi wireframe navbar ───────────────────────────────────────────────
+function SketchNavbar() {
+  const links = ['Dashboard', 'Components', 'Docs'];
+  return (
+    <AppBar>
+      <Toolbar sx={{ gap: 3, px: 3 }}>
+        <Typography variant="h6">▢ Component Gallery</Typography>
+        <Stack direction="row" gap={2.5} sx={{ display: { xs: 'none', sm: 'flex' } }}>
+          {links.map((n, i) => (
+            <Typography
+              key={n}
+              variant="body2"
+              sx={{ color: i === 1 ? 'text.primary' : 'text.secondary', cursor: 'default' }}
+            >
+              {n}
+            </Typography>
+          ))}
+        </Stack>
+        <Box sx={{ flexGrow: 1 }} />
+        <ThemeSwitcher />
+      </Toolbar>
+    </AppBar>
+  );
+}
+
+// ── Top bar that morphs with the active theme ────────────────────────────────
+function TopBar() {
+  const { themeKey } = useThemeController();
+  return themeKey === 'sketch' ? <SketchNavbar /> : <MacMenuBar />;
 }
 
 // ── A labelled row that groups related demo controls ─────────────────────────
@@ -104,6 +135,12 @@ function TabPanel({ value, index, children }: { value: number; index: number; ch
 }
 
 export default function App() {
+  const { themeKey } = useThemeController();
+  const subtitle =
+    themeKey === 'sketch'
+      ? 'A Material UI theme styled after a lo-fi wireframe prototyping kit.'
+      : 'A Material UI theme dressed up as Macintosh System 7.6 & HyperCard.';
+
   const [tab, setTab] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
@@ -124,13 +161,13 @@ export default function App() {
 
   return (
     <Box sx={{ minHeight: '100vh', pb: 6 }}>
-      <MenuBar />
+      <TopBar />
 
       <Box sx={{ px: { xs: 2, md: 4 }, pt: 3 }}>
         <Stack spacing={0.5} sx={{ mb: 3 }}>
           <Typography variant="h2">Component Gallery</Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            A Material UI theme dressed up as Macintosh System 7.6 &amp; HyperCard.
+            {subtitle}
           </Typography>
         </Stack>
 

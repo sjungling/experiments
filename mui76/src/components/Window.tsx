@@ -318,6 +318,39 @@ function ExcalidrawWindow({ title, children, disablePadding }: WindowProps) {
   );
 }
 
+// ── Plan 9 (rio / acme) chrome ───────────────────────────────────────────────
+/** An acme window: a pale-cyan tag bar + a left scroll column on a yellow body. */
+function Plan9Window({ title, children, disablePadding }: WindowProps) {
+  return (
+    <Box sx={{ border: '1px solid #5B8AA0', boxShadow: '1px 1px 0 rgba(0,0,0,0.2)' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 0.75,
+          bgcolor: '#EAFFFF',
+          borderBottom: '1px solid #5B8AA0',
+          px: '4px',
+          py: '2px',
+        }}
+      >
+        {/* the acme "layout box" you drag to manipulate the window */}
+        <Box sx={{ width: 12, height: 12, flex: 'none', bgcolor: '#CBEEF0', border: '1px solid #5B8AA0' }} />
+        <Box sx={{ fontFamily: "'Lucida Grande', sans-serif", fontSize: 13, color: '#000', whiteSpace: 'nowrap' }}>
+          {title}
+        </Box>
+      </Box>
+      <Box sx={{ display: 'flex', bgcolor: '#FFFFEA' }}>
+        {/* acme's left scrollbar column */}
+        <Box sx={{ width: 12, flex: 'none', borderRight: '1px solid #9FBEC9' }}>
+          <Box sx={{ height: 44, bgcolor: '#CBEEF0', borderBottom: '1px solid #9FBEC9' }} />
+        </Box>
+        <Box sx={{ flex: 1, minWidth: 0, p: disablePadding ? 0 : 2 }}>{children}</Box>
+      </Box>
+    </Box>
+  );
+}
+
 export interface WindowProps {
   title: string;
   children: ReactNode;
@@ -362,6 +395,14 @@ export function Window({ title, children, disablePadding }: WindowProps) {
       <ExcalidrawWindow title={title} disablePadding={disablePadding}>
         {children}
       </ExcalidrawWindow>
+    );
+  }
+
+  if (themeKey === 'plan9') {
+    return (
+      <Plan9Window title={title} disablePadding={disablePadding}>
+        {children}
+      </Plan9Window>
     );
   }
 

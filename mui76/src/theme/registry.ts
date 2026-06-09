@@ -5,9 +5,10 @@ import beos from './beos';
 import aqua from './aqua';
 import nextstep from './nextstep';
 import excalidraw from './excalidraw';
+import plan9 from './plan9';
 
 /** The available theme identities. Also doubles as the "chrome" style key. */
-export type ThemeKey = 'mac' | 'sketch' | 'beos' | 'aqua' | 'nextstep' | 'excalidraw';
+export type ThemeKey = 'mac' | 'sketch' | 'beos' | 'aqua' | 'nextstep' | 'excalidraw' | 'plan9';
 
 export interface ThemeEntry {
   label: string;
@@ -21,6 +22,7 @@ export const THEMES: Record<ThemeKey, ThemeEntry> = {
   aqua: { label: 'Mac OS X Aqua', theme: aqua },
   nextstep: { label: 'NeXTSTEP', theme: nextstep },
   excalidraw: { label: 'Excalidraw', theme: excalidraw },
+  plan9: { label: 'Plan 9', theme: plan9 },
 };
 
 export const THEME_KEYS = Object.keys(THEMES) as ThemeKey[];

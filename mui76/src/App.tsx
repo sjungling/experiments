@@ -268,6 +268,27 @@ function ExcalidrawMenuBar() {
   );
 }
 
+// ── The Plan 9 acme tag bar ──────────────────────────────────────────────────
+function Plan9TagBar() {
+  const commands = ['Newcol', 'Kill', 'Putall', 'Dump', 'Exit'];
+  return (
+    <AppBar>
+      <Toolbar variant="dense" sx={{ gap: 2, px: 1.5, minHeight: 30 }}>
+        {commands.map((c) => (
+          <Typography key={c} variant="body2" sx={{ cursor: 'default', userSelect: 'none' }}>
+            {c}
+          </Typography>
+        ))}
+        <Typography variant="body2" sx={{ color: 'text.secondary', userSelect: 'none' }}>
+          | Component Gallery
+        </Typography>
+        <Box sx={{ flexGrow: 1 }} />
+        <ThemeSwitcher />
+      </Toolbar>
+    </AppBar>
+  );
+}
+
 // ── Top bar that morphs with the active theme ────────────────────────────────
 function TopBar() {
   const { themeKey } = useThemeController();
@@ -276,6 +297,7 @@ function TopBar() {
   if (themeKey === 'aqua') return <AquaMenuBar />;
   if (themeKey === 'nextstep') return <NextVerticalMenu />;
   if (themeKey === 'excalidraw') return <ExcalidrawMenuBar />;
+  if (themeKey === 'plan9') return <Plan9TagBar />;
   return <MacMenuBar />;
 }
 
@@ -311,7 +333,9 @@ export default function App() {
             ? 'A Material UI theme chiseled out of NeXTSTEP gray.'
             : themeKey === 'excalidraw'
               ? 'A Material UI theme that looks hand-drawn in Excalidraw.'
-              : 'A Material UI theme dressed up as Macintosh System 7.6 & HyperCard.';
+              : themeKey === 'plan9'
+                ? 'A Material UI theme in the flat pastels of Plan 9 (rio / acme).'
+                : 'A Material UI theme dressed up as Macintosh System 7.6 & HyperCard.';
 
   const [tab, setTab] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);

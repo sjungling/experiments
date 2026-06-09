@@ -166,35 +166,82 @@ function AquaMenuBar() {
   );
 }
 
-// ── The NeXTSTEP menu bar ────────────────────────────────────────────────────
-function NextMenuBar() {
-  const menus = ['Info', 'File', 'Edit', 'Tools', 'Windows'];
+// ── The NeXTSTEP main menu: a vertical column floating over the workspace ─────
+const NEXT_CHISEL = 'inset 2px 2px 0 #fff, inset -2px -2px 0 #565656';
+
+function NextMenuCell({
+  label,
+  trailing,
+  header,
+}: {
+  label: string;
+  trailing?: string;
+  header?: boolean;
+}) {
   return (
-    <AppBar>
-      <Toolbar variant="dense" sx={{ gap: 2.5, px: 1.5, minHeight: 34 }}>
-        <Box
-          sx={{
-            bgcolor: '#3A3A3A',
-            color: '#fff',
-            border: '1px solid #000',
-            px: 1,
-            py: '2px',
-            fontWeight: 700,
-            fontSize: 13,
-            userSelect: 'none',
-          }}
-        >
-          Workspace
+    <Box
+      sx={{
+        height: 23,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: header ? 'center' : 'space-between',
+        px: 1,
+        bgcolor: '#A8A8A8',
+        color: '#000',
+        borderBottom: '1px solid #000',
+        boxShadow: NEXT_CHISEL,
+        fontFamily: "'Helvetica Neue', Helvetica, sans-serif",
+        fontSize: 13,
+        fontWeight: 700,
+        cursor: 'default',
+        ...(header
+          ? {}
+          : { '&:hover': { bgcolor: '#3A3A3A', color: '#fff' } }),
+      }}
+    >
+      <span>{label}</span>
+      {trailing ? (
+        <Box component="span" sx={{ fontSize: trailing === '▷' ? 11 : 12, fontWeight: 400, opacity: 0.85 }}>
+          {trailing}
         </Box>
-        {menus.map((m) => (
-          <Typography key={m} variant="body2" sx={{ fontWeight: 700, cursor: 'default', userSelect: 'none' }}>
-            {m}
-          </Typography>
-        ))}
-        <Box sx={{ flexGrow: 1 }} />
+      ) : null}
+    </Box>
+  );
+}
+
+/** The iconic NeXT main menu — a vertical strip anchored at the workspace's top-left. */
+function NextVerticalMenu() {
+  const items: Array<{ label: string; trailing: string }> = [
+    { label: 'Info', trailing: '▷' },
+    { label: 'File', trailing: '▷' },
+    { label: 'Edit', trailing: '▷' },
+    { label: 'Tools', trailing: '▷' },
+    { label: 'Windows', trailing: '▷' },
+    { label: 'Services', trailing: '▷' },
+    { label: 'Hide', trailing: 'h' },
+    { label: 'Quit', trailing: 'q' },
+  ];
+  return (
+    <Box
+      sx={{
+        position: 'absolute',
+        top: 14,
+        left: 14,
+        width: 168,
+        zIndex: 1100,
+        border: '1px solid #000',
+        boxShadow: '4px 4px 9px rgba(0,0,0,0.45)',
+        userSelect: 'none',
+      }}
+    >
+      <NextMenuCell label="Workspace" header />
+      {items.map((it) => (
+        <NextMenuCell key={it.label} label={it.label} trailing={it.trailing} />
+      ))}
+      <Box sx={{ p: 0.75, bgcolor: '#A8A8A8', boxShadow: NEXT_CHISEL }}>
         <ThemeSwitcher />
-      </Toolbar>
-    </AppBar>
+      </Box>
+    </Box>
   );
 }
 
@@ -227,7 +274,7 @@ function TopBar() {
   if (themeKey === 'sketch') return <SketchNavbar />;
   if (themeKey === 'beos') return <BeMenuBar />;
   if (themeKey === 'aqua') return <AquaMenuBar />;
-  if (themeKey === 'nextstep') return <NextMenuBar />;
+  if (themeKey === 'nextstep') return <NextVerticalMenu />;
   if (themeKey === 'excalidraw') return <ExcalidrawMenuBar />;
   return <MacMenuBar />;
 }
@@ -285,11 +332,18 @@ export default function App() {
   ];
 
   return (
-    <Box sx={{ minHeight: '100vh', pb: 6 }}>
+    <Box sx={{ minHeight: '100vh', pb: 6, position: 'relative' }}>
       <RoughFilterDefs />
       <TopBar />
 
-      <Box sx={{ px: { xs: 2, md: 4 }, pt: 3 }}>
+      <Box
+        sx={{
+          pt: 3,
+          pr: { xs: 2, md: 4 },
+          // NeXTSTEP's menu floats in a left gutter, so clear room for it.
+          pl: themeKey === 'nextstep' ? '196px' : { xs: 2, md: 4 },
+        }}
+      >
         <Stack spacing={0.5} sx={{ mb: 3 }}>
           <Typography variant="h2">Component Gallery</Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>

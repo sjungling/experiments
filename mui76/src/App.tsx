@@ -1,0 +1,437 @@
+import { useState } from 'react';
+import type { ReactNode, SyntheticEvent } from 'react';
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Alert,
+  AlertTitle,
+  AppBar,
+  Badge,
+  Box,
+  Button,
+  ButtonGroup,
+  Checkbox,
+  Chip,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Divider,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
+  FormLabel,
+  IconButton,
+  InputLabel,
+  LinearProgress,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Radio,
+  RadioGroup,
+  Select,
+  Slider,
+  Stack,
+  Switch,
+  Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Tabs,
+  TextField,
+  Toolbar,
+  Tooltip,
+  Typography,
+} from '@mui/material';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import SearchIcon from '@mui/icons-material/Search';
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Window from './components/Window';
+
+// ── The classic Mac menu bar ─────────────────────────────────────────────────
+function MenuBar() {
+  const menus = ['File', 'Edit', 'View', 'Label', 'Special'];
+  return (
+    <AppBar>
+      <Toolbar variant="dense" sx={{ gap: 2, px: 2 }}>
+        <Box sx={{ fontSize: 16, lineHeight: 1, pr: 1 }}></Box>
+        {menus.map((m) => (
+          <Typography key={m} variant="button" sx={{ cursor: 'default', userSelect: 'none' }}>
+            {m}
+          </Typography>
+        ))}
+        <Box sx={{ flexGrow: 1 }} />
+        <Typography variant="button" sx={{ userSelect: 'none' }}>
+          3:14 PM
+        </Typography>
+      </Toolbar>
+    </AppBar>
+  );
+}
+
+// ── A labelled row that groups related demo controls ─────────────────────────
+function Row({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <Stack spacing={1}>
+      <Typography variant="overline" sx={{ color: 'text.secondary' }}>
+        {label}
+      </Typography>
+      <Stack direction="row" spacing={1.5} flexWrap="wrap" useFlexGap alignItems="center">
+        {children}
+      </Stack>
+    </Stack>
+  );
+}
+
+function TabPanel({ value, index, children }: { value: number; index: number; children: ReactNode }) {
+  if (value !== index) return null;
+  return <Box sx={{ p: 2 }}>{children}</Box>;
+}
+
+export default function App() {
+  const [tab, setTab] = useState(0);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
+  const [checks, setChecks] = useState({ chooser: true, balloon: false, sound: true });
+  const [fill, setFill] = useState('pattern');
+  const [sharing, setSharing] = useState(true);
+  const [volume, setVolume] = useState(7);
+  const [font, setFont] = useState('chicago');
+  const [text, setText] = useState('Welcome to Macintosh');
+  const [selectedFile, setSelectedFile] = useState(1);
+
+  const files = [
+    { name: 'Read Me', kind: 'TeachText document', icon: <DescriptionOutlinedIcon fontSize="small" /> },
+    { name: 'System Folder', kind: 'Folder', icon: <FolderOutlinedIcon fontSize="small" /> },
+    { name: 'Scrapbook File', kind: 'System document', icon: <DescriptionOutlinedIcon fontSize="small" /> },
+    { name: 'HyperCard', kind: 'Application program', icon: <FolderOutlinedIcon fontSize="small" /> },
+  ];
+
+  return (
+    <Box sx={{ minHeight: '100vh', pb: 6 }}>
+      <MenuBar />
+
+      <Box sx={{ px: { xs: 2, md: 4 }, pt: 3 }}>
+        <Stack spacing={0.5} sx={{ mb: 3 }}>
+          <Typography variant="h2">Component Gallery</Typography>
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            A Material UI theme dressed up as Macintosh System 7.6 &amp; HyperCard.
+          </Typography>
+        </Stack>
+
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' },
+            gap: 3,
+            alignItems: 'start',
+          }}
+        >
+          {/* ── Buttons ─────────────────────────────────────────────────── */}
+          <Window title="Buttons">
+            <Stack spacing={2.5}>
+              <Row label="Push Buttons">
+                <Button>Cancel</Button>
+                <Button variant="contained">OK</Button>
+                <Button variant="text">More Info…</Button>
+                <Button disabled>Disabled</Button>
+              </Row>
+              <Row label="Button Group">
+                <ButtonGroup>
+                  <Button>Cut</Button>
+                  <Button>Copy</Button>
+                  <Button>Paste</Button>
+                </ButtonGroup>
+              </Row>
+              <Row label="Icon Buttons">
+                <Tooltip title="Save">
+                  <IconButton>
+                    <SaveOutlinedIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Print">
+                  <IconButton>
+                    <PrintOutlinedIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Find">
+                  <IconButton>
+                    <SearchIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Throw away">
+                  <IconButton>
+                    <DeleteOutlineIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+                <Badge badgeContent={3}>
+                  <IconButton>
+                    <FavoriteBorderIcon fontSize="small" />
+                  </IconButton>
+                </Badge>
+              </Row>
+            </Stack>
+          </Window>
+
+          {/* ── Form controls ───────────────────────────────────────────── */}
+          <Window title="Controls">
+            <Stack spacing={2.5}>
+              <TextField
+                label="Document name"
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                helperText="Type a name for this card."
+                fullWidth
+              />
+              <FormControl fullWidth>
+                <InputLabel id="font-label">Font</InputLabel>
+                <Select
+                  labelId="font-label"
+                  label="Font"
+                  value={font}
+                  onChange={(e) => setFont(e.target.value)}
+                >
+                  <MenuItem value="chicago">Chicago</MenuItem>
+                  <MenuItem value="geneva">Geneva</MenuItem>
+                  <MenuItem value="monaco">Monaco</MenuItem>
+                  <MenuItem value="newyork">New York</MenuItem>
+                </Select>
+              </FormControl>
+
+              <FormGroup>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={checks.chooser}
+                      onChange={(e) => setChecks({ ...checks, chooser: e.target.checked })}
+                    />
+                  }
+                  label="Show the Chooser"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={checks.balloon}
+                      onChange={(e) => setChecks({ ...checks, balloon: e.target.checked })}
+                    />
+                  }
+                  label="Balloon Help"
+                />
+              </FormGroup>
+
+              <FormControl>
+                <FormLabel>Fill pattern</FormLabel>
+                <RadioGroup row value={fill} onChange={(e) => setFill(e.target.value)}>
+                  <FormControlLabel value="pattern" control={<Radio />} label="Pattern" />
+                  <FormControlLabel value="white" control={<Radio />} label="White" />
+                  <FormControlLabel value="black" control={<Radio />} label="Black" />
+                </RadioGroup>
+              </FormControl>
+
+              <FormControlLabel
+                control={<Switch checked={sharing} onChange={(e) => setSharing(e.target.checked)} />}
+                label="File Sharing on"
+              />
+
+              <Stack spacing={0.5}>
+                <Typography variant="overline" sx={{ color: 'text.secondary' }}>
+                  <VolumeUpIcon fontSize="inherit" sx={{ verticalAlign: 'middle', mr: 0.5 }} />
+                  Speaker volume
+                </Typography>
+                <Slider
+                  value={volume}
+                  onChange={(_, v) => setVolume(v as number)}
+                  min={0}
+                  max={10}
+                  step={1}
+                  marks
+                  valueLabelDisplay="auto"
+                />
+              </Stack>
+            </Stack>
+          </Window>
+
+          {/* ── Feedback ────────────────────────────────────────────────── */}
+          <Window title="Alerts &amp; Progress">
+            <Stack spacing={2}>
+              <Alert severity="info">
+                <AlertTitle>Note</AlertTitle>
+                The disk &ldquo;Macintosh HD&rdquo; is now available.
+              </Alert>
+              <Alert severity="success">File copied successfully.</Alert>
+              <Alert severity="warning">This disk is almost full.</Alert>
+              <Alert severity="error">
+                <AlertTitle>Bomb</AlertTitle>
+                A system error has occurred. ID = 02
+              </Alert>
+
+              <Stack spacing={0.5}>
+                <Typography variant="overline" sx={{ color: 'text.secondary' }}>
+                  Copying… 64%
+                </Typography>
+                <LinearProgress variant="determinate" value={64} />
+              </Stack>
+              <Stack spacing={0.5}>
+                <Typography variant="overline" sx={{ color: 'text.secondary' }}>
+                  Rebuilding desktop…
+                </Typography>
+                <LinearProgress />
+              </Stack>
+
+              <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" useFlexGap>
+                <CircularProgress size={28} />
+                <Chip label="System 7.6" />
+                <Chip label="Read Only" variant="outlined" />
+                <Chip label="Locked" onDelete={() => undefined} />
+              </Stack>
+            </Stack>
+          </Window>
+
+          {/* ── Surfaces & navigation (spans wide) ──────────────────────── */}
+          <Box sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}>
+            <Window title="Surfaces" disablePadding>
+              <Box>
+                <Tabs value={tab} onChange={(_: SyntheticEvent, v: number) => setTab(v)} sx={{ px: 1, pt: 1 }}>
+                  <Tab label="Home" />
+                  <Tab label="Cards" />
+                  <Tab label="About" />
+                </Tabs>
+
+                <TabPanel value={tab} index={0}>
+                  <Typography variant="h4" gutterBottom>
+                    Stack
+                  </Typography>
+                  <Typography variant="body1">
+                    HyperCard is a software erector set that lets you build your own stacks of cards.
+                    Each card can hold text, pictures, buttons, and fields.
+                  </Typography>
+                </TabPanel>
+                <TabPanel value={tab} index={1}>
+                  <Stack spacing={1}>
+                    {['Address Card', 'Phone List', 'To Do', 'Calendar'].map((c, i) => (
+                      <Accordion key={c} defaultExpanded={i === 0}>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>{c}</AccordionSummary>
+                        <AccordionDetails>
+                          <Typography variant="body2">
+                            The {c.toLowerCase()} stack stores its records on individual cards you can
+                            flip through with the arrow keys.
+                          </Typography>
+                        </AccordionDetails>
+                      </Accordion>
+                    ))}
+                  </Stack>
+                </TabPanel>
+                <TabPanel value={tab} index={2}>
+                  <Typography variant="body1">
+                    This Macintosh is running System 7.6. HyperCard 2.4 is installed. Click the buttons
+                    below to summon a dialog box or a pull-down menu.
+                  </Typography>
+                  <Stack direction="row" spacing={1.5} sx={{ mt: 2 }}>
+                    <Button variant="contained" onClick={() => setDialogOpen(true)}>
+                      Show Dialog…
+                    </Button>
+                    <Button onClick={(e) => setMenuAnchor(e.currentTarget)}>Open Menu ▾</Button>
+                  </Stack>
+                </TabPanel>
+              </Box>
+            </Window>
+          </Box>
+
+          {/* ── Data: table ─────────────────────────────────────────────── */}
+          <Box sx={{ gridColumn: { xs: '1', md: 'span 1', lg: 'span 2' } }}>
+            <Window title="Get Info" disablePadding>
+              <TableContainer>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Name</TableCell>
+                      <TableCell>Kind</TableCell>
+                      <TableCell align="right">Size</TableCell>
+                      <TableCell align="right">Modified</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {[
+                      ['System', 'Suitcase', '2.4 MB', '7/26/97'],
+                      ['Finder', 'Application', '1.1 MB', '7/26/97'],
+                      ['Note Pad File', 'Document', '4 K', '8/02/97'],
+                      ['Clipboard', 'System document', '8 K', '8/02/97'],
+                    ].map((r) => (
+                      <TableRow key={r[0]} hover>
+                        <TableCell>{r[0]}</TableCell>
+                        <TableCell>{r[1]}</TableCell>
+                        <TableCell align="right">{r[2]}</TableCell>
+                        <TableCell align="right">{r[3]}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Window>
+          </Box>
+
+          {/* ── Data: list ──────────────────────────────────────────────── */}
+          <Window title="Macintosh HD" disablePadding>
+            <List>
+              {files.map((f, i) => (
+                <ListItemButton
+                  key={f.name}
+                  selected={selectedFile === i}
+                  onClick={() => setSelectedFile(i)}
+                  divider
+                >
+                  <ListItemIcon>{f.icon}</ListItemIcon>
+                  <ListItemText primary={f.name} secondary={f.kind} />
+                </ListItemButton>
+              ))}
+            </List>
+          </Window>
+        </Box>
+      </Box>
+
+      {/* ── Overlays ──────────────────────────────────────────────────── */}
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="xs" fullWidth>
+        <DialogTitle>Save changes?</DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+          <DialogContentText>
+            Do you want to save the changes you made to the document &ldquo;{text}&rdquo; before
+            closing?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ px: 2, pb: 2 }}>
+          <Button variant="text" onClick={() => setDialogOpen(false)}>
+            Don&rsquo;t Save
+          </Button>
+          <Box sx={{ flexGrow: 1 }} />
+          <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
+          <Button variant="contained" onClick={() => setDialogOpen(false)}>
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={() => setMenuAnchor(null)}>
+        <MenuItem onClick={() => setMenuAnchor(null)}>New Card&ensp;&#8984;N</MenuItem>
+        <MenuItem onClick={() => setMenuAnchor(null)}>Open Stack…&ensp;&#8984;O</MenuItem>
+        <MenuItem onClick={() => setMenuAnchor(null)}>Close&ensp;&#8984;W</MenuItem>
+        <Divider />
+        <MenuItem onClick={() => setMenuAnchor(null)}>Quit&ensp;&#8984;Q</MenuItem>
+      </Menu>
+    </Box>
+  );
+}

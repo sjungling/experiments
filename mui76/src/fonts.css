@@ -1,0 +1,47 @@
+/*
+ * Authentic Macintosh webfonts (self-hosted from public/fonts/).
+ * Sourced from the MIT-licensed @sakun/system.css project.
+ *
+ *   Chicago — the smooth vector recreation of the classic System UI font
+ *             (menus, buttons, titles, dialogs).
+ *   Geneva  — the bitmap content font used in Finder windows & fields.
+ *   Monaco  — the monospaced font, handy for code-like content.
+ */
+@font-face {
+  font-family: 'Chicago';
+  src: url('/fonts/ChicagoFLF.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Geneva';
+  src: url('/fonts/FindersKeepers.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Monaco';
+  src: url('/fonts/monaco.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+/* The pixel-perfect Chicago bitmap, if you want the crunchier look. */
+@font-face {
+  font-family: 'ChicagoPixel';
+  src: url('/fonts/ChiKareGo2.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Virgil — Excalidraw's hand-drawn marker font (self-hosted, MIT/OFL). */
+@font-face {
+  font-family: 'Virgil';
+  src: url('/fonts/Virgil.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}

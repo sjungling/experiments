@@ -63,6 +63,7 @@ import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Window from './components/Window';
 import ThemeSwitcher from './components/ThemeSwitcher';
+import RoughFilterDefs from './components/RoughFilterDefs';
 import { useThemeController } from './theme/ThemeController';
 
 // ── The classic Mac menu bar ─────────────────────────────────────────────────
@@ -197,6 +198,29 @@ function NextMenuBar() {
   );
 }
 
+// ── The Excalidraw "menu" bar ────────────────────────────────────────────────
+function ExcalidrawMenuBar() {
+  const links = ['File', 'Edit', 'View', 'Help'];
+  return (
+    <AppBar>
+      <Toolbar sx={{ gap: 3, px: 3 }}>
+        <Typography variant="h6" sx={{ color: 'primary.dark' }}>
+          ✏️ Component Gallery
+        </Typography>
+        <Stack direction="row" gap={2.5} sx={{ display: { xs: 'none', sm: 'flex' } }}>
+          {links.map((n) => (
+            <Typography key={n} variant="body2" sx={{ color: 'text.secondary', cursor: 'default' }}>
+              {n}
+            </Typography>
+          ))}
+        </Stack>
+        <Box sx={{ flexGrow: 1 }} />
+        <ThemeSwitcher />
+      </Toolbar>
+    </AppBar>
+  );
+}
+
 // ── Top bar that morphs with the active theme ────────────────────────────────
 function TopBar() {
   const { themeKey } = useThemeController();
@@ -204,6 +228,7 @@ function TopBar() {
   if (themeKey === 'beos') return <BeMenuBar />;
   if (themeKey === 'aqua') return <AquaMenuBar />;
   if (themeKey === 'nextstep') return <NextMenuBar />;
+  if (themeKey === 'excalidraw') return <ExcalidrawMenuBar />;
   return <MacMenuBar />;
 }
 
@@ -237,7 +262,9 @@ export default function App() {
           ? 'A Material UI theme dripping with Mac OS X Aqua gloss.'
           : themeKey === 'nextstep'
             ? 'A Material UI theme chiseled out of NeXTSTEP gray.'
-            : 'A Material UI theme dressed up as Macintosh System 7.6 & HyperCard.';
+            : themeKey === 'excalidraw'
+              ? 'A Material UI theme that looks hand-drawn in Excalidraw.'
+              : 'A Material UI theme dressed up as Macintosh System 7.6 & HyperCard.';
 
   const [tab, setTab] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -259,6 +286,7 @@ export default function App() {
 
   return (
     <Box sx={{ minHeight: '100vh', pb: 6 }}>
+      <RoughFilterDefs />
       <TopBar />
 
       <Box sx={{ px: { xs: 2, md: 4 }, pt: 3 }}>

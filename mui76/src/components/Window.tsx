@@ -275,6 +275,49 @@ function NextWindow({ title, children, disablePadding }: WindowProps) {
   );
 }
 
+// ── Excalidraw chrome ────────────────────────────────────────────────────────
+/** An Excalidraw "frame": a hand-drawn label over a rough-bordered card. */
+function ExcalidrawWindow({ title, children, disablePadding }: WindowProps) {
+  return (
+    <Box>
+      <Box
+        sx={{
+          fontFamily: "'Virgil', cursive",
+          fontSize: 15,
+          color: '#6965DB',
+          mb: 0.5,
+          ml: 0.5,
+        }}
+      >
+        {title}
+      </Box>
+      <Box sx={{ position: 'relative' }}>
+        {/* A border-only overlay carries the rough filter so content stays crisp. */}
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            border: '1.5px solid #1E1E1E',
+            borderRadius: '10px',
+            filter: 'url(#excalidraw-rough)',
+            pointerEvents: 'none',
+          }}
+        />
+        <Box
+          sx={{
+            bgcolor: 'background.paper',
+            borderRadius: '10px',
+            boxShadow: '0 2px 0 rgba(0,0,0,0.10)',
+            p: disablePadding ? 0 : 2,
+          }}
+        >
+          {children}
+        </Box>
+      </Box>
+    </Box>
+  );
+}
+
 export interface WindowProps {
   title: string;
   children: ReactNode;
@@ -311,6 +354,14 @@ export function Window({ title, children, disablePadding }: WindowProps) {
       <NextWindow title={title} disablePadding={disablePadding}>
         {children}
       </NextWindow>
+    );
+  }
+
+  if (themeKey === 'excalidraw') {
+    return (
+      <ExcalidrawWindow title={title} disablePadding={disablePadding}>
+        {children}
+      </ExcalidrawWindow>
     );
   }
 
